@@ -1,0 +1,1422 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>物流管理系统</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --primary: #1890ff;
+      --success: #52c41a;
+      --warning: #faad14;
+      --error: #f5222d;
+      --border: #d9d9d9;
+      --bg: #f5f5f5;
+      --card: #fff;
+      --text: #333;
+      --text2: #666;
+    }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+    .app { display: flex; min-height: 100vh; }
+    .sidebar { width: 220px; background: #001529; color: #fff; position: fixed; height: 100vh; overflow-y: auto; }
+    .sidebar-header { padding: 20px; font-size: 18px; font-weight: bold; border-bottom: 1px solid rgba(255,255,255,0.1); text-align: center; }
+    .menu-group { padding: 10px 0; }
+    .menu-title { padding: 10px 20px; color: rgba(255,255,255,0.45); font-size: 12px; }
+    .menu-item { padding: 12px 20px; cursor: pointer; transition: all 0.3s; }
+    .menu-item:hover { background: rgba(255,255,255,0.1); }
+    .menu-item.active { background: var(--primary); }
+    .download-section { padding: 15px 20px; border-top: 1px solid rgba(255,255,255,0.1); margin-top: auto; position: absolute; bottom: 0; width: 100%; }
+    .download-btn { width: 100%; padding: 10px; background: var(--success); color: #fff; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; }
+    .download-btn:hover { background: #73d13d; }
+    .main { flex: 1; margin-left: 220px; padding: 20px; }
+    .page { display: none; }
+    .page.active { display: block; }
+    .page-header { background: var(--card); padding: 20px; margin-bottom: 20px; border-radius: 4px; box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
+    .page-title { font-size: 20px; font-weight: 600; }
+    .card { background: var(--card); border-radius: 4px; box-shadow: 0 1px 2px rgba(0,0,0,0.1); margin-bottom: 20px; }
+    .card-header { padding: 15px 20px; border-bottom: 1px solid var(--border); font-weight: 600; display: flex; justify-content: space-between; align-items: center; }
+    .card-body { padding: 20px; }
+    table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    th, td { padding: 12px; text-align: left; border: 1px solid var(--border); }
+    th { background: #fafafa; font-weight: 600; white-space: nowrap; }
+    tr:hover { background: #fafafa; }
+    .form-row { display: flex; gap: 15px; flex-wrap: wrap; margin-bottom: 15px; }
+    .form-col { flex: 1; min-width: 180px; }
+    .form-group { margin-bottom: 15px; }
+    .form-label { display: block; margin-bottom: 5px; font-weight: 500; color: var(--text2); font-size: 14px; }
+    .form-control { width: 100%; padding: 8px 12px; border: 1px solid var(--border); border-radius: 4px; font-size: 14px; }
+    .form-control:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 2px rgba(24,144,255,0.2); }
+    .form-control[readonly] { background: #f5f5f5; color: var(--text2); }
+    .form-control.weekday { background: #e6f7ff; color: var(--primary); font-weight: 600; text-align: center; width: 70px; }
+    .btn { padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; display: inline-flex; align-items: center; gap: 5px; }
+    .btn-primary { background: var(--primary); color: #fff; }
+    .btn-primary:hover { background: #40a9ff; }
+    .btn-success { background: var(--success); color: #fff; }
+    .btn-success:hover { background: #73d13d; }
+    .btn-danger { background: var(--error); color: #fff; }
+    .btn-danger:hover { background: #ff4d4f; }
+    .btn-warning { background: var(--warning); color: #fff; }
+    .btn-sm { padding: 4px 8px; font-size: 12px; }
+    .btn-group { display: flex; gap: 10px; margin-top: 15px; }
+    .tag { padding: 2px 8px; border-radius: 4px; font-size: 12px; }
+    .tag-success { background: #f6ffed; color: var(--success); border: 1px solid #b7eb8f; }
+    .tag-warning { background: #fffbe6; color: var(--warning); border: 1px solid #ffe58f; }
+    .stat-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; margin-bottom: 20px; }
+    .stat-card { background: var(--card); padding: 20px; border-radius: 4px; box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
+    .stat-value { font-size: 24px; font-weight: bold; color: var(--primary); }
+    .stat-label { color: var(--text2); font-size: 14px; margin-top: 5px; }
+    .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center; }
+    .modal.show { display: flex; }
+    .modal-content { background: #fff; border-radius: 4px; max-width: 800px; width: 90%; max-height: 90vh; overflow-y: auto; }
+    .modal-header { padding: 15px 20px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+    .modal-title { font-size: 16px; font-weight: 600; }
+    .modal-close { background: none; border: none; font-size: 20px; cursor: pointer; color: var(--text2); }
+    .modal-body { padding: 20px; }
+    .modal-footer { padding: 15px 20px; border-top: 1px solid var(--border); display: flex; justify-content: flex-end; gap: 10px; }
+    .result-item { display: flex; justify-content: space-between; padding: 15px; background: #fafafa; border-radius: 4px; margin-bottom: 10px; }
+    .result-label { color: var(--text2); }
+    .result-value { font-weight: 600; font-size: 18px; }
+    .result-value.negative { color: var(--error); }
+    .result-value.positive { color: var(--success); }
+    .scroll-table { overflow-x: auto; }
+    @media (max-width: 768px) {
+      .sidebar { width: 180px; }
+      .main { margin-left: 180px; }
+    }
+    @media (max-width: 576px) {
+      .sidebar { position: relative; width: 100%; height: auto; }
+      .main { margin-left: 0; }
+      .app { flex-direction: column; }
+      .download-section { position: relative; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar">
+      <div class="sidebar-header">物流管理系统</div>
+      <div class="menu-group">
+        <div class="menu-title">配置管理</div>
+        <div class="menu-item active" data-page="config-area">区域参数配置</div>
+        <div class="menu-item" data-page="config-flight">航班配置</div>
+        <div class="menu-item" data-page="config-port">目的港配置</div>
+        <div class="menu-item" data-page="config-route">航空路由配置</div>
+      </div>
+      <div class="menu-group">
+        <div class="menu-title">业务操作</div>
+        <div class="menu-item" data-page="volume-estimate">方数预估</div>
+        <div class="menu-item" data-page="main-order">主单发放</div>
+        <div class="menu-item" data-page="order-query">主单查询</div>
+        <div class="menu-item" data-page="balance-query">欠方余方查询</div>
+      </div>
+      <div class="download-section">
+        <button class="download-btn" onclick="downloadHTML()">📥 下载HTML文件</button>
+      </div>
+    </aside>
+
+    <main class="main">
+      <!-- 区域参数配置 -->
+      <div id="config-area" class="page active">
+        <div class="page-header"><h1 class="page-title">区域参数配置</h1></div>
+        <div class="card">
+          <div class="card-header">
+            <span>配置列表</span>
+            <button class="btn btn-primary" onclick="openAreaModal()">+ 新增配置</button>
+          </div>
+          <div class="card-body">
+            <div class="scroll-table">
+              <table>
+                <thead><tr><th>仓库</th><th>大包预估体积</th><th>关东占比(%)</th><th>关西占比(%)</th><th>关东普货(%)</th><th>关东特货(%)</th><th>关西普货(%)</th><th>关西特货(%)</th><th>操作</th></tr></thead>
+                <tbody id="area-tbody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 航班配置 -->
+      <div id="config-flight" class="page">
+        <div class="page-header"><h1 class="page-title">航班配置</h1></div>
+        <div class="card">
+          <div class="card-header">
+            <span>配置列表</span>
+            <button class="btn btn-primary" onclick="openFlightModal()">+ 新增配置</button>
+          </div>
+          <div class="card-body">
+            <div class="scroll-table">
+              <table>
+                <thead><tr><th>仓库</th><th>周几</th><th>关东普货</th><th>关西普货</th><th>关东特货</th><th>关西特货</th><th>备注</th><th>操作</th></tr></thead>
+                <tbody id="flight-tbody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 目的港配置 -->
+      <div id="config-port" class="page">
+        <div class="page-header"><h1 class="page-title">目的港配置</h1></div>
+        <div class="card">
+          <div class="card-header">
+            <span>配置列表</span>
+            <button class="btn btn-primary" onclick="openPortModal()">+ 新增配置</button>
+          </div>
+          <div class="card-body">
+            <table>
+              <thead><tr><th>目的港代码</th><th>所属区域</th><th>操作</th></tr></thead>
+              <tbody id="port-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- 航空路由配置 -->
+      <div id="config-route" class="page">
+        <div class="page-header"><h1 class="page-title">航空路由配置</h1></div>
+        <div class="card">
+          <div class="card-header">
+            <span>配置列表</span>
+            <button class="btn btn-primary" onclick="openRouteModal()">+ 新增配置</button>
+          </div>
+          <div class="card-body">
+            <div class="scroll-table">
+              <table>
+                <thead><tr><th>航班号</th><th>始发</th><th>中转</th><th>目的</th><th>起飞</th><th>落地</th><th>隔天</th><th>路由</th><th>操作</th></tr></thead>
+                <tbody id="route-tbody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 方数预估 -->
+      <div id="volume-estimate" class="page">
+        <div class="page-header"><h1 class="page-title">方数预估</h1></div>
+        <div class="card">
+          <div class="card-body">
+            <div class="form-row">
+              <div class="form-col">
+                <div class="form-group">
+                  <label class="form-label">揽收日期</label>
+                  <input type="date" class="form-control" id="vol-date" onchange="updateVolWeekday()">
+                </div>
+              </div>
+              <div class="form-col" style="max-width:100px">
+                <div class="form-group">
+                  <label class="form-label">星期</label>
+                  <input type="text" class="form-control weekday" id="vol-weekday" readonly>
+                </div>
+              </div>
+              <div class="form-col">
+                <div class="form-group">
+                  <label class="form-label">仓库</label>
+                  <select class="form-control" id="vol-warehouse" onchange="calcVolume()">
+                    <option value="">请选择</option>
+                    <option value="东莞">东莞</option>
+                    <option value="加工区">加工区</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-col">
+                <div class="form-group">
+                  <label class="form-label">揽收大包数</label>
+                  <input type="number" class="form-control" id="vol-count" oninput="calcVolume()" placeholder="请输入">
+                </div>
+              </div>
+            </div>
+
+            <h3 style="margin: 20px 0 15px; color: var(--primary);">计算结果</h3>
+
+            <div class="stat-cards">
+              <div class="stat-card"><div class="stat-value" id="res-total">0</div><div class="stat-label">总方数</div></div>
+              <div class="stat-card"><div class="stat-value" id="res-kanto">0</div><div class="stat-label">关东总方数</div></div>
+              <div class="stat-card"><div class="stat-value" id="res-kansai">0</div><div class="stat-label">关西总方数</div></div>
+            </div>
+            <div class="stat-cards">
+              <div class="stat-card"><div class="stat-value" id="res-kn">0</div><div class="stat-label">关东普货</div></div>
+              <div class="stat-card"><div class="stat-value" id="res-ks">0</div><div class="stat-label">关东特货</div></div>
+              <div class="stat-card"><div class="stat-value" id="res-wn">0</div><div class="stat-label">关西普货</div></div>
+              <div class="stat-card"><div class="stat-value" id="res-ws">0</div><div class="stat-label">关西特货</div></div>
+            </div>
+            <div class="stat-cards">
+              <div class="stat-card"><div class="stat-value" id="res-air">0</div><div class="stat-label">空运方数</div></div>
+              <div class="stat-card"><div class="stat-value" id="res-sea">0</div><div class="stat-label">海空方数</div></div>
+            </div>
+
+            <div class="btn-group">
+              <button class="btn btn-success" onclick="saveVolume()">保存数据</button>
+              <button class="btn btn-primary" onclick="showVolHistory()">查看历史</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 主单发放 -->
+      <div id="main-order" class="page">
+        <div class="page-header"><h1 class="page-title">主单发放</h1></div>
+        <div class="card">
+          <div class="card-body">
+            <input type="hidden" id="order-edit-id">
+            <div class="form-row">
+              <div class="form-col">
+                <div class="form-group">
+                  <label class="form-label">揽收日期</label>
+                  <div style="display:flex;gap:8px">
+                    <input type="date" class="form-control" id="o-cdate" onchange="updateOrderWeekday()" style="flex:1">
+                    <input type="text" class="form-control weekday" id="o-cw" readonly>
+                  </div>
+                </div>
+              </div>
+              <div class="form-col">
+                <div class="form-group">
+                  <label class="form-label">发车日期</label>
+                  <div style="display:flex;gap:8px">
+                    <input type="date" class="form-control" id="o-ddate" onchange="updateOrderWeekday()" style="flex:1">
+                    <input type="text" class="form-control weekday" id="o-dw" readonly>
+                  </div>
+                </div>
+              </div>
+              <div class="form-col">
+                <div class="form-group">
+                  <label class="form-label">仓库</label>
+                  <select class="form-control" id="o-wh" onchange="updateCategory()">
+                    <option value="">请选择</option>
+                    <option value="东莞">东莞</option>
+                    <option value="加工区">加工区</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-col">
+                <div class="form-group">
+                  <label class="form-label">货物属性</label>
+                  <select class="form-control" id="o-cargo" onchange="updateCategory()">
+                    <option value="">请选择</option>
+                    <option value="特货">特货</option>
+                    <option value="普货">普货</option>
+                    <option value="混打">混打</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-col">
+                <div class="form-group">
+                  <label class="form-label">口岸</label>
+                  <select class="form-control" id="o-port" onchange="updateCategory()">
+                    <option value="">请选择</option>
+                    <option value="关东">关东</option>
+                    <option value="关西">关西</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-col">
+                <div class="form-group">
+                  <label class="form-label">类别(路由)</label>
+                  <input type="text" class="form-control" id="o-cat" readonly placeholder="自动计算">
+                </div>
+              </div>
+              <div class="form-col">
+                <div class="form-group">
+                  <label class="form-label">主单状态</label>
+                  <select class="form-control" id="o-status">
+                    <option value="">请选择</option>
+                    <option value="正常">正常</option>
+                    <option value="取消">取消</option>
+                    <option value="待取消">待取消</option>
+                    <option value="待定">待定</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-col">
+                <div class="form-group">
+                  <label class="form-label">打货要求</label>
+                  <select class="form-control" id="o-pack" onchange="calcMaxPieces()">
+                    <option value="">请选择</option>
+                    <option value="纸箱">纸箱</option>
+                    <option value="麻袋">麻袋</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-col">
+                <div class="form-group">
+                  <label class="form-label">打货上限(航线提供)</label>
+                  <input type="number" step="0.01" class="form-control" id="o-maxvol" oninput="calcMaxPieces()">
+                </div>
+              </div>
+              <div class="form-col">
+                <div class="form-group">
+                  <label class="form-label">打货上限件数</label>
+                  <input type="number" class="form-control" id="o-maxpieces" readonly placeholder="自动计算">
+                </div>
+              </div>
+              <div class="form-col">
+                <div class="form-group">
+                  <label class="form-label">预估方数</label>
+                  <input type="text" class="form-control" id="o-estvol" readonly placeholder="自动计算">
+                </div>
+              </div>
+              <div class="form-col">
+                <div class="form-group">
+                  <label class="form-label">预估件数</label>
+                  <input type="number" class="form-control" id="o-estpieces" readonly placeholder="自动计算">
+                </div>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-col">
+                <div class="form-group">
+                  <label class="form-label">实际航班日期</label>
+                  <input type="date" class="form-control" id="o-fdate" onchange="fillFlightInfo()">
+                </div>
+              </div>
+              <div class="form-col">
+                <div class="form-group">
+                  <label class="form-label">主单号</label>
+                  <input type="text" class="form-control" id="o-mainno">
+                </div>
+              </div>
+              <div class="form-col">
+                <div class="form-group">
+                  <label class="form-label">航班号</label>
+                  <select class="form-control" id="o-flight" onchange="fillFlightInfo()">
+                    <option value="">请选择</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-col">
+                <div class="form-group">
+                  <label class="form-label">始发港</label>
+                  <input type="text" class="form-control" id="o-origin">
+                </div>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-col">
+                <div class="form-group">
+                  <label class="form-label">中转站</label>
+                  <input type="text" class="form-control" id="o-trans">
+                </div>
+              </div>
+              <div class="form-col">
+                <div class="form-group">
+                  <label class="form-label">目的港</label>
+                  <input type="text" class="form-control" id="o-dest">
+                </div>
+              </div>
+              <div class="form-col">
+                <div class="form-group">
+                  <label class="form-label">起飞时间</label>
+                  <input type="text" class="form-control" id="o-deptime" readonly placeholder="自动填充">
+                </div>
+              </div>
+              <div class="form-col">
+                <div class="form-group">
+                  <label class="form-label">到港时间</label>
+                  <input type="text" class="form-control" id="o-arrtime" readonly placeholder="自动填充">
+                </div>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-col">
+                <div class="form-group">
+                  <label class="form-label">实际件数</label>
+                  <input type="number" class="form-control" id="o-apieces">
+                </div>
+              </div>
+              <div class="form-col">
+                <div class="form-group">
+                  <label class="form-label">实际重量</label>
+                  <input type="number" step="0.01" class="form-control" id="o-aweight">
+                </div>
+              </div>
+              <div class="form-col">
+                <div class="form-group">
+                  <label class="form-label">实际体积</label>
+                  <input type="number" step="0.01" class="form-control" id="o-avol">
+                </div>
+              </div>
+              <div class="form-col">
+                <div class="form-group">
+                  <label class="form-label">实际票数</label>
+                  <input type="number" class="form-control" id="o-abills">
+                </div>
+              </div>
+            </div>
+
+            <div class="btn-group">
+              <button class="btn btn-success" onclick="saveOrder()">保存主单</button>
+              <button class="btn btn-primary" onclick="showOrderList()">查看主单列表</button>
+              <button class="btn btn-warning" onclick="clearOrderForm()">清空表单</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 主单查询 -->
+      <div id="order-query" class="page">
+        <div class="page-header"><h1 class="page-title">主单查询</h1></div>
+        <div class="card">
+          <div class="card-body">
+            <div class="form-row">
+              <div class="form-col">
+                <div class="form-group">
+                  <label class="form-label">揽收日期</label>
+                  <input type="date" class="form-control" id="q-date">
+                </div>
+              </div>
+              <div class="form-col">
+                <div class="form-group">
+                  <label class="form-label">仓库</label>
+                  <select class="form-control" id="q-wh">
+                    <option value="">全部</option>
+                    <option value="东莞">东莞</option>
+                    <option value="加工区">加工区</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-col">
+                <button class="btn btn-primary" style="margin-top:25px" onclick="queryOrders()">查询</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header">查询结果</div>
+          <div class="card-body">
+            <div class="scroll-table">
+              <table>
+                <thead><tr><th>揽收日期</th><th>仓库</th><th>口岸</th><th>货物属性</th><th>类别</th><th>主单号</th><th>航班号</th><th>目的港</th><th>操作</th></tr></thead>
+                <tbody id="q-tbody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 欠方余方查询 -->
+      <div id="balance-query" class="page">
+        <div class="page-header"><h1 class="page-title">欠方余方查询</h1></div>
+        <div class="card">
+          <div class="card-body">
+            <div class="form-row">
+              <div class="form-col">
+                <div class="form-group">
+                  <label class="form-label">揽收日期</label>
+                  <input type="date" class="form-control" id="b-date">
+                </div>
+              </div>
+              <div class="form-col">
+                <div class="form-group">
+                  <label class="form-label">仓库</label>
+                  <select class="form-control" id="b-wh">
+                    <option value="">请选择</option>
+                    <option value="东莞">东莞</option>
+                    <option value="加工区">加工区</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-col">
+                <div class="form-group">
+                  <label class="form-label">口岸</label>
+                  <select class="form-control" id="b-port">
+                    <option value="">请选择</option>
+                    <option value="关东">关东</option>
+                    <option value="关西">关西</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-col">
+                <div class="form-group">
+                  <label class="form-label">货物属性</label>
+                  <select class="form-control" id="b-cargo">
+                    <option value="">请选择</option>
+                    <option value="普货">普货</option>
+                    <option value="特货">特货</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-col">
+                <button class="btn btn-primary" style="margin-top:25px" onclick="queryBalance()">查询</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header">查询结果</div>
+          <div class="card-body">
+            <div class="result-item"><div class="result-label">预估方数</div><div class="result-value" id="b-est">--</div></div>
+            <div class="result-item"><div class="result-label">打货上限汇总</div><div class="result-value" id="b-max">--</div></div>
+            <div class="result-item"><div class="result-label">欠方</div><div class="result-value negative" id="b-def">--</div></div>
+            <div class="result-item"><div class="result-label">余方</div><div class="result-value positive" id="b-sur">--</div></div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- 区域参数模态框 -->
+  <div class="modal" id="modal-area">
+    <div class="modal-content">
+      <div class="modal-header">
+        <span class="modal-title" id="modal-area-title">新增区域参数</span>
+        <button class="modal-close" onclick="closeModal('modal-area')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="area-id">
+        <div class="form-row">
+          <div class="form-col">
+            <div class="form-group">
+              <label class="form-label">仓库</label>
+              <select class="form-control" id="area-wh">
+                <option value="">请选择</option>
+                <option value="东莞">东莞</option>
+                <option value="加工区">加工区</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-col">
+            <div class="form-group">
+              <label class="form-label">大包预估体积</label>
+              <input type="number" step="0.01" class="form-control" id="area-pvol">
+            </div>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-col">
+            <div class="form-group"><label class="form-label">关东目的港占比(%)</label><input type="number" step="0.01" class="form-control" id="area-kr"></div>
+          </div>
+          <div class="form-col">
+            <div class="form-group"><label class="form-label">关西目的港占比(%)</label><input type="number" step="0.01" class="form-control" id="area-wr"></div>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-col">
+            <div class="form-group"><label class="form-label">关东普货占比(%)</label><input type="number" step="0.01" class="form-control" id="area-kn"></div>
+          </div>
+          <div class="form-col">
+            <div class="form-group"><label class="form-label">关东特货占比(%)</label><input type="number" step="0.01" class="form-control" id="area-ks"></div>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-col">
+            <div class="form-group"><label class="form-label">关西普货占比(%)</label><input type="number" step="0.01" class="form-control" id="area-wn"></div>
+          </div>
+          <div class="form-col">
+            <div class="form-group"><label class="form-label">关西特货占比(%)</label><input type="number" step="0.01" class="form-control" id="area-ws"></div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn" onclick="closeModal('modal-area')">取消</button>
+        <button class="btn btn-primary" onclick="saveArea()">保存</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 航班配置模态框 -->
+  <div class="modal" id="modal-flight">
+    <div class="modal-content">
+      <div class="modal-header">
+        <span class="modal-title" id="modal-flight-title">新增航班配置</span>
+        <button class="modal-close" onclick="closeModal('modal-flight')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="flight-id">
+        <div class="form-row">
+          <div class="form-col">
+            <div class="form-group">
+              <label class="form-label">仓库</label>
+              <select class="form-control" id="flight-wh">
+                <option value="">请选择</option>
+                <option value="东莞">东莞</option>
+                <option value="加工区">加工区</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-col">
+            <div class="form-group">
+              <label class="form-label">周几</label>
+              <select class="form-control" id="flight-wd">
+                <option value="">请选择</option>
+                <option value="周一">周一</option><option value="周二">周二</option><option value="周三">周三</option>
+                <option value="周四">周四</option><option value="周五">周五</option><option value="周六">周六</option><option value="周日">周日</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-col"><div class="form-group"><label class="form-label">关东普货路由</label>
+            <select class="form-control" id="flight-kn"><option value="">请选择</option><option value="空运">空运</option><option value="海空">海空</option></select>
+          </div></div>
+          <div class="form-col"><div class="form-group"><label class="form-label">关西普货路由</label>
+            <select class="form-control" id="flight-wn"><option value="">请选择</option><option value="空运">空运</option><option value="海空">海空</option></select>
+          </div></div>
+        </div>
+        <div class="form-row">
+          <div class="form-col"><div class="form-group"><label class="form-label">关东特货路由</label>
+            <select class="form-control" id="flight-ks"><option value="">请选择</option><option value="空运">空运</option><option value="海空">海空</option></select>
+          </div></div>
+          <div class="form-col"><div class="form-group"><label class="form-label">关西特货路由</label>
+            <select class="form-control" id="flight-ws"><option value="">请选择</option><option value="空运">空运</option><option value="海空">海空</option></select>
+          </div></div>
+        </div>
+        <div class="form-group"><label class="form-label">备注</label><textarea class="form-control" id="flight-rm" rows="2"></textarea></div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn" onclick="closeModal('modal-flight')">取消</button>
+        <button class="btn btn-primary" onclick="saveFlight()">保存</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 目的港配置模态框 -->
+  <div class="modal" id="modal-port">
+    <div class="modal-content" style="max-width:400px">
+      <div class="modal-header">
+        <span class="modal-title" id="modal-port-title">新增目的港配置</span>
+        <button class="modal-close" onclick="closeModal('modal-port')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="port-id">
+        <div class="form-group"><label class="form-label">目的港代码</label><input type="text" class="form-control" id="port-code" placeholder="如：KIX、NRT"></div>
+        <div class="form-group"><label class="form-label">所属区域</label>
+          <select class="form-control" id="port-region"><option value="">请选择</option><option value="关东">关东</option><option value="关西">关西</option></select>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn" onclick="closeModal('modal-port')">取消</button>
+        <button class="btn btn-primary" onclick="savePort()">保存</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 航空路由配置模态框 -->
+  <div class="modal" id="modal-route">
+    <div class="modal-content">
+      <div class="modal-header">
+        <span class="modal-title" id="modal-route-title">新增航空路由配置</span>
+        <button class="modal-close" onclick="closeModal('modal-route')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="route-id">
+        <div class="form-row">
+          <div class="form-col"><div class="form-group"><label class="form-label">航班号</label><input type="text" class="form-control" id="route-fno" placeholder="如：CA123"></div></div>
+          <div class="form-col"><div class="form-group"><label class="form-label">始发</label><input type="text" class="form-control" id="route-orig" placeholder="如：SZX"></div></div>
+          <div class="form-col"><div class="form-group"><label class="form-label">中转</label><input type="text" class="form-control" id="route-trans" placeholder="如：PVG"></div></div>
+        </div>
+        <div class="form-row">
+          <div class="form-col"><div class="form-group"><label class="form-label">目的</label><input type="text" class="form-control" id="route-dest" placeholder="如：NRT"></div></div>
+          <div class="form-col"><div class="form-group"><label class="form-label">起飞时间</label><input type="time" class="form-control" id="route-dep"></div></div>
+          <div class="form-col"><div class="form-group"><label class="form-label">落地时间</label><input type="time" class="form-control" id="route-arr"></div></div>
+        </div>
+        <div class="form-row">
+          <div class="form-col"><div class="form-group"><label class="form-label">是否隔天</label>
+            <select class="form-control" id="route-next"><option value="">请选择</option><option value="是">是</option><option value="否">否</option></select>
+          </div></div>
+          <div class="form-col"><div class="form-group"><label class="form-label">二程航班</label><input type="text" class="form-control" id="route-sf"></div></div>
+          <div class="form-col"><div class="form-group"><label class="form-label">路由</label>
+            <select class="form-control" id="route-type"><option value="">请选择</option><option value="空运">空运</option><option value="海空">海空</option></select>
+          </div></div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn" onclick="closeModal('modal-route')">取消</button>
+        <button class="btn btn-primary" onclick="saveRoute()">保存</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 方数预估历史模态框 -->
+  <div class="modal" id="modal-volhist">
+    <div class="modal-content" style="max-width:1400px">
+      <div class="modal-header">
+        <span class="modal-title">方数预估历史记录</span>
+        <button class="modal-close" onclick="closeModal('modal-volhist')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="scroll-table">
+          <table style="font-size:12px">
+            <thead><tr><th>揽收日期</th><th>仓库</th><th>大包数</th><th>总方数</th><th>关东总</th><th>关西总</th><th>关东普货</th><th>关东特货</th><th>关西普货</th><th>关西特货</th><th>空运</th><th>海空</th><th>操作</th></tr></thead>
+            <tbody id="volhist-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="modal-footer"><button class="btn" onclick="closeModal('modal-volhist')">关闭</button></div>
+    </div>
+  </div>
+
+  <!-- 主单列表模态框 -->
+  <div class="modal" id="modal-orderlist">
+    <div class="modal-content" style="max-width:1200px">
+      <div class="modal-header">
+        <span class="modal-title">主单列表</span>
+        <button class="modal-close" onclick="closeModal('modal-orderlist')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="scroll-table">
+          <table>
+            <thead><tr><th>揽收日期</th><th>仓库</th><th>口岸</th><th>货物属性</th><th>类别</th><th>主单号</th><th>航班号</th><th>目的港</th><th>打货上限</th><th>操作</th></tr></thead>
+            <tbody id="orderlist-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="modal-footer"><button class="btn" onclick="closeModal('modal-orderlist')">关闭</button></div>
+    </div>
+  </div>
+
+<script>
+// ==================== 数据存储 ====================
+const KEYS = { AREA: 'lg_area', FLIGHT: 'lg_flight', PORT: 'lg_port', ROUTE: 'lg_route', VOL: 'lg_vol', ORDER: 'lg_order' };
+const getData = k => JSON.parse(localStorage.getItem(k) || '[]');
+const saveData = (k, d) => localStorage.setItem(k, JSON.stringify(d));
+const genId = () => Date.now().toString(36) + Math.random().toString(36).substr(2);
+const getWeekday = d => ['周日','周一','周二','周三','周四','周五','周六'][new Date(d).getDay()];
+const addDays = (d, n) => { const dt = new Date(d); dt.setDate(dt.getDate()+n); return dt.toISOString().split('T')[0]; };
+
+// ==================== 下载功能 ====================
+function downloadHTML() {
+  const html = document.documentElement.outerHTML;
+  const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = '物流管理系统.html';
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+// ==================== 页面导航 ====================
+document.querySelectorAll('.menu-item').forEach(item => {
+  item.addEventListener('click', function() {
+    document.querySelectorAll('.menu-item').forEach(i => i.classList.remove('active'));
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    this.classList.add('active');
+    document.getElementById(this.dataset.page).classList.add('active');
+    if (this.dataset.page === 'main-order') initFlightOpts();
+  });
+});
+
+// ==================== 模态框 ====================
+function openModal(id) { document.getElementById(id).classList.add('show'); }
+function closeModal(id) { document.getElementById(id).classList.remove('show'); }
+
+// ==================== 区域参数配置 ====================
+function openAreaModal(editId = null) {
+  document.getElementById('area-id').value = '';
+  document.getElementById('area-wh').value = '';
+  document.getElementById('area-pvol').value = '';
+  document.getElementById('area-kr').value = '';
+  document.getElementById('area-wr').value = '';
+  document.getElementById('area-kn').value = '';
+  document.getElementById('area-ks').value = '';
+  document.getElementById('area-wn').value = '';
+  document.getElementById('area-ws').value = '';
+  document.getElementById('modal-area-title').textContent = '新增区域参数';
+  if (editId) {
+    const item = getData(KEYS.AREA).find(i => i.id === editId);
+    if (item) {
+      document.getElementById('area-id').value = item.id;
+      document.getElementById('area-wh').value = item.warehouse;
+      document.getElementById('area-pvol').value = item.package_volume;
+      document.getElementById('area-kr').value = item.kanto_ratio;
+      document.getElementById('area-wr').value = item.kansai_ratio;
+      document.getElementById('area-kn').value = item.kanto_normal_ratio;
+      document.getElementById('area-ks').value = item.kanto_special_ratio;
+      document.getElementById('area-wn').value = item.kansai_normal_ratio;
+      document.getElementById('area-ws').value = item.kansai_special_ratio;
+      document.getElementById('modal-area-title').textContent = '编辑区域参数';
+    }
+  }
+  openModal('modal-area');
+}
+
+function saveArea() {
+  const id = document.getElementById('area-id').value;
+  const data = {
+    id: id || genId(),
+    warehouse: document.getElementById('area-wh').value,
+    package_volume: document.getElementById('area-pvol').value,
+    kanto_ratio: document.getElementById('area-kr').value,
+    kansai_ratio: document.getElementById('area-wr').value,
+    kanto_normal_ratio: document.getElementById('area-kn').value,
+    kanto_special_ratio: document.getElementById('area-ks').value,
+    kansai_normal_ratio: document.getElementById('area-wn').value,
+    kansai_special_ratio: document.getElementById('area-ws').value,
+  };
+  let list = getData(KEYS.AREA);
+  if (id) {
+    const idx = list.findIndex(i => i.id === id);
+    if (idx > -1) list[idx] = data;
+  } else {
+    list.push(data);
+  }
+  saveData(KEYS.AREA, list);
+  closeModal('modal-area');
+  renderArea();
+}
+
+function deleteArea(id) {
+  if (confirm('确定删除？')) {
+    saveData(KEYS.AREA, getData(KEYS.AREA).filter(i => i.id !== id));
+    renderArea();
+  }
+}
+
+function renderArea() {
+  const tbody = document.getElementById('area-tbody');
+  tbody.innerHTML = getData(KEYS.AREA).map(i => `<tr>
+    <td>${i.warehouse}</td><td>${i.package_volume}</td><td>${i.kanto_ratio}%</td><td>${i.kansai_ratio}%</td>
+    <td>${i.kanto_normal_ratio}%</td><td>${i.kanto_special_ratio}%</td><td>${i.kansai_normal_ratio}%</td><td>${i.kansai_special_ratio}%</td>
+    <td><button class="btn btn-sm btn-primary" onclick="openAreaModal('${i.id}')">编辑</button> <button class="btn btn-sm btn-danger" onclick="deleteArea('${i.id}')">删除</button></td>
+  </tr>`).join('');
+}
+
+// ==================== 航班配置 ====================
+function openFlightModal(editId = null) {
+  document.getElementById('flight-id').value = '';
+  document.getElementById('flight-wh').value = '';
+  document.getElementById('flight-wd').value = '';
+  document.getElementById('flight-kn').value = '';
+  document.getElementById('flight-wn').value = '';
+  document.getElementById('flight-ks').value = '';
+  document.getElementById('flight-ws').value = '';
+  document.getElementById('flight-rm').value = '';
+  document.getElementById('modal-flight-title').textContent = '新增航班配置';
+  if (editId) {
+    const item = getData(KEYS.FLIGHT).find(i => i.id === editId);
+    if (item) {
+      document.getElementById('flight-id').value = item.id;
+      document.getElementById('flight-wh').value = item.warehouse;
+      document.getElementById('flight-wd').value = item.weekday;
+      document.getElementById('flight-kn').value = item.kanto_normal || '';
+      document.getElementById('flight-wn').value = item.kansai_normal || '';
+      document.getElementById('flight-ks').value = item.kanto_special || '';
+      document.getElementById('flight-ws').value = item.kansai_special || '';
+      document.getElementById('flight-rm').value = item.remark || '';
+      document.getElementById('modal-flight-title').textContent = '编辑航班配置';
+    }
+  }
+  openModal('modal-flight');
+}
+
+function saveFlight() {
+  const id = document.getElementById('flight-id').value;
+  const data = {
+    id: id || genId(),
+    warehouse: document.getElementById('flight-wh').value,
+    weekday: document.getElementById('flight-wd').value,
+    kanto_normal: document.getElementById('flight-kn').value,
+    kansai_normal: document.getElementById('flight-wn').value,
+    kanto_special: document.getElementById('flight-ks').value,
+    kansai_special: document.getElementById('flight-ws').value,
+    remark: document.getElementById('flight-rm').value,
+  };
+  let list = getData(KEYS.FLIGHT);
+  if (id) {
+    const idx = list.findIndex(i => i.id === id);
+    if (idx > -1) list[idx] = data;
+  } else {
+    list.push(data);
+  }
+  saveData(KEYS.FLIGHT, list);
+  closeModal('modal-flight');
+  renderFlight();
+}
+
+function deleteFlight(id) {
+  if (confirm('确定删除？')) {
+    saveData(KEYS.FLIGHT, getData(KEYS.FLIGHT).filter(i => i.id !== id));
+    renderFlight();
+  }
+}
+
+function renderFlight() {
+  const tbody = document.getElementById('flight-tbody');
+  tbody.innerHTML = getData(KEYS.FLIGHT).map(i => `<tr>
+    <td>${i.warehouse}</td><td>${i.weekday}</td>
+    <td>${i.kanto_normal || '-'}</td><td>${i.kansai_normal || '-'}</td>
+    <td>${i.kanto_special || '-'}</td><td>${i.kansai_special || '-'}</td><td>${i.remark || '-'}</td>
+    <td><button class="btn btn-sm btn-primary" onclick="openFlightModal('${i.id}')">编辑</button> <button class="btn btn-sm btn-danger" onclick="deleteFlight('${i.id}')">删除</button></td>
+  </tr>`).join('');
+}
+
+// ==================== 目的港配置 ====================
+function openPortModal(editId = null) {
+  document.getElementById('port-id').value = '';
+  document.getElementById('port-code').value = '';
+  document.getElementById('port-region').value = '';
+  document.getElementById('modal-port-title').textContent = '新增目的港配置';
+  if (editId) {
+    const item = getData(KEYS.PORT).find(i => i.id === editId);
+    if (item) {
+      document.getElementById('port-id').value = item.id;
+      document.getElementById('port-code').value = item.port_code;
+      document.getElementById('port-region').value = item.region;
+      document.getElementById('modal-port-title').textContent = '编辑目的港配置';
+    }
+  }
+  openModal('modal-port');
+}
+
+function savePort() {
+  const id = document.getElementById('port-id').value;
+  const data = { id: id || genId(), port_code: document.getElementById('port-code').value, region: document.getElementById('port-region').value };
+  let list = getData(KEYS.PORT);
+  if (id) { const idx = list.findIndex(i => i.id === id); if (idx > -1) list[idx] = data; }
+  else { list.push(data); }
+  saveData(KEYS.PORT, list);
+  closeModal('modal-port');
+  renderPort();
+}
+
+function deletePort(id) {
+  if (confirm('确定删除？')) { saveData(KEYS.PORT, getData(KEYS.PORT).filter(i => i.id !== id)); renderPort(); }
+}
+
+function renderPort() {
+  document.getElementById('port-tbody').innerHTML = getData(KEYS.PORT).map(i => `<tr>
+    <td>${i.port_code}</td><td>${i.region}</td>
+    <td><button class="btn btn-sm btn-primary" onclick="openPortModal('${i.id}')">编辑</button> <button class="btn btn-sm btn-danger" onclick="deletePort('${i.id}')">删除</button></td>
+  </tr>`).join('');
+}
+
+// ==================== 航空路由配置 ====================
+function openRouteModal(editId = null) {
+  document.getElementById('route-id').value = '';
+  document.getElementById('route-fno').value = '';
+  document.getElementById('route-orig').value = '';
+  document.getElementById('route-trans').value = '';
+  document.getElementById('route-dest').value = '';
+  document.getElementById('route-dep').value = '';
+  document.getElementById('route-arr').value = '';
+  document.getElementById('route-next').value = '';
+  document.getElementById('route-sf').value = '';
+  document.getElementById('route-type').value = '';
+  document.getElementById('modal-route-title').textContent = '新增航空路由配置';
+  if (editId) {
+    const item = getData(KEYS.ROUTE).find(i => i.id === editId);
+    if (item) {
+      document.getElementById('route-id').value = item.id;
+      document.getElementById('route-fno').value = item.flight_no;
+      document.getElementById('route-orig').value = item.origin;
+      document.getElementById('route-trans').value = item.transfer || '';
+      document.getElementById('route-dest').value = item.dest;
+      document.getElementById('route-dep').value = item.depart_time || '';
+      document.getElementById('route-arr').value = item.arrive_time || '';
+      document.getElementById('route-next').value = item.is_next_day || '';
+      document.getElementById('route-sf').value = item.second_flight || '';
+      document.getElementById('route-type').value = item.route_type;
+      document.getElementById('modal-route-title').textContent = '编辑航空路由配置';
+    }
+  }
+  openModal('modal-route');
+}
+
+function saveRoute() {
+  const id = document.getElementById('route-id').value;
+  const data = {
+    id: id || genId(),
+    flight_no: document.getElementById('route-fno').value,
+    origin: document.getElementById('route-orig').value,
+    transfer: document.getElementById('route-trans').value,
+    dest: document.getElementById('route-dest').value,
+    depart_time: document.getElementById('route-dep').value,
+    arrive_time: document.getElementById('route-arr').value,
+    is_next_day: document.getElementById('route-next').value,
+    second_flight: document.getElementById('route-sf').value,
+    route_type: document.getElementById('route-type').value,
+  };
+  let list = getData(KEYS.ROUTE);
+  if (id) { const idx = list.findIndex(i => i.id === id); if (idx > -1) list[idx] = data; }
+  else { list.push(data); }
+  saveData(KEYS.ROUTE, list);
+  closeModal('modal-route');
+  renderRoute();
+}
+
+function deleteRoute(id) {
+  if (confirm('确定删除？')) { saveData(KEYS.ROUTE, getData(KEYS.ROUTE).filter(i => i.id !== id)); renderRoute(); }
+}
+
+function renderRoute() {
+  document.getElementById('route-tbody').innerHTML = getData(KEYS.ROUTE).map(i => `<tr>
+    <td>${i.flight_no}</td><td>${i.origin}</td><td>${i.transfer || '-'}</td><td>${i.dest}</td>
+    <td>${i.depart_time || '-'}</td><td>${i.arrive_time || '-'}</td><td>${i.is_next_day || '-'}</td>
+    <td><span class="tag ${i.route_type === '空运' ? 'tag-success' : 'tag-warning'}">${i.route_type}</span></td>
+    <td><button class="btn btn-sm btn-primary" onclick="openRouteModal('${i.id}')">编辑</button> <button class="btn btn-sm btn-danger" onclick="deleteRoute('${i.id}')">删除</button></td>
+  </tr>`).join('');
+}
+
+// ==================== 方数预估 ====================
+function updateVolWeekday() {
+  const d = document.getElementById('vol-date').value;
+  document.getElementById('vol-weekday').value = d ? getWeekday(d) : '';
+  calcVolume();
+}
+
+function calcVolume() {
+  const wh = document.getElementById('vol-warehouse').value;
+  const cnt = parseFloat(document.getElementById('vol-count').value) || 0;
+  const date = document.getElementById('vol-date').value;
+
+  if (!wh || !cnt) {
+    document.getElementById('res-total').textContent = '0';
+    document.getElementById('res-kanto').textContent = '0';
+    document.getElementById('res-kansai').textContent = '0';
+    document.getElementById('res-kn').textContent = '0';
+    document.getElementById('res-ks').textContent = '0';
+    document.getElementById('res-wn').textContent = '0';
+    document.getElementById('res-ws').textContent = '0';
+    document.getElementById('res-air').textContent = '0';
+    document.getElementById('res-sea').textContent = '0';
+    return;
+  }
+
+  const area = getData(KEYS.AREA).find(i => i.warehouse === wh);
+  if (!area) { alert('请先配置该仓库的区域参数'); return; }
+
+  const pvol = parseFloat(area.package_volume);
+  const total = pvol * cnt;
+  const kr = parseFloat(area.kanto_ratio) / 100;
+  const wr = parseFloat(area.kansai_ratio) / 100;
+  const knr = parseFloat(area.kanto_normal_ratio) / 100;
+  const ksr = parseFloat(area.kanto_special_ratio) / 100;
+  const wnr = parseFloat(area.kansai_normal_ratio) / 100;
+  const wsr = parseFloat(area.kansai_special_ratio) / 100;
+
+  const kanto = total * kr;
+  const kansai = total * wr;
+  const kn = kanto * knr;
+  const ks = kanto * ksr;
+  const wn = kansai * wnr;
+  const ws = kansai * wsr;
+
+  let air = 0, sea = 0;
+  if (date) {
+    const wd = getWeekday(date);
+    const flight = getData(KEYS.FLIGHT).find(i => i.warehouse === wh && i.weekday === wd);
+    if (flight) {
+      if (flight.kanto_normal === '空运') air += kn; else if (flight.kanto_normal === '海空') sea += kn;
+      if (flight.kanto_special === '空运') air += ks; else if (flight.kanto_special === '海空') sea += ks;
+      if (flight.kansai_normal === '空运') air += wn; else if (flight.kansai_normal === '海空') sea += wn;
+      if (flight.kansai_special === '空运') air += ws; else if (flight.kansai_special === '海空') sea += ws;
+    }
+  }
+
+  document.getElementById('res-total').textContent = total.toFixed(2);
+  document.getElementById('res-kanto').textContent = kanto.toFixed(2);
+  document.getElementById('res-kansai').textContent = kansai.toFixed(2);
+  document.getElementById('res-kn').textContent = kn.toFixed(2);
+  document.getElementById('res-ks').textContent = ks.toFixed(2);
+  document.getElementById('res-wn').textContent = wn.toFixed(2);
+  document.getElementById('res-ws').textContent = ws.toFixed(2);
+  document.getElementById('res-air').textContent = air.toFixed(2);
+  document.getElementById('res-sea').textContent = sea.toFixed(2);
+}
+
+function saveVolume() {
+  const date = document.getElementById('vol-date').value;
+  const wh = document.getElementById('vol-warehouse').value;
+  const cnt = document.getElementById('vol-count').value;
+  if (!date || !wh || !cnt) { alert('请填写完整'); return; }
+
+  const data = {
+    id: genId(),
+    collect_date: date,
+    weekday: getWeekday(date),
+    warehouse: wh,
+    package_count: cnt,
+    total_volume: document.getElementById('res-total').textContent,
+    kanto_total: document.getElementById('res-kanto').textContent,
+    kansai_total: document.getElementById('res-kansai').textContent,
+    kanto_normal: document.getElementById('res-kn').textContent,
+    kanto_special: document.getElementById('res-ks').textContent,
+    kansai_normal: document.getElementById('res-wn').textContent,
+    kansai_special: document.getElementById('res-ws').textContent,
+    air_volume: document.getElementById('res-air').textContent,
+    sea_air_volume: document.getElementById('res-sea').textContent,
+  };
+  saveData(KEYS.VOL, [...getData(KEYS.VOL), data]);
+  alert('保存成功！');
+}
+
+function showVolHistory() {
+  const list = getData(KEYS.VOL);
+  document.getElementById('volhist-tbody').innerHTML = list.map(i => `<tr>
+    <td>${i.collect_date}</td><td>${i.warehouse}</td><td>${i.package_count}</td>
+    <td>${i.total_volume}</td><td>${i.kanto_total}</td><td>${i.kansai_total}</td>
+    <td>${i.kanto_normal}</td><td>${i.kanto_special}</td><td>${i.kansai_normal}</td><td>${i.kansai_special}</td>
+    <td>${i.air_volume}</td><td>${i.sea_air_volume}</td>
+    <td><button class="btn btn-sm btn-danger" onclick="deleteVol('${i.id}')">删除</button></td>
+  </tr>`).join('');
+  openModal('modal-volhist');
+}
+
+function deleteVol(id) {
+  if (confirm('确定删除？')) {
+    saveData(KEYS.VOL, getData(KEYS.VOL).filter(i => i.id !== id));
+    showVolHistory();
+  }
+}
+
+// ==================== 主单发放 ====================
+function updateOrderWeekday() {
+  const cd = document.getElementById('o-cdate').value;
+  const dd = document.getElementById('o-ddate').value;
+  document.getElementById('o-cw').value = cd ? getWeekday(cd) : '';
+  document.getElementById('o-dw').value = dd ? getWeekday(dd) : '';
+  updateCategory();
+  calcEstVolume();
+}
+
+function updateCategory() {
+  const port = document.getElementById('o-port').value;
+  const cargo = document.getElementById('o-cargo').value;
+  document.getElementById('o-cat').value = `${port}${cargo}`;
+  initFlightOpts();
+}
+
+function calcMaxPieces() {
+  const wh = document.getElementById('o-wh').value;
+  const pack = document.getElementById('o-pack').value;
+  const maxv = parseFloat(document.getElementById('o-maxvol').value) || 0;
+  if (wh && pack && maxv) {
+    let unit = wh === '东莞' ? (pack === '纸箱' ? 0.12 : 0.159) : (pack === '纸箱' ? 0.12 : 0.18);
+    document.getElementById('o-maxpieces').value = Math.round(maxv / unit);
+  } else {
+    document.getElementById('o-maxpieces').value = '';
+  }
+}
+
+function calcEstVolume() {
+  const date = document.getElementById('o-cdate').value;
+  const wh = document.getElementById('o-wh').value;
+  const port = document.getElementById('o-port').value;
+  const cargo = document.getElementById('o-cargo').value;
+
+  if (!date || !wh || !port || !cargo) return;
+
+  const vol = getData(KEYS.VOL).find(i => i.collect_date === date && i.warehouse === wh);
+  if (vol) {
+    let est = 0;
+    if (port === '关东' && cargo === '普货') est = parseFloat(vol.kanto_normal) || 0;
+    else if (port === '关东' && cargo === '特货') est = parseFloat(vol.kanto_special) || 0;
+    else if (port === '关西' && cargo === '普货') est = parseFloat(vol.kansai_normal) || 0;
+    else if (port === '关西' && cargo === '特货') est = parseFloat(vol.kansai_special) || 0;
+    document.getElementById('o-estvol').value = est.toFixed(2);
+    document.getElementById('o-estpieces').value = Math.round(est / 0.06);
+  }
+}
+
+function initFlightOpts() {
+  const sel = document.getElementById('o-flight');
+  sel.innerHTML = '<option value="">请选择</option>';
+  const routes = getData(KEYS.ROUTE);
+  routes.forEach(r => {
+    const opt = document.createElement('option');
+    opt.value = r.flight_no;
+    opt.textContent = r.flight_no;
+    sel.appendChild(opt);
+  });
+}
+
+function fillFlightInfo() {
+  const fno = document.getElementById('o-flight').value;
+  const route = getData(KEYS.ROUTE).find(i => i.flight_no === fno);
+  if (route) {
+    document.getElementById('o-origin').value = route.origin;
+    document.getElementById('o-trans').value = route.transfer || '';
+    document.getElementById('o-dest').value = route.dest;
+    document.getElementById('o-deptime').value = route.depart_time || '';
+    document.getElementById('o-arrtime').value = route.arrive_time || '';
+  }
+}
+
+function saveOrder() {
+  const id = document.getElementById('order-edit-id').value;
+  const data = {
+    id: id || genId(),
+    collect_date: document.getElementById('o-cdate').value,
+    collect_weekday: document.getElementById('o-cw').value,
+    depart_date: document.getElementById('o-ddate').value,
+    depart_weekday: document.getElementById('o-dw').value,
+    warehouse: document.getElementById('o-wh').value,
+    cargo_type: document.getElementById('o-cargo').value,
+    port: document.getElementById('o-port').value,
+    category: document.getElementById('o-cat').value,
+    status: document.getElementById('o-status').value,
+    pack_req: document.getElementById('o-pack').value,
+    max_volume: document.getElementById('o-maxvol').value,
+    max_pieces: document.getElementById('o-maxpieces').value,
+    est_volume: document.getElementById('o-estvol').value,
+    est_pieces: document.getElementById('o-estpieces').value,
+    req_flight_date: document.getElementById('o-ddate').value ? addDays(document.getElementById('o-ddate').value, 1) : '',
+    actual_flight_date: document.getElementById('o-fdate').value,
+    main_no: document.getElementById('o-mainno').value,
+    flight_no: document.getElementById('o-flight').value,
+    origin: document.getElementById('o-origin').value,
+    transfer: document.getElementById('o-trans').value,
+    dest: document.getElementById('o-dest').value,
+    depart_time: document.getElementById('o-deptime').value,
+    arrive_time: document.getElementById('o-arrtime').value,
+    actual_pieces: document.getElementById('o-apieces').value,
+    actual_weight: document.getElementById('o-aweight').value,
+    actual_volume: document.getElementById('o-avol').value,
+    actual_bills: document.getElementById('o-abills').value,
+  };
+
+  let list = getData(KEYS.ORDER);
+  if (id) { const idx = list.findIndex(i => i.id === id); if (idx > -1) list[idx] = data; }
+  else { list.push(data); }
+  saveData(KEYS.ORDER, list);
+  alert('保存成功！');
+  clearOrderForm();
+}
+
+function clearOrderForm() {
+  document.getElementById('order-edit-id').value = '';
+  document.getElementById('o-cdate').value = '';
+  document.getElementById('o-cw').value = '';
+  document.getElementById('o-ddate').value = '';
+  document.getElementById('o-dw').value = '';
+  document.getElementById('o-wh').value = '';
+  document.getElementById('o-cargo').value = '';
+  document.getElementById('o-port').value = '';
+  document.getElementById('o-cat').value = '';
+  document.getElementById('o-status').value = '';
+  document.getElementById('o-pack').value = '';
+  document.getElementById('o-maxvol').value = '';
+  document.getElementById('o-maxpieces').value = '';
+  document.getElementById('o-estvol').value = '';
+  document.getElementById('o-estpieces').value = '';
+  document.getElementById('o-fdate').value = '';
+  document.getElementById('o-mainno').value = '';
+  document.getElementById('o-flight').value = '';
+  document.getElementById('o-origin').value = '';
+  document.getElementById('o-trans').value = '';
+  document.getElementById('o-dest').value = '';
+  document.getElementById('o-deptime').value = '';
+  document.getElementById('o-arrtime').value = '';
+  document.getElementById('o-apieces').value = '';
+  document.getElementById('o-aweight').value = '';
+  document.getElementById('o-avol').value = '';
+  document.getElementById('o-abills').value = '';
+  initFlightOpts();
+}
+
+function showOrderList() {
+  const list = getData(KEYS.ORDER);
+  document.getElementById('orderlist-tbody').innerHTML = list.map(i => `<tr>
+    <td>${i.collect_date}</td><td>${i.warehouse}</td><td>${i.port}</td><td>${i.cargo_type}</td>
+    <td>${i.category}</td><td>${i.main_no || '-'}</td><td>${i.flight_no || '-'}</td><td>${i.dest || '-'}</td><td>${i.max_volume || '-'}</td>
+    <td><button class="btn btn-sm btn-primary" onclick="editOrder('${i.id}')">编辑</button> <button class="btn btn-sm btn-danger" onclick="deleteOrder('${i.id}')">删除</button></td>
+  </tr>`).join('');
+  openModal('modal-orderlist');
+}
+
+function editOrder(id) {
+  const item = getData(KEYS.ORDER).find(i => i.id === id);
+  if (item) {
+    closeModal('modal-orderlist');
+    document.getElementById('order-edit-id').value = item.id;
+    document.getElementById('o-cdate').value = item.collect_date;
+    document.getElementById('o-cw').value = item.collect_weekday || '';
+    document.getElementById('o-ddate').value = item.depart_date || '';
+    document.getElementById('o-dw').value = item.depart_weekday || '';
+    document.getElementById('o-wh').value = item.warehouse;
+    document.getElementById('o-cargo').value = item.cargo_type;
+    document.getElementById('o-port').value = item.port;
+    document.getElementById('o-cat').value = item.category || '';
+    document.getElementById('o-status').value = item.status || '';
+    document.getElementById('o-pack').value = item.pack_req || '';
+    document.getElementById('o-maxvol').value = item.max_volume || '';
+    document.getElementById('o-maxpieces').value = item.max_pieces || '';
+    document.getElementById('o-estvol').value = item.est_volume || '';
+    document.getElementById('o-estpieces').value = item.est_pieces || '';
+    document.getElementById('o-fdate').value = item.actual_flight_date || '';
+    document.getElementById('o-mainno').value = item.main_no || '';
+    document.getElementById('o-flight').value = item.flight_no || '';
+    document.getElementById('o-origin').value = item.origin || '';
+    document.getElementById('o-trans').value = item.transfer || '';
+    document.getElementById('o-dest').value = item.dest || '';
+    document.getElementById('o-deptime').value = item.depart_time || '';
+    document.getElementById('o-arrtime').value = item.arrive_time || '';
+    document.getElementById('o-apieces').value = item.actual_pieces || '';
+    document.getElementById('o-aweight').value = item.actual_weight || '';
+    document.getElementById('o-avol').value = item.actual_volume || '';
+    document.getElementById('o-abills').value = item.actual_bills || '';
+    document.querySelector('.menu-item[data-page="main-order"]').click();
+  }
+}
+
+function deleteOrder(id) {
+  if (confirm('确定删除？')) {
+    saveData(KEYS.ORDER, getData(KEYS.ORDER).filter(i => i.id !== id));
+    showOrderList();
+  }
+}
+
+// ==================== 主单查询 ====================
+function queryOrders() {
+  const date = document.getElementById('q-date').value;
+  const wh = document.getElementById('q-wh').value;
+  let list = getData(KEYS.ORDER);
+  if (date) list = list.filter(i => i.collect_date === date);
+  if (wh) list = list.filter(i => i.warehouse === wh);
+  document.getElementById('q-tbody').innerHTML = list.map(i => `<tr>
+    <td>${i.collect_date}</td><td>${i.warehouse}</td><td>${i.port}</td><td>${i.cargo_type}</td>
+    <td>${i.category}</td><td>${i.main_no || '-'}</td><td>${i.flight_no || '-'}</td><td>${i.dest || '-'}</td>
+    <td><button class="btn btn-sm btn-primary" onclick="editOrder('${i.id}')">编辑</button> <button class="btn btn-sm btn-danger" onclick="deleteOrder('${i.id}')">删除</button></td>
+  </tr>`).join('');
+}
+
+// ==================== 欠方余方查询 ====================
+function queryBalance() {
+  const date = document.getElementById('b-date').value;
+  const wh = document.getElementById('b-wh').value;
+  const port = document.getElementById('b-port').value;
+  const cargo = document.getElementById('b-cargo').value;
+
+  if (!date || !wh || !port || !cargo) { alert('请填写完整'); return; }
+
+  // 获取预估方数
+  const vol = getData(KEYS.VOL).find(i => i.collect_date === date && i.warehouse === wh);
+  let est = 0;
+  if (vol) {
+    if (port === '关东' && cargo === '普货') est = parseFloat(vol.kanto_normal) || 0;
+    else if (port === '关东' && cargo === '特货') est = parseFloat(vol.kanto_special) || 0;
+    else if (port === '关西' && cargo === '普货') est = parseFloat(vol.kansai_normal) || 0;
+    else if (port === '关西' && cargo === '特货') est = parseFloat(vol.kansai_special) || 0;
+  }
+
+  // 获取打货上限汇总
+  const orders = getData(KEYS.ORDER).filter(i => i.collect_date === date && i.warehouse === wh && i.port === port && i.cargo_type === cargo);
+  const maxSum = orders.reduce((s, i) => s + (parseFloat(i.max_volume) || 0), 0);
+
+  const balance = est - maxSum;
+  document.getElementById('b-est').textContent = est.toFixed(2);
+  document.getElementById('b-max').textContent = maxSum.toFixed(2);
+  if (balance > 0) {
+    document.getElementById('b-def').textContent = balance.toFixed(2);
+    document.getElementById('b-sur').textContent = '0.00';
+  } else {
+    document.getElementById('b-def').textContent = '0.00';
+    document.getElementById('b-sur').textContent = Math.abs(balance).toFixed(2);
+  }
+}
+
+// ==================== 初始化 ====================
+renderArea();
+renderFlight();
+renderPort();
+renderRoute();
+</script>
+</body>
+</html>
