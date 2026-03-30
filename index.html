@@ -1,33 +1,241 @@
-<!doctype html>
-<html lang="zh-CN">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="扣子编程，你的 AI 开发伙伴已就位" />
-    <title>扣子编程 - AI 开发伙伴</title>
-    <link rel="stylesheet" href="/styles/main.css" />
-  </head>
-  <body>
-    <div id="app">
-      <main class="main-wrapper">
-        <div class="content-container">
-          <img
-            src="https://lf-coze-web-cdn.coze.cn/obj/eden-cn/lm-lgvj/ljhwZthlaukjlkulzlp/coze-coding/icon/coze-coding.gif"
-            alt="扣子编程 Logo"
-            class="logo-image"
-          />
-          <div>
-            <div class="text-container">
-              <h1 class="heading">
-                应用开发中
-              </h1>
-              <p class="description">
-                请稍后，页面即将呈现
-              </p>
-            </div>
-          </div>
-        </div>
-      </main>
-    </div>
-  </body>
+
+    // 监听实际航班日期变化，更新起飞到港时间
+    document.getElementById('order-actual-flight-date').addEventListener('change', fillFlightInfo);
+    
+    function saveMainOrder() {
+      const order = {
+        id: generateId(),
+        collectDate: document.getElementById('order-collect-date').value,
+        collectWeekday: document.getElementById('order-collect-weekday').value,
+        departDate: document.getElementById('order-depart-date').value,
+        departWeekday: document.getElementById('order-depart-weekday').value,
+        warehouse: document.getElementById('order-warehouse').value,
+        cargoType: document.getElementById('order-cargo-type').value,
+        port: document.getElementById('order-port').value,
+        category: document.getElementById('order-category').value,
+        outWarehouse: document.getElementById('order-out-warehouse').value,
+        status: document.getElementById('order-status').value,
+        packReq: document.getElementById('order-pack-req').value,
+        maxVolume: document.getElementById('order-max-volume').value,
+        maxPieces: document.getElementById('order-max-pieces').value,
+        estVolume: document.getElementById('order-est-volume').value,
+        estPieces: document.getElementById('order-est-pieces').value,
+        reqFlightDate: document.getElementById('order-req-flight-date').value,
+        actualFlightDate: document.getElementById('order-actual-flight-date').value,
+        mainNo: document.getElementById('order-main-no').value,
+        flightId: document.getElementById('order-flight-no').value,
+        flightNo: document.getElementById('order-flight-no').selectedOptions[0]?.dataset.flightNo || '',
+        origin: document.getElementById('order-origin').value,
+        transfer: document.getElementById('order-transfer').value,
+        dest: document.getElementById('order-dest').value,
+        departTime: document.getElementById('order-depart-time').value,
+        arriveTime: document.getElementById('order-arrive-time').value,
+        actualPieces: document.getElementById('order-actual-pieces').value,
+        actualWeight: document.getElementById('order-actual-weight').value,
+        actualVolume: document.getElementById('order-actual-volume').value,
+        actualBills: document.getElementById('order-actual-bills').value,
+        createdAt: new Date().toISOString()
+      };
+      
+      if (!order.collectDate || !order.warehouse) {
+        alert('请填写揽收日期和仓库');
+        return;
+      }
+      
+      const data = getData(STORAGE_KEYS.MAIN_ORDERS);
+      data.push(order);
+      saveData(STORAGE_KEYS.MAIN_ORDERS, data);
+      
+      alert('主单保存成功！');
+      clearOrderForm();
+    }
+    
+    function clearOrderForm() {
+      ['order-collect-date', 'order-collect-weekday', 'order-depart-date', 'order-depart-weekday',
+       'order-warehouse', 'order-cargo-type', 'order-port', 'order-category', 'order-out-warehouse',
+       'order-status', 'order-pack-req', 'order-max-volume', 'order-max-pieces', 'order-est-volume',
+       'order-est-pieces', 'order-req-flight-date', 'order-actual-flight-date', 'order-main-no',
+       'order-flight-no', 'order-origin', 'order-transfer', 'order-dest', 'order-depart-time',
+       'order-arrive-time', 'order-actual-pieces', 'order-actual-weight', 'order-actual-volume',
+       'order-actual-bills'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el.tagName === 'SELECT') {
+          el.selectedIndex = 0;
+        } else {
+          el.value = '';
+        }
+      });
+    }
+    
+    function showOrderList() {
+      const data = getData(STORAGE_KEYS.MAIN_ORDERS);
+      data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+      
+      const tbody = document.getElementById('order-list-tbody');
+      tbody.innerHTML = data.map(item => `
+        <tr>
+          <td>${formatDate(item.collectDate)}</td>
+          <td>${item.warehouse}</td>
+          <td>${item.port}</td>
+          <td>${item.cargoType}</td>
+          <td><span class="tag ${item.category === '空运' ? 'tag-info' : 'tag-success'}">${item.category}</span></td>
+          <td>${item.mainNo || '--'}</td>
+          <td>${item.flightNo || '--'}</td>
+          <td>${item.dest || '--'}</td>
+          <td>${item.maxVolume || '--'}</td>
+          <td>
+            <button class="btn btn-sm btn-danger" onclick="deleteMainOrder('${item.id}')">删除</button>
+          </td>
+        </tr>
+      `).join('');
+      
+      openModal('order-list-modal');
+    }
+    
+    function deleteMainOrder(id) {
+      if (!confirm('确定要删除此主单吗？')) return;
+      const data = getData(STORAGE_KEYS.MAIN_ORDERS);
+      const newData = data.filter(d => d.id !== id);
+      saveData(STORAGE_KEYS.MAIN_ORDERS, newData);
+      showOrderList();
+    }
+    
+    // ==================== 主单查询 ====================
+    function queryOrders() {
+      const date = document.getElementById('query-order-date').value;
+      const warehouse = document.getElementById('query-order-warehouse').value;
+      
+      const data = getData(STORAGE_KEYS.MAIN_ORDERS);
+      let filtered = data;
+      
+      if (date) {
+        filtered = filtered.filter(d => d.collectDate === date);
+      }
+      if (warehouse) {
+        filtered = filtered.filter(d => d.warehouse === warehouse);
+      }
+      
+      const tbody = document.getElementById('order-query-tbody');
+      tbody.innerHTML = filtered.map(item => `
+        <tr>
+          <td>${formatDate(item.collectDate)}</td>
+          <td>${item.warehouse}</td>
+          <td>${item.port}</td>
+          <td>${item.cargoType}</td>
+          <td><span class="tag ${item.category === '空运' ? 'tag-info' : 'tag-success'}">${item.category}</span></td>
+          <td>${item.mainNo || '--'}</td>
+          <td>${item.flightNo || '--'}</td>
+          <td>${item.dest || '--'}</td>
+          <td>${item.actualFlightDate || '--'}</td>
+          <td>
+            <button class="btn btn-sm btn-primary" onclick="viewOrderDetail('${item.id}')">详情</button>
+          </td>
+        </tr>
+      `).join('');
+    }
+    
+    function viewOrderDetail(id) {
+      const data = getData(STORAGE_KEYS.MAIN_ORDERS);
+      const order = data.find(d => d.id === id);
+      if (!order) return;
+      
+      alert(`
+主单详情：
+揽收日期：${formatDate(order.collectDate)}
+发车日期：${formatDate(order.departDate)}
+仓库：${order.warehouse}
+货物属性：${order.cargoType}
+口岸：${order.port}
+类别：${order.category}
+出货仓：${order.outWarehouse}
+主单状态：${order.status}
+打货要求：${order.packReq}
+打货上限：${order.maxVolume}
+预估方数：${order.estVolume}
+预估件数：${order.estPieces}
+需求航班日期：${order.reqFlightDate}
+实际航班日期：${order.actualFlightDate}
+主单号：${order.mainNo}
+航班号：${order.flightNo}
+始发港：${order.origin}
+中转站：${order.transfer}
+目的港：${order.dest}
+起飞时间：${order.departTime}
+到港时间：${order.arriveTime}
+实际件数：${order.actualPieces}
+实际重量：${order.actualWeight}
+实际体积：${order.actualVolume}
+      `);
+    }
+    
+    // ==================== 欠方余方查询 ====================
+    function queryBalance() {
+      const date = document.getElementById('balance-date').value;
+      const warehouse = document.getElementById('balance-warehouse').value;
+      const port = document.getElementById('balance-port').value;
+      const cargoType = document.getElementById('balance-cargo-type').value;
+      
+      if (!date || !warehouse || !port || !cargoType) {
+        alert('请填写完整查询条件');
+        return;
+      }
+      
+      // 1. 获取前一天的预估方数
+      const prevDate = addDays(date, -1);
+      const volumeEstimates = getData(STORAGE_KEYS.VOLUME_ESTIMATE);
+      const estimate = volumeEstimates.find(e => e.date === prevDate && e.warehouse === warehouse);
+      
+      let estVolume = 0;
+      if (estimate) {
+        if (port === '关东') {
+          estVolume = cargoType === '普货' ? parseFloat(estimate.kantoNormal) : parseFloat(estimate.kantoSpecial);
+        } else if (port === '关西') {
+          estVolume = cargoType === '普货' ? parseFloat(estimate.kansaiNormal) : parseFloat(estimate.kansaiSpecial);
+        }
+      }
+      
+      // 2. 汇总主单中的打货上限
+      const orders = getData(STORAGE_KEYS.MAIN_ORDERS);
+      const filteredOrders = orders.filter(o => 
+        o.collectDate === date && 
+        o.warehouse === warehouse && 
+        o.port === port && 
+        o.cargoType === cargoType
+      );
+      
+      let maxVolumeTotal = 0;
+      filteredOrders.forEach(o => {
+        maxVolumeTotal += parseFloat(o.maxVolume) || 0;
+      });
+      
+      // 3. 计算
+      const diff = estVolume - maxVolumeTotal;
+      const deficit = diff < 0 ? Math.abs(diff) : 0;
+      const surplus = diff > 0 ? diff : 0;
+      
+      // 4. 显示结果
+      document.getElementById('balance-est-volume').textContent = estVolume.toFixed(2);
+      document.getElementById('balance-max-volume').textContent = maxVolumeTotal.toFixed(2);
+      document.getElementById('balance-deficit').textContent = deficit.toFixed(2);
+      document.getElementById('balance-surplus').textContent = surplus.toFixed(2);
+    }
+    
+    // ==================== 初始化 ====================
+    function init() {
+      renderAreaTable();
+      renderFlightTable();
+      renderPortTable();
+      renderRouteTable();
+      initFlightNoOptions();
+      
+      // 设置今天为默认日期
+      const today = new Date().toISOString().split('T')[0];
+      document.getElementById('volume-date').value = today;
+      updateVolumeWeekday();
+    }
+    
+    // 页面加载完成后初始化
+    document.addEventListener('DOMContentLoaded', init);
+  </script>
+</body>
 </html>
