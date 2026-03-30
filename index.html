@@ -1352,24 +1352,28 @@
   
   <!-- 方数预估历史模态框 -->
   <div class="modal" id="volume-history-modal">
-    <div class="modal-content" style="max-width: 1000px;">
+    <div class="modal-content" style="max-width: 1400px;">
       <div class="modal-header">
         <span class="modal-title">方数预估历史记录</span>
         <button class="modal-close" onclick="closeModal('volume-history-modal')">&times;</button>
       </div>
       <div class="modal-body">
         <div class="table-container">
-          <table>
+          <table style="font-size: 12px;">
             <thead>
               <tr>
                 <th>揽收日期</th>
                 <th>仓库</th>
-                <th>揽收大包数</th>
+                <th>大包数</th>
                 <th>总方数</th>
-                <th>关东方数</th>
-                <th>关西方数</th>
-                <th>空运方数</th>
-                <th>海空方数</th>
+                <th>关东总</th>
+                <th>关西总</th>
+                <th>关东普货</th>
+                <th>关东特货</th>
+                <th>关西普货</th>
+                <th>关西特货</th>
+                <th>空运</th>
+                <th>海空</th>
                 <th>操作</th>
               </tr>
             </thead>
@@ -1955,9 +1959,13 @@
           <td>${formatDate(item.date)}</td>
           <td>${item.warehouse}</td>
           <td>${item.packageCount}</td>
-          <td>${item.totalVolume}</td>
+          <td><strong>${item.totalVolume}</strong></td>
           <td>${item.kantoTotal}</td>
           <td>${item.kansaiTotal}</td>
+          <td>${item.kantoNormal}</td>
+          <td>${item.kantoSpecial}</td>
+          <td>${item.kansaiNormal}</td>
+          <td>${item.kansaiSpecial}</td>
           <td>${item.airVolume}</td>
           <td>${item.seaAirVolume}</td>
           <td>
