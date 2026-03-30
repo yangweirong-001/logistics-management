@@ -696,6 +696,7 @@
       <div id="main-order" class="page">
         <div class="page-header">
           <h1 class="page-title">主单发放</h1>
+          <input type="hidden" id="order-edit-id">
         </div>
         <div class="card">
           <div class="card-body">
@@ -703,25 +704,21 @@
               <div class="form-col">
                 <div class="form-group">
                   <label class="form-label">揽收日期</label>
-                  <input type="date" class="form-control" id="order-collect-date" onchange="updateOrderWeekdays()">
-                </div>
-              </div>
-              <div class="form-col">
-                <div class="form-group">
-                  <label class="form-label">揽收星期</label>
-                  <input type="text" class="form-control" id="order-collect-weekday" readonly>
+                  <div style="display: flex; gap: 10px;">
+                    <input type="date" class="form-control" id="order-collect-date" onchange="updateOrderWeekdays()" style="flex: 1;">
+                    <input type="text" class="form-control" id="order-collect-weekday-display" readonly style="width: 80px; text-align: center; background: #e6f7ff; color: #1890ff; font-weight: 600;">
+                  </div>
+                  <input type="hidden" id="order-collect-weekday">
                 </div>
               </div>
               <div class="form-col">
                 <div class="form-group">
                   <label class="form-label">发车日期</label>
-                  <input type="date" class="form-control" id="order-depart-date" onchange="updateOrderWeekdays()">
-                </div>
-              </div>
-              <div class="form-col">
-                <div class="form-group">
-                  <label class="form-label">发车星期</label>
-                  <input type="text" class="form-control" id="order-depart-weekday" readonly>
+                  <div style="display: flex; gap: 10px;">
+                    <input type="date" class="form-control" id="order-depart-date" onchange="updateOrderWeekdays()" style="flex: 1;">
+                    <input type="text" class="form-control" id="order-depart-weekday-display" readonly style="width: 80px; text-align: center; background: #e6f7ff; color: #1890ff; font-weight: 600;">
+                  </div>
+                  <input type="hidden" id="order-depart-weekday">
                 </div>
               </div>
             </div>
@@ -769,20 +766,10 @@
             <div class="form-row">
               <div class="form-col">
                 <div class="form-group">
-                  <label class="form-label">出货仓</label>
-                  <select class="form-control" id="order-out-warehouse">
-                    <option value="">请选择</option>
-                    <option value="东莞">东莞</option>
-                    <option value="加工区">加工区</option>
-                    <option value="东莞+加工区">东莞+加工区</option>
-                  </select>
-                </div>
-              </div>
-              <div class="form-col">
-                <div class="form-group">
                   <label class="form-label">主单状态</label>
                   <select class="form-control" id="order-status">
                     <option value="">请选择</option>
+                    <option value="正常">正常</option>
                     <option value="取消">取消</option>
                     <option value="待取消">待取消</option>
                     <option value="待定">待定</option>
@@ -792,7 +779,7 @@
               <div class="form-col">
                 <div class="form-group">
                   <label class="form-label">打货要求</label>
-                  <select class="form-control" id="order-pack-req" onchange="calculateEstimatedPieces()">
+                  <select class="form-control" id="order-pack-req" onchange="calculateMaxPieces()">
                     <option value="">请选择</option>
                     <option value="纸箱">纸箱</option>
                     <option value="麻袋">麻袋</option>
@@ -802,18 +789,18 @@
               <div class="form-col">
                 <div class="form-group">
                   <label class="form-label">打货上限（航线提供）</label>
-                  <input type="number" step="0.01" class="form-control" id="order-max-volume" placeholder="保留两位小数">
+                  <input type="number" step="0.01" class="form-control" id="order-max-volume" placeholder="保留两位小数" oninput="calculateMaxPieces()">
+                </div>
+              </div>
+              <div class="form-col">
+                <div class="form-group">
+                  <label class="form-label">打货上限件数</label>
+                  <input type="number" class="form-control" id="order-max-pieces" readonly placeholder="自动计算">
                 </div>
               </div>
             </div>
             
             <div class="form-row">
-              <div class="form-col">
-                <div class="form-group">
-                  <label class="form-label">打货上限件数</label>
-                  <input type="number" class="form-control" id="order-max-pieces">
-                </div>
-              </div>
               <div class="form-col">
                 <div class="form-group">
                   <label class="form-label">预估方数</label>
@@ -1985,12 +1972,19 @@
     }
 
     // ==================== 主单发放 ====================
-    function initFlightNoOptions() {
+    // 初始化航班选项（根据路由类型筛选）
+    function initFlightNoOptions(routeType = null) {
       const routeConfigs = getData(STORAGE_KEYS.ROUTE_CONFIG);
       const select = document.getElementById('order-flight-no');
       
+      // 筛选航班
+      let filteredConfigs = routeConfigs;
+      if (routeType) {
+        filteredConfigs = routeConfigs.filter(r => r.routeType === routeType);
+      }
+      
       const flightMap = new Map();
-      routeConfigs.forEach(r => {
+      filteredConfigs.forEach(r => {
         const key = `${r.flightNo}-${r.dest}`;
         if (!flightMap.has(key)) flightMap.set(key, r);
       });
@@ -2002,15 +1996,46 @@
     }
     
     function updateOrderWeekdays() {
-      const collectDate = document.getElementById('order-collect-date').value;
-      const departDate = document.getElementById('order-depart-date').value;
+      const collectDateEl = document.getElementById('order-collect-date');
+      const departDateEl = document.getElementById('order-depart-date');
+      const collectDate = collectDateEl.value;
+      const departDate = departDateEl.value;
       
-      document.getElementById('order-collect-weekday').value = collectDate ? getWeekday(collectDate) : '';
-      document.getElementById('order-depart-weekday').value = departDate ? getWeekday(departDate) : '';
+      // 保存日期值并显示星期
+      const collectWeekday = collectDate ? getWeekday(collectDate) : '';
+      const departWeekday = departDate ? getWeekday(departDate) : '';
       
+      document.getElementById('order-collect-weekday').value = collectWeekday;
+      document.getElementById('order-depart-weekday').value = departWeekday;
+      document.getElementById('order-collect-weekday-display').value = collectWeekday;
+      document.getElementById('order-depart-weekday-display').value = departWeekday;
+      
+      // 更新航班选项
       updateOrderCategory();
       calculateEstimatedVolume();
       calculateReqFlightDate();
+    }
+    
+    // 打货上限件数自动计算
+    function calculateMaxPieces() {
+      const warehouse = document.getElementById('order-warehouse').value;
+      const packReq = document.getElementById('order-pack-req').value;
+      const maxVolume = parseFloat(document.getElementById('order-max-volume').value) || 0;
+      
+      if (!warehouse || !packReq || !maxVolume) {
+        document.getElementById('order-max-pieces').value = '';
+        return;
+      }
+      
+      let multiplier = 0;
+      if (warehouse === '东莞') {
+        multiplier = packReq === '纸箱' ? 0.12 : 0.159;
+      } else if (warehouse === '加工区') {
+        multiplier = packReq === '纸箱' ? 0.12 : 0.18;
+      }
+      
+      const maxPieces = Math.round(maxVolume * multiplier);
+      document.getElementById('order-max-pieces').value = maxPieces;
     }
     
     function updateOrderCategory() {
@@ -2021,6 +2046,7 @@
       
       if (!collectDate || !warehouse || !port || !cargoType) {
         document.getElementById('order-category').value = '';
+        initFlightNoOptions();
         return;
       }
       
@@ -2030,6 +2056,7 @@
       
       if (!config) {
         document.getElementById('order-category').value = '未配置';
+        initFlightNoOptions();
         return;
       }
       
@@ -2041,6 +2068,14 @@
       }
       
       document.getElementById('order-category').value = route || '未配置';
+      
+      // 根据路由类型筛选航班
+      if (route) {
+        initFlightNoOptions(route);
+      } else {
+        initFlightNoOptions();
+      }
+      
       calculateReqFlightDate();
     }
     
@@ -2154,8 +2189,9 @@
     }
     
     function saveMainOrder() {
+      const editId = document.getElementById('order-edit-id').value;
       const order = {
-        id: generateId(),
+        id: editId || generateId(),
         collectDate: document.getElementById('order-collect-date').value,
         collectWeekday: document.getElementById('order-collect-weekday').value,
         departDate: document.getElementById('order-depart-date').value,
@@ -2164,7 +2200,6 @@
         cargoType: document.getElementById('order-cargo-type').value,
         port: document.getElementById('order-port').value,
         category: document.getElementById('order-category').value,
-        outWarehouse: document.getElementById('order-out-warehouse').value,
         status: document.getElementById('order-status').value,
         packReq: document.getElementById('order-pack-req').value,
         maxVolume: document.getElementById('order-max-volume').value,
@@ -2185,7 +2220,8 @@
         actualWeight: document.getElementById('order-actual-weight').value,
         actualVolume: document.getElementById('order-actual-volume').value,
         actualBills: document.getElementById('order-actual-bills').value,
-        createdAt: new Date().toISOString()
+        createdAt: editId ? undefined : new Date().toISOString(),
+        updatedAt: editId ? new Date().toISOString() : undefined
       };
       
       if (!order.collectDate || !order.warehouse) {
@@ -2194,16 +2230,81 @@
       }
       
       const data = getData(STORAGE_KEYS.MAIN_ORDERS);
-      data.push(order);
+      
+      if (editId) {
+        const index = data.findIndex(d => d.id === editId);
+        if (index !== -1) {
+          order.createdAt = data[index].createdAt;
+          data[index] = order;
+        }
+      } else {
+        data.push(order);
+      }
+      
       saveData(STORAGE_KEYS.MAIN_ORDERS, data);
       
-      alert('主单保存成功！');
+      alert(editId ? '主单更新成功！' : '主单保存成功！');
       clearOrderForm();
     }
     
+    function editMainOrder(id) {
+      const data = getData(STORAGE_KEYS.MAIN_ORDERS);
+      const order = data.find(d => d.id === id);
+      if (!order) return;
+      
+      document.getElementById('order-edit-id').value = id;
+      document.getElementById('order-collect-date').value = order.collectDate;
+      document.getElementById('order-collect-weekday').value = order.collectWeekday;
+      document.getElementById('order-collect-weekday-display').value = order.collectWeekday;
+      document.getElementById('order-depart-date').value = order.departDate;
+      document.getElementById('order-depart-weekday').value = order.departWeekday;
+      document.getElementById('order-depart-weekday-display').value = order.departWeekday;
+      document.getElementById('order-warehouse').value = order.warehouse;
+      document.getElementById('order-cargo-type').value = order.cargoType;
+      document.getElementById('order-port').value = order.port;
+      document.getElementById('order-category').value = order.category;
+      document.getElementById('order-status').value = order.status;
+      document.getElementById('order-pack-req').value = order.packReq;
+      document.getElementById('order-max-volume').value = order.maxVolume;
+      document.getElementById('order-max-pieces').value = order.maxPieces;
+      document.getElementById('order-est-volume').value = order.estVolume;
+      document.getElementById('order-est-pieces').value = order.estPieces;
+      document.getElementById('order-req-flight-date').value = order.reqFlightDate;
+      document.getElementById('order-actual-flight-date').value = order.actualFlightDate;
+      document.getElementById('order-main-no').value = order.mainNo;
+      document.getElementById('order-origin').value = order.origin;
+      document.getElementById('order-transfer').value = order.transfer;
+      document.getElementById('order-dest').value = order.dest;
+      document.getElementById('order-depart-time').value = order.departTime;
+      document.getElementById('order-arrive-time').value = order.arriveTime;
+      document.getElementById('order-actual-pieces').value = order.actualPieces;
+      document.getElementById('order-actual-weight').value = order.actualWeight;
+      document.getElementById('order-actual-volume').value = order.actualVolume;
+      document.getElementById('order-actual-bills').value = order.actualBills;
+      
+      // 初始化航班选项并选中
+      initFlightNoOptions(order.category);
+      setTimeout(() => {
+        document.getElementById('order-flight-no').value = order.flightId;
+      }, 100);
+      
+      closeModal('order-list-modal');
+      
+      // 切换到主单发放页面
+      document.querySelectorAll('.menu-item').forEach(i => i.classList.remove('active'));
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      document.querySelector('[data-page="main-order"]').classList.add('active');
+      document.getElementById('main-order').classList.add('active');
+      
+      // 滚动到顶部
+      document.querySelector('.main-content').scrollTo(0, 0);
+    }
+    
     function clearOrderForm() {
-      ['order-collect-date', 'order-collect-weekday', 'order-depart-date', 'order-depart-weekday',
-       'order-warehouse', 'order-cargo-type', 'order-port', 'order-category', 'order-out-warehouse',
+      document.getElementById('order-edit-id').value = '';
+      ['order-collect-date', 'order-collect-weekday', 'order-collect-weekday-display', 
+       'order-depart-date', 'order-depart-weekday', 'order-depart-weekday-display',
+       'order-warehouse', 'order-cargo-type', 'order-port', 'order-category',
        'order-status', 'order-pack-req', 'order-max-volume', 'order-max-pieces', 'order-est-volume',
        'order-est-pieces', 'order-req-flight-date', 'order-actual-flight-date', 'order-main-no',
        'order-flight-no', 'order-origin', 'order-transfer', 'order-dest', 'order-depart-time',
@@ -2213,6 +2314,7 @@
         if (el.tagName === 'SELECT') el.selectedIndex = 0;
         else el.value = '';
       });
+      initFlightNoOptions();
     }
     
     function showOrderList() {
@@ -2232,6 +2334,7 @@
           <td>${item.dest || '--'}</td>
           <td>${item.maxVolume || '--'}</td>
           <td>
+            <button class="btn btn-sm btn-primary" onclick="editMainOrder('${item.id}')">编辑</button>
             <button class="btn btn-sm btn-danger" onclick="deleteMainOrder('${item.id}')">删除</button>
           </td>
         </tr>
@@ -2271,7 +2374,8 @@
           <td>${item.dest || '--'}</td>
           <td>${item.actualFlightDate || '--'}</td>
           <td>
-            <button class="btn btn-sm btn-primary" onclick="viewOrderDetail('${item.id}')">详情</button>
+            <button class="btn btn-sm btn-primary" onclick="editMainOrder('${item.id}')">编辑</button>
+            <button class="btn btn-sm btn-warning" onclick="viewOrderDetail('${item.id}')">详情</button>
           </td>
         </tr>
       `).join('');
@@ -2289,10 +2393,10 @@
 货物属性：${order.cargoType}
 口岸：${order.port}
 类别：${order.category}
-出货仓：${order.outWarehouse}
 主单状态：${order.status}
 打货要求：${order.packReq}
 打货上限：${order.maxVolume}
+打货上限件数：${order.maxPieces}
 预估方数：${order.estVolume}
 预估件数：${order.estPieces}
 需求航班日期：${order.reqFlightDate}
