@@ -248,6 +248,31 @@
               <button class="btn btn-success" onclick="saveVolume()">保存数据</button>
               <button class="btn btn-primary" onclick="showVolHistory()">查看历史</button>
             </div>
+            
+            <!-- 最近记录 -->
+            <h3 style="margin: 30px 0 15px; color: var(--primary);">最近保存的记录</h3>
+            <div class="scroll-table">
+              <table id="vol-recent-table">
+                <thead>
+                  <tr>
+                    <th>揽收日期</th>
+                    <th>仓库</th>
+                    <th>大包数</th>
+                    <th>总方数</th>
+                    <th>关东总</th>
+                    <th>关西总</th>
+                    <th>关东普货</th>
+                    <th>关东特货</th>
+                    <th>关西普货</th>
+                    <th>关西特货</th>
+                    <th>空运</th>
+                    <th>海空</th>
+                    <th>操作</th>
+                  </tr>
+                </thead>
+                <tbody id="vol-recent-tbody"></tbody>
+              </table>
+            </div>
           </div>
         </div>
       </div>
@@ -493,7 +518,7 @@
           <div class="card-body">
             <div class="scroll-table">
               <table>
-                <thead><tr><th>揽收日期</th><th>仓库</th><th>口岸</th><th>货物属性</th><th>类别</th><th>主单号</th><th>航班号</th><th>目的港</th><th>操作</th></tr></thead>
+                <thead><tr><th>揽收日期</th><th>仓库</th><th>口岸</th><th>货物属性</th><th>类别</th><th>主单号</th><th>航班号</th><th>目的港</th><th>起飞时间</th><th>到港时间</th><th>操作</th></tr></thead>
                 <tbody id="q-tbody"></tbody>
               </table>
             </div>
@@ -755,7 +780,7 @@
 
   <!-- 主单列表模态框 -->
   <div class="modal" id="modal-orderlist">
-    <div class="modal-content" style="max-width:1200px">
+    <div class="modal-content" style="max-width:1400px">
       <div class="modal-header">
         <span class="modal-title">主单列表</span>
         <button class="modal-close" onclick="closeModal('modal-orderlist')">&times;</button>
@@ -763,7 +788,7 @@
       <div class="modal-body">
         <div class="scroll-table">
           <table>
-            <thead><tr><th>揽收日期</th><th>仓库</th><th>口岸</th><th>货物属性</th><th>类别</th><th>主单号</th><th>航班号</th><th>目的港</th><th>打货上限</th><th>操作</th></tr></thead>
+            <thead><tr><th>揽收日期</th><th>仓库</th><th>口岸</th><th>货物属性</th><th>类别</th><th>主单号</th><th>航班号</th><th>目的港</th><th>打货上限</th><th>起飞时间</th><th>到港时间</th><th>操作</th></tr></thead>
             <tbody id="orderlist-tbody"></tbody>
           </table>
         </div>
@@ -1145,6 +1170,7 @@ function saveVolume() {
   };
   saveData(KEYS.VOL, [...getData(KEYS.VOL), data]);
   alert('保存成功！');
+  renderVolRecent(); // 刷新最近记录列表
 }
 
 function showVolHistory() {
@@ -1229,13 +1255,30 @@ function initFlightOpts() {
 
 function fillFlightInfo() {
   const fno = document.getElementById('o-flight').value;
+  const fdate = document.getElementById('o-fdate').value;
   const route = getData(KEYS.ROUTE).find(i => i.flight_no === fno);
   if (route) {
     document.getElementById('o-origin').value = route.origin;
     document.getElementById('o-trans').value = route.transfer || '';
     document.getElementById('o-dest').value = route.dest;
-    document.getElementById('o-deptime').value = route.depart_time || '';
-    document.getElementById('o-arrtime').value = route.arrive_time || '';
+    
+    // 计算起飞时间：实际航班日期 + 起飞时间
+    if (fdate && route.depart_time) {
+      document.getElementById('o-deptime').value = fdate + ' ' + route.depart_time;
+    } else {
+      document.getElementById('o-deptime').value = route.depart_time || '';
+    }
+    
+    // 计算到港时间：实际航班日期 + 落地时间（隔天则加1天）
+    if (fdate && route.arrive_time) {
+      let arrDate = fdate;
+      if (route.is_next_day === '是') {
+        arrDate = addDays(fdate, 1);
+      }
+      document.getElementById('o-arrtime').value = arrDate + ' ' + route.arrive_time;
+    } else {
+      document.getElementById('o-arrtime').value = route.arrive_time || '';
+    }
   }
 }
 
@@ -1277,7 +1320,9 @@ function saveOrder() {
   else { list.push(data); }
   saveData(KEYS.ORDER, list);
   alert('保存成功！');
-  clearOrderForm();
+  document.getElementById('order-edit-id').value = '';
+  // 保存后显示主单列表
+  showOrderList();
 }
 
 function clearOrderForm() {
@@ -1315,7 +1360,8 @@ function showOrderList() {
   const list = getData(KEYS.ORDER);
   document.getElementById('orderlist-tbody').innerHTML = list.map(i => `<tr>
     <td>${i.collect_date}</td><td>${i.warehouse}</td><td>${i.port}</td><td>${i.cargo_type}</td>
-    <td>${i.category}</td><td>${i.main_no || '-'}</td><td>${i.flight_no || '-'}</td><td>${i.dest || '-'}</td><td>${i.max_volume || '-'}</td>
+    <td>${i.category}</td><td>${i.main_no || '-'}</td><td>${i.flight_no || '-'}</td><td>${i.dest || '-'}</td>
+    <td>${i.max_volume || '-'}</td><td>${i.depart_time || '-'}</td><td>${i.arrive_time || '-'}</td>
     <td><button class="btn btn-sm btn-primary" onclick="editOrder('${i.id}')">编辑</button> <button class="btn btn-sm btn-danger" onclick="deleteOrder('${i.id}')">删除</button></td>
   </tr>`).join('');
   openModal('modal-orderlist');
@@ -1373,6 +1419,7 @@ function queryOrders() {
   document.getElementById('q-tbody').innerHTML = list.map(i => `<tr>
     <td>${i.collect_date}</td><td>${i.warehouse}</td><td>${i.port}</td><td>${i.cargo_type}</td>
     <td>${i.category}</td><td>${i.main_no || '-'}</td><td>${i.flight_no || '-'}</td><td>${i.dest || '-'}</td>
+    <td>${i.depart_time || '-'}</td><td>${i.arrive_time || '-'}</td>
     <td><button class="btn btn-sm btn-primary" onclick="editOrder('${i.id}')">编辑</button> <button class="btn btn-sm btn-danger" onclick="deleteOrder('${i.id}')">删除</button></td>
   </tr>`).join('');
 }
@@ -1412,11 +1459,31 @@ function queryBalance() {
   }
 }
 
+// 渲染最近的方数预估记录
+function renderVolRecent() {
+  const list = getData(KEYS.VOL).slice(-10).reverse();
+  document.getElementById('vol-recent-tbody').innerHTML = list.map(i => `<tr>
+    <td>${i.collect_date}</td><td>${i.warehouse}</td><td>${i.package_count}</td>
+    <td>${i.total_volume}</td><td>${i.kanto_total}</td><td>${i.kansai_total}</td>
+    <td>${i.kanto_normal}</td><td>${i.kanto_special}</td><td>${i.kansai_normal}</td><td>${i.kansai_special}</td>
+    <td>${i.air_volume}</td><td>${i.sea_air_volume}</td>
+    <td><button class="btn btn-sm btn-danger" onclick="deleteVolRecent('${i.id}')">删除</button></td>
+  </tr>`).join('');
+}
+
+function deleteVolRecent(id) {
+  if (confirm('确定删除？')) {
+    saveData(KEYS.VOL, getData(KEYS.VOL).filter(i => i.id !== id));
+    renderVolRecent();
+  }
+}
+
 // ==================== 初始化 ====================
 renderArea();
 renderFlight();
 renderPort();
 renderRoute();
+renderVolRecent();
 </script>
 </body>
 </html>
