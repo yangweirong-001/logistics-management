@@ -807,6 +807,9 @@ export default function LogisticsManagement() {
   
   // 获取可用航班号列表
   const getAvailableFlights = () => {
+    // 如果没有配置路由，返回空数组
+    if (!routeConfigs || routeConfigs.length === 0) return [];
+    
     // 获取类别对应的路由类型
     const category = `${orderForm.port}${orderForm.cargo_type}`;
     
@@ -816,7 +819,10 @@ export default function LogisticsManagement() {
       f => f.warehouse === orderForm.warehouse && f.weekday === weekday
     );
     
-    if (!flightConfig) return routeConfigs;
+    // 如果没有航班配置或类别为空，显示所有航班
+    if (!flightConfig || !category) {
+      return routeConfigs;
+    }
     
     let routeType = '';
     if (category === '关东普货') routeType = flightConfig.kanto_normal || '';
@@ -824,7 +830,10 @@ export default function LogisticsManagement() {
     else if (category === '关西普货') routeType = flightConfig.kansai_normal || '';
     else if (category === '关西特货') routeType = flightConfig.kansai_special || '';
     
-    if (!routeType) return routeConfigs;
+    // 如果没有匹配的路由类型，显示所有航班
+    if (!routeType) {
+      return routeConfigs;
+    }
     
     return routeConfigs.filter(r => r.route_type === routeType);
   };
@@ -2028,9 +2037,9 @@ export default function LogisticsManagement() {
       
       {/* 主单列表模态框 */}
       <Dialog open={orderListOpen} onOpenChange={setOrderListOpen}>
-        <DialogContent className="max-w-[95vw] max-h-[90vh]">
+        <DialogContent className="w-[98vw] max-w-[98vw] h-[95vh] max-h-[95vh] p-4">
           <DialogHeader>
-            <DialogTitle>主单列表</DialogTitle>
+            <DialogTitle className="text-xl">主单列表</DialogTitle>
           </DialogHeader>
           <div className="mb-4 grid grid-cols-5 gap-3">
             <Input type="date" id="filter-order-date" placeholder="揽收日期" />
@@ -2072,32 +2081,32 @@ export default function LogisticsManagement() {
               loadMainOrdersWithFilter(date);
             }}>查询</Button>
           </div>
-          <div className="overflow-auto max-h-[60vh]">
+          <div className="overflow-auto flex-1 border rounded-lg" style={{ height: 'calc(95vh - 180px)' }}>
             <Table>
-              <TableHeader className="sticky top-0 bg-white">
+              <TableHeader className="sticky top-0 bg-white z-10">
                 <TableRow>
-                  <TableHead className="whitespace-nowrap">揽收日期</TableHead>
-                  <TableHead className="whitespace-nowrap">发车日期</TableHead>
-                  <TableHead className="whitespace-nowrap">仓库</TableHead>
-                  <TableHead className="whitespace-nowrap">口岸</TableHead>
-                  <TableHead className="whitespace-nowrap">货物属性</TableHead>
-                  <TableHead className="whitespace-nowrap">类别</TableHead>
-                  <TableHead className="whitespace-nowrap">主单状态</TableHead>
-                  <TableHead className="whitespace-nowrap">打货要求</TableHead>
-                  <TableHead className="whitespace-nowrap">打货上限</TableHead>
-                  <TableHead className="whitespace-nowrap">上限件数</TableHead>
-                  <TableHead className="whitespace-nowrap">预估方数</TableHead>
-                  <TableHead className="whitespace-nowrap">预估件数</TableHead>
-                  <TableHead className="whitespace-nowrap">实际航班</TableHead>
-                  <TableHead className="whitespace-nowrap">主单号</TableHead>
-                  <TableHead className="whitespace-nowrap">航班号</TableHead>
-                  <TableHead className="whitespace-nowrap">目的港</TableHead>
-                  <TableHead className="whitespace-nowrap">实际件数</TableHead>
-                  <TableHead className="whitespace-nowrap">实际重量</TableHead>
-                  <TableHead className="whitespace-nowrap">实际体积</TableHead>
-                  <TableHead className="whitespace-nowrap">实际票数</TableHead>
-                  <TableHead className="whitespace-nowrap">备注</TableHead>
-                  <TableHead className="whitespace-nowrap">操作</TableHead>
+                  <TableHead className="whitespace-nowrap bg-gray-50">揽收日期</TableHead>
+                  <TableHead className="whitespace-nowrap bg-gray-50">发车日期</TableHead>
+                  <TableHead className="whitespace-nowrap bg-gray-50">仓库</TableHead>
+                  <TableHead className="whitespace-nowrap bg-gray-50">口岸</TableHead>
+                  <TableHead className="whitespace-nowrap bg-gray-50">货物属性</TableHead>
+                  <TableHead className="whitespace-nowrap bg-gray-50">类别</TableHead>
+                  <TableHead className="whitespace-nowrap bg-gray-50">主单状态</TableHead>
+                  <TableHead className="whitespace-nowrap bg-gray-50">打货要求</TableHead>
+                  <TableHead className="whitespace-nowrap bg-gray-50">打货上限</TableHead>
+                  <TableHead className="whitespace-nowrap bg-gray-50">上限件数</TableHead>
+                  <TableHead className="whitespace-nowrap bg-gray-50">预估方数</TableHead>
+                  <TableHead className="whitespace-nowrap bg-gray-50">预估件数</TableHead>
+                  <TableHead className="whitespace-nowrap bg-gray-50">实际航班</TableHead>
+                  <TableHead className="whitespace-nowrap bg-gray-50">主单号</TableHead>
+                  <TableHead className="whitespace-nowrap bg-gray-50">航班号</TableHead>
+                  <TableHead className="whitespace-nowrap bg-gray-50">目的港</TableHead>
+                  <TableHead className="whitespace-nowrap bg-gray-50">实际件数</TableHead>
+                  <TableHead className="whitespace-nowrap bg-gray-50">实际重量</TableHead>
+                  <TableHead className="whitespace-nowrap bg-gray-50">实际体积</TableHead>
+                  <TableHead className="whitespace-nowrap bg-gray-50">实际票数</TableHead>
+                  <TableHead className="whitespace-nowrap bg-gray-50">备注</TableHead>
+                  <TableHead className="whitespace-nowrap bg-gray-50 sticky right-0">操作</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -2133,7 +2142,7 @@ export default function LogisticsManagement() {
                     <TableCell>{order.actual_volume || '-'}</TableCell>
                     <TableCell>{order.actual_bills || '-'}</TableCell>
                     <TableCell className="max-w-[100px] truncate" title={order.remark || ''}>{order.remark || '-'}</TableCell>
-                    <TableCell className="whitespace-nowrap">
+                    <TableCell className="whitespace-nowrap sticky right-0 bg-white">
                       <Button size="sm" variant="outline" className="mr-2"
                         onClick={() => {
                           setEditingOrder(order);
