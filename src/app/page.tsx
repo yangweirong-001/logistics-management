@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -253,63 +253,73 @@ export default function LogisticsManagement() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   
-  // 监听volumeForm变化，自动计算
+  // 监听volumeForm变化，自动计算（延迟执行避免频繁计算）
   useEffect(() => {
-    if (volumeForm.warehouse && volumeForm.package_count > 0 && volumeForm.collect_date) {
-      const areaConfig = areaConfigs.find(a => a.warehouse === volumeForm.warehouse);
-      if (areaConfig) {
-        const packageVolume = parseFloat(areaConfig.package_volume);
-        const packageCount = volumeForm.package_count;
-        const totalVolume = packageVolume * packageCount;
-        
-        const kantoRatio = parseFloat(areaConfig.kanto_ratio) / 100;
-        const kansaiRatio = parseFloat(areaConfig.kansai_ratio) / 100;
-        const kantoNormalRatio = parseFloat(areaConfig.kanto_normal_ratio) / 100;
-        const kantoSpecialRatio = parseFloat(areaConfig.kanto_special_ratio) / 100;
-        const kansaiNormalRatio = parseFloat(areaConfig.kansai_normal_ratio) / 100;
-        const kansaiSpecialRatio = parseFloat(areaConfig.kansai_special_ratio) / 100;
-        
-        const kantoTotal = totalVolume * kantoRatio;
-        const kansaiTotal = totalVolume * kansaiRatio;
-        const kantoNormal = kantoTotal * kantoNormalRatio;
-        const kantoSpecial = kantoTotal * kantoSpecialRatio;
-        const kansaiNormal = kansaiTotal * kansaiNormalRatio;
-        const kansaiSpecial = kansaiTotal * kansaiSpecialRatio;
-        
-        const weekday = getWeekday(volumeForm.collect_date);
-        const flightConfig = flightConfigs.find(f => f.warehouse === volumeForm.warehouse && f.weekday === weekday);
-        
-        let airVolume = 0;
-        let seaAirVolume = 0;
-        
-        if (flightConfig) {
-          if (flightConfig.kanto_normal === '空运') airVolume += kantoNormal;
-          else if (flightConfig.kanto_normal === '海空') seaAirVolume += kantoNormal;
-          if (flightConfig.kanto_special === '空运') airVolume += kantoSpecial;
-          else if (flightConfig.kanto_special === '海空') seaAirVolume += kantoSpecial;
-          if (flightConfig.kansai_normal === '空运') airVolume += kansaiNormal;
-          else if (flightConfig.kansai_normal === '海空') seaAirVolume += kansaiNormal;
-          if (flightConfig.kansai_special === '空运') airVolume += kansaiSpecial;
-          else if (flightConfig.kansai_special === '海空') seaAirVolume += kansaiSpecial;
+    const timer = setTimeout(() => {
+      if (volumeForm.warehouse && volumeForm.package_count > 0 && volumeForm.collect_date && areaConfigs.length > 0) {
+        const areaConfig = areaConfigs.find(a => a.warehouse === volumeForm.warehouse);
+        if (areaConfig) {
+          try {
+            const packageVolume = parseFloat(areaConfig.package_volume) || 0;
+            const packageCount = volumeForm.package_count || 0;
+            const totalVolume = packageVolume * packageCount;
+            
+            const kantoRatio = (parseFloat(areaConfig.kanto_ratio) || 0) / 100;
+            const kansaiRatio = (parseFloat(areaConfig.kansai_ratio) || 0) / 100;
+            const kantoNormalRatio = (parseFloat(areaConfig.kanto_normal_ratio) || 0) / 100;
+            const kantoSpecialRatio = (parseFloat(areaConfig.kanto_special_ratio) || 0) / 100;
+            const kansaiNormalRatio = (parseFloat(areaConfig.kansai_normal_ratio) || 0) / 100;
+            const kansaiSpecialRatio = (parseFloat(areaConfig.kansai_special_ratio) || 0) / 100;
+            
+            const kantoTotal = totalVolume * kantoRatio;
+            const kansaiTotal = totalVolume * kansaiRatio;
+            const kantoNormal = kantoTotal * kantoNormalRatio;
+            const kantoSpecial = kantoTotal * kantoSpecialRatio;
+            const kansaiNormal = kansaiTotal * kansaiNormalRatio;
+            const kansaiSpecial = kansaiTotal * kansaiSpecialRatio;
+            
+            const weekday = getWeekday(volumeForm.collect_date);
+            const flightConfig = flightConfigs.find(f => f.warehouse === volumeForm.warehouse && f.weekday === weekday);
+            
+            let airVolume = 0;
+            let seaAirVolume = 0;
+            
+            if (flightConfig) {
+              if (flightConfig.kanto_normal === '空运') airVolume += kantoNormal;
+              else if (flightConfig.kanto_normal === '海空') seaAirVolume += kantoNormal;
+              if (flightConfig.kanto_special === '空运') airVolume += kantoSpecial;
+              else if (flightConfig.kanto_special === '海空') seaAirVolume += kantoSpecial;
+              if (flightConfig.kansai_normal === '空运') airVolume += kansaiNormal;
+              else if (flightConfig.kansai_normal === '海空') seaAirVolume += kansaiNormal;
+              if (flightConfig.kansai_special === '空运') airVolume += kansaiSpecial;
+              else if (flightConfig.kansai_special === '海空') seaAirVolume += kansaiSpecial;
+            }
+            
+            setVolumeResult({
+              totalVolume,
+              kantoTotal,
+              kansaiTotal,
+              kantoNormal,
+              kantoSpecial,
+              kansaiNormal,
+              kansaiSpecial,
+              airVolume,
+              seaAirVolume,
+            });
+          } catch {
+            setVolumeResult(null);
+          }
+        } else {
+          setVolumeResult(null);
         }
-        
-        setVolumeResult({
-          totalVolume,
-          kantoTotal,
-          kansaiTotal,
-          kantoNormal,
-          kantoSpecial,
-          kansaiNormal,
-          kansaiSpecial,
-          airVolume,
-          seaAirVolume,
-        });
+      } else {
+        setVolumeResult(null);
       }
-    } else {
-      setVolumeResult(null);
-    }
+    }, 100);
+    
+    return () => clearTimeout(timer);
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [volumeForm.collect_date, volumeForm.warehouse, volumeForm.package_count]);
+  }, [volumeForm.collect_date, volumeForm.warehouse, volumeForm.package_count, areaConfigs, flightConfigs]);
   
   // 区域参数配置操作
   const saveAreaConfig = async (formData: FormData) => {
@@ -1261,7 +1271,7 @@ export default function LogisticsManagement() {
                 <div className="grid grid-cols-4 gap-4 mb-4">
                   <div>
                     <Label>打货上限（航线提供）</Label>
-                    <Input type="number" step="0.01" value={orderForm.max_volume}
+                    <Input type="number" step="0.001" value={orderForm.max_volume}
                       onChange={e => setOrderForm(prev => ({ ...prev, max_volume: e.target.value }))} />
                   </div>
                   <div>
@@ -1274,6 +1284,38 @@ export default function LogisticsManagement() {
                         : ''} />
                   </div>
                   <div>
+                    <Label>预估方数</Label>
+                    <Input readOnly placeholder="自动计算"
+                      value={(() => {
+                        if (!orderForm.collect_date || !orderForm.warehouse || !orderForm.port || !orderForm.cargo_type) return '';
+                        const estimate = volumeEstimates.find(e => e.collect_date === orderForm.collect_date && e.warehouse === orderForm.warehouse);
+                        if (!estimate) return '';
+                        if (orderForm.port === '关东' && orderForm.cargo_type === '普货') return parseFloat(estimate.kanto_normal || '0').toFixed(3);
+                        if (orderForm.port === '关东' && orderForm.cargo_type === '特货') return parseFloat(estimate.kanto_special || '0').toFixed(3);
+                        if (orderForm.port === '关西' && orderForm.cargo_type === '普货') return parseFloat(estimate.kansai_normal || '0').toFixed(3);
+                        if (orderForm.port === '关西' && orderForm.cargo_type === '特货') return parseFloat(estimate.kansai_special || '0').toFixed(3);
+                        return '';
+                      })()} />
+                  </div>
+                  <div>
+                    <Label>预估件数</Label>
+                    <Input readOnly placeholder="自动计算"
+                      value={(() => {
+                        if (!orderForm.collect_date || !orderForm.warehouse || !orderForm.port || !orderForm.cargo_type) return '';
+                        const estimate = volumeEstimates.find(e => e.collect_date === orderForm.collect_date && e.warehouse === orderForm.warehouse);
+                        if (!estimate) return '';
+                        let estVol = 0;
+                        if (orderForm.port === '关东' && orderForm.cargo_type === '普货') estVol = parseFloat(estimate.kanto_normal || '0');
+                        else if (orderForm.port === '关东' && orderForm.cargo_type === '特货') estVol = parseFloat(estimate.kanto_special || '0');
+                        else if (orderForm.port === '关西' && orderForm.cargo_type === '普货') estVol = parseFloat(estimate.kansai_normal || '0');
+                        else if (orderForm.port === '关西' && orderForm.cargo_type === '特货') estVol = parseFloat(estimate.kansai_special || '0');
+                        return Math.round(estVol / 0.06);
+                      })()} />
+                  </div>
+                </div>
+                
+                <div className="grid grid-cols-4 gap-4 mb-4">
+                  <div>
                     <Label>实际航班日期</Label>
                     <Input type="date" value={orderForm.actual_flight_date}
                       onChange={e => setOrderForm(prev => ({ ...prev, actual_flight_date: e.target.value }))} />
@@ -1283,9 +1325,6 @@ export default function LogisticsManagement() {
                     <Input value={orderForm.main_no}
                       onChange={e => setOrderForm(prev => ({ ...prev, main_no: e.target.value }))} />
                   </div>
-                </div>
-                
-                <div className="grid grid-cols-4 gap-4 mb-4">
                   <div>
                     <Label>航班号</Label>
                     <Select value={orderForm.flight_no}
