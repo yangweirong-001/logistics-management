@@ -2143,14 +2143,14 @@ export default function LogisticsManagement() {
       
       {/* 主单列表模态框 */}
       <Dialog open={orderListOpen} onOpenChange={setOrderListOpen}>
-        <DialogContent className="w-[99vw] max-w-[99vw] h-auto max-h-[55vh] p-4 flex flex-col">
+        <DialogContent className="w-[99vw] max-w-[99vw] h-[80vh] max-h-[80vh] p-5 flex flex-col">
           <DialogHeader>
             <DialogTitle className="text-xl">主单列表</DialogTitle>
           </DialogHeader>
-          <div className="mb-3 grid grid-cols-5 gap-2">
-            <Input type="date" id="filter-order-date" placeholder="揽收日期" className="h-9" />
+          <div className="mb-4 grid grid-cols-5 gap-3">
+            <Input type="date" id="filter-order-date" placeholder="揽收日期" />
             <Select defaultValue="全部">
-              <SelectTrigger className="h-9"><SelectValue placeholder="仓库" /></SelectTrigger>
+              <SelectTrigger><SelectValue placeholder="仓库" /></SelectTrigger>
               <SelectContent>
                 <SelectItem value="全部">全部</SelectItem>
                 <SelectItem value="东莞">东莞</SelectItem>
@@ -2158,7 +2158,7 @@ export default function LogisticsManagement() {
               </SelectContent>
             </Select>
             <Select defaultValue="全部">
-              <SelectTrigger className="h-9"><SelectValue placeholder="口岸" /></SelectTrigger>
+              <SelectTrigger><SelectValue placeholder="口岸" /></SelectTrigger>
               <SelectContent>
                 <SelectItem value="全部">全部</SelectItem>
                 <SelectItem value="关东">关东</SelectItem>
@@ -2166,44 +2166,44 @@ export default function LogisticsManagement() {
               </SelectContent>
             </Select>
             <Select defaultValue="全部">
-              <SelectTrigger className="h-9"><SelectValue placeholder="货物属性" /></SelectTrigger>
+              <SelectTrigger><SelectValue placeholder="货物属性" /></SelectTrigger>
               <SelectContent>
                 <SelectItem value="全部">全部</SelectItem>
                 <SelectItem value="普货">普货</SelectItem>
                 <SelectItem value="特货">特货</SelectItem>
               </SelectContent>
             </Select>
-            <Button className="h-9" onClick={() => {
+            <Button onClick={() => {
               const date = (document.getElementById('filter-order-date') as HTMLInputElement).value;
               loadMainOrdersWithFilter(date);
             }}>查询</Button>
           </div>
-          <div className="flex-1 overflow-auto border rounded-lg" style={{ maxHeight: 'calc(55vh - 130px)' }}>
-            <Table className="w-full text-sm">
+          <div className="flex-1 overflow-auto border rounded-lg" style={{ maxHeight: 'calc(80vh - 180px)' }}>
+            <Table className="w-full text-base">
               <TableHeader className="sticky top-0 bg-white z-10">
                 <TableRow>
-                  <TableHead className="bg-gray-50 text-center">揽收日期</TableHead>
-                  <TableHead className="bg-gray-50 text-center">仓库</TableHead>
-                  <TableHead className="bg-gray-50 text-center">口岸</TableHead>
-                  <TableHead className="bg-gray-50 text-center">货物属性</TableHead>
-                  <TableHead className="bg-gray-50 text-center">类别</TableHead>
-                  <TableHead className="bg-gray-50 text-center">主单号</TableHead>
-                  <TableHead className="bg-gray-50 text-center">航班号</TableHead>
-                  <TableHead className="bg-gray-50 text-center">目的港</TableHead>
-                  <TableHead className="bg-gray-50 text-center">打货上限</TableHead>
-                  <TableHead className="bg-gray-50 text-center">起飞时间</TableHead>
-                  <TableHead className="bg-gray-50 text-center">到港时间</TableHead>
-                  <TableHead className="bg-gray-50 text-center">实际件数</TableHead>
-                  <TableHead className="bg-gray-50 text-center">实际重量</TableHead>
-                  <TableHead className="bg-gray-50 text-center">实际体积</TableHead>
-                  <TableHead className="bg-gray-50 text-center">实际票数</TableHead>
-                  <TableHead className="bg-gray-50 text-center">备注</TableHead>
-                  <TableHead className="bg-gray-50 text-center sticky right-0">操作</TableHead>
+                  <TableHead className="bg-gray-50 text-center px-2">揽收日期</TableHead>
+                  <TableHead className="bg-gray-50 text-center px-2">仓库</TableHead>
+                  <TableHead className="bg-gray-50 text-center px-2">口岸</TableHead>
+                  <TableHead className="bg-gray-50 text-center px-2">货物属性</TableHead>
+                  <TableHead className="bg-gray-50 text-center px-2">类别</TableHead>
+                  <TableHead className="bg-gray-50 text-center px-2">主单号</TableHead>
+                  <TableHead className="bg-gray-50 text-center px-2">航班号</TableHead>
+                  <TableHead className="bg-gray-50 text-center px-2">目的港</TableHead>
+                  <TableHead className="bg-gray-50 text-center px-2">打货上限</TableHead>
+                  <TableHead className="bg-gray-50 text-center px-2">起飞时间</TableHead>
+                  <TableHead className="bg-gray-50 text-center px-2">到港时间</TableHead>
+                  <TableHead className="bg-gray-50 text-center px-2">实际件数</TableHead>
+                  <TableHead className="bg-gray-50 text-center px-2">实际重量</TableHead>
+                  <TableHead className="bg-gray-50 text-center px-2">实际体积</TableHead>
+                  <TableHead className="bg-gray-50 text-center px-2">实际票数</TableHead>
+                  <TableHead className="bg-gray-50 text-center px-2">备注</TableHead>
+                  <TableHead className="bg-gray-50 text-center px-2 sticky right-0">操作</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {mainOrders.slice(0, 100).map(order => (
-                  <TableRow key={order.id}>
+                  <TableRow key={order.id} className="h-10">
                     <TableCell className="text-center">{order.collect_date}</TableCell>
                     <TableCell className="text-center">{order.warehouse}</TableCell>
                     <TableCell className="text-center">{order.port}</TableCell>
@@ -2227,7 +2227,7 @@ export default function LogisticsManagement() {
                     <TableCell className="text-center">{order.actual_weight || '-'}</TableCell>
                     <TableCell className="text-center">{order.actual_volume || '-'}</TableCell>
                     <TableCell className="text-center">{order.actual_bills || '-'}</TableCell>
-                    <TableCell className="text-center truncate max-w-[80px]" title={order.remark || ''}>{order.remark || '-'}</TableCell>
+                    <TableCell className="text-center truncate max-w-[100px]" title={order.remark || ''}>{order.remark || '-'}</TableCell>
                     <TableCell className="text-center sticky right-0 bg-white">
                       <Button size="sm" className="bg-blue-600 hover:bg-blue-700 text-white mr-1"
                         onClick={() => {
