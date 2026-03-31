@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -128,6 +128,19 @@ export default function LogisticsManagement() {
   const [volumeEstimates, setVolumeEstimates] = useState<VolumeEstimate[]>([]);
   const [mainOrders, setMainOrders] = useState<MainOrder[]>([]);
   
+  // 方数预估计算结果
+  const [volumeResult, setVolumeResult] = useState<{
+    totalVolume: number;
+    kantoTotal: number;
+    kansaiTotal: number;
+    kantoNormal: number;
+    kantoSpecial: number;
+    kansaiNormal: number;
+    kansaiSpecial: number;
+    airVolume: number;
+    seaAirVolume: number;
+  } | null>(null);
+  
   // 模态框状态
   const [areaModalOpen, setAreaModalOpen] = useState(false);
   const [flightModalOpen, setFlightModalOpen] = useState(false);
@@ -142,6 +155,7 @@ export default function LogisticsManagement() {
   const [editingPort, setEditingPort] = useState<PortConfig | null>(null);
   const [editingRoute, setEditingRoute] = useState<RouteConfig | null>(null);
   const [editingOrder, setEditingOrder] = useState<MainOrder | null>(null);
+  const [editingVolume, setEditingVolume] = useState<VolumeEstimate | null>(null);
   
   // 方数预估表单
   const [volumeForm, setVolumeForm] = useState({
@@ -229,14 +243,73 @@ export default function LogisticsManagement() {
   };
   
   // 初始加载
-  useState(() => {
+  useEffect(() => {
     loadAreaConfigs();
     loadFlightConfigs();
     loadPortConfigs();
     loadRouteConfigs();
     loadVolumeEstimates();
     loadMainOrders();
-  });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+  
+  // 监听volumeForm变化，自动计算
+  useEffect(() => {
+    if (volumeForm.warehouse && volumeForm.package_count > 0 && volumeForm.collect_date) {
+      const areaConfig = areaConfigs.find(a => a.warehouse === volumeForm.warehouse);
+      if (areaConfig) {
+        const packageVolume = parseFloat(areaConfig.package_volume);
+        const packageCount = volumeForm.package_count;
+        const totalVolume = packageVolume * packageCount;
+        
+        const kantoRatio = parseFloat(areaConfig.kanto_ratio) / 100;
+        const kansaiRatio = parseFloat(areaConfig.kansai_ratio) / 100;
+        const kantoNormalRatio = parseFloat(areaConfig.kanto_normal_ratio) / 100;
+        const kantoSpecialRatio = parseFloat(areaConfig.kanto_special_ratio) / 100;
+        const kansaiNormalRatio = parseFloat(areaConfig.kansai_normal_ratio) / 100;
+        const kansaiSpecialRatio = parseFloat(areaConfig.kansai_special_ratio) / 100;
+        
+        const kantoTotal = totalVolume * kantoRatio;
+        const kansaiTotal = totalVolume * kansaiRatio;
+        const kantoNormal = kantoTotal * kantoNormalRatio;
+        const kantoSpecial = kantoTotal * kantoSpecialRatio;
+        const kansaiNormal = kansaiTotal * kansaiNormalRatio;
+        const kansaiSpecial = kansaiTotal * kansaiSpecialRatio;
+        
+        const weekday = getWeekday(volumeForm.collect_date);
+        const flightConfig = flightConfigs.find(f => f.warehouse === volumeForm.warehouse && f.weekday === weekday);
+        
+        let airVolume = 0;
+        let seaAirVolume = 0;
+        
+        if (flightConfig) {
+          if (flightConfig.kanto_normal === '空运') airVolume += kantoNormal;
+          else if (flightConfig.kanto_normal === '海空') seaAirVolume += kantoNormal;
+          if (flightConfig.kanto_special === '空运') airVolume += kantoSpecial;
+          else if (flightConfig.kanto_special === '海空') seaAirVolume += kantoSpecial;
+          if (flightConfig.kansai_normal === '空运') airVolume += kansaiNormal;
+          else if (flightConfig.kansai_normal === '海空') seaAirVolume += kansaiNormal;
+          if (flightConfig.kansai_special === '空运') airVolume += kansaiSpecial;
+          else if (flightConfig.kansai_special === '海空') seaAirVolume += kansaiSpecial;
+        }
+        
+        setVolumeResult({
+          totalVolume,
+          kantoTotal,
+          kansaiTotal,
+          kantoNormal,
+          kantoSpecial,
+          kansaiNormal,
+          kansaiSpecial,
+          airVolume,
+          seaAirVolume,
+        });
+      }
+    } else {
+      setVolumeResult(null);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [volumeForm.collect_date, volumeForm.warehouse, volumeForm.package_count]);
   
   // 区域参数配置操作
   const saveAreaConfig = async (formData: FormData) => {
@@ -388,9 +461,17 @@ export default function LogisticsManagement() {
     }
   };
   
-  // 方数预估计算
-  const calculateVolume = async () => {
-    if (!volumeForm.warehouse || !volumeForm.package_count || !volumeForm.collect_date) return;
+  // 保存方数预估
+  const saveVolumeEstimate = async () => {
+    if (!volumeForm.warehouse || !volumeForm.package_count || !volumeForm.collect_date) {
+      alert('请填写完整信息');
+      return;
+    }
+    
+    if (!volumeForm.is_complete) {
+      alert('请选择货物袋数是否齐全');
+      return;
+    }
     
     const areaConfig = areaConfigs.find(a => a.warehouse === volumeForm.warehouse);
     if (!areaConfig) {
@@ -416,7 +497,6 @@ export default function LogisticsManagement() {
     const kansaiNormal = kansaiTotal * kansaiNormalRatio;
     const kansaiSpecial = kansaiTotal * kansaiSpecialRatio;
     
-    // 根据航班配置计算空运和海空方数
     const weekday = getWeekday(volumeForm.collect_date);
     const flightConfig = flightConfigs.find(f => f.warehouse === volumeForm.warehouse && f.weekday === weekday);
     
@@ -424,46 +504,84 @@ export default function LogisticsManagement() {
     let seaAirVolume = 0;
     
     if (flightConfig) {
-      // 关东普货
       if (flightConfig.kanto_normal === '空运') airVolume += kantoNormal;
       else if (flightConfig.kanto_normal === '海空') seaAirVolume += kantoNormal;
-      
-      // 关东特货
       if (flightConfig.kanto_special === '空运') airVolume += kantoSpecial;
       else if (flightConfig.kanto_special === '海空') seaAirVolume += kantoSpecial;
-      
-      // 关西普货
       if (flightConfig.kansai_normal === '空运') airVolume += kansaiNormal;
       else if (flightConfig.kansai_normal === '海空') seaAirVolume += kansaiNormal;
-      
-      // 关西特货
       if (flightConfig.kansai_special === '空运') airVolume += kansaiSpecial;
       else if (flightConfig.kansai_special === '海空') seaAirVolume += kansaiSpecial;
     }
     
-    await fetch('/api/volume-estimate', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        collect_date: volumeForm.collect_date,
-        weekday,
-        warehouse: volumeForm.warehouse,
-        package_count: volumeForm.package_count,
-        total_volume: totalVolume.toFixed(3),
-        kanto_total: kantoTotal.toFixed(3),
-        kansai_total: kansaiTotal.toFixed(3),
-        kanto_normal: kantoNormal.toFixed(3),
-        kanto_special: kantoSpecial.toFixed(3),
-        kansai_normal: kansaiNormal.toFixed(3),
-        kansai_special: kansaiSpecial.toFixed(3),
-        air_volume: airVolume.toFixed(3),
-        sea_air_volume: seaAirVolume.toFixed(3),
-        is_complete: volumeForm.is_complete,
-      }),
-    });
+    if (editingVolume) {
+      await fetch(`/api/volume-estimate/${editingVolume.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          collect_date: volumeForm.collect_date,
+          weekday,
+          warehouse: volumeForm.warehouse,
+          package_count: volumeForm.package_count,
+          total_volume: totalVolume.toFixed(3),
+          kanto_total: kantoTotal.toFixed(3),
+          kansai_total: kansaiTotal.toFixed(3),
+          kanto_normal: kantoNormal.toFixed(3),
+          kanto_special: kantoSpecial.toFixed(3),
+          kansai_normal: kansaiNormal.toFixed(3),
+          kansai_special: kansaiSpecial.toFixed(3),
+          air_volume: airVolume.toFixed(3),
+          sea_air_volume: seaAirVolume.toFixed(3),
+          is_complete: volumeForm.is_complete,
+        }),
+      });
+    } else {
+      await fetch('/api/volume-estimate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          collect_date: volumeForm.collect_date,
+          weekday,
+          warehouse: volumeForm.warehouse,
+          package_count: volumeForm.package_count,
+          total_volume: totalVolume.toFixed(3),
+          kanto_total: kantoTotal.toFixed(3),
+          kansai_total: kansaiTotal.toFixed(3),
+          kanto_normal: kantoNormal.toFixed(3),
+          kanto_special: kantoSpecial.toFixed(3),
+          kansai_normal: kansaiNormal.toFixed(3),
+          kansai_special: kansaiSpecial.toFixed(3),
+          air_volume: airVolume.toFixed(3),
+          sea_air_volume: seaAirVolume.toFixed(3),
+          is_complete: volumeForm.is_complete,
+        }),
+      });
+    }
     
     loadVolumeEstimates();
+    setEditingVolume(null);
+    setVolumeForm({ collect_date: '', warehouse: '', package_count: 0, is_complete: '是' });
+    setVolumeResult(null);
     alert('保存成功！');
+  };
+  
+  // 编辑方数预估记录
+  const editVolumeEstimate = (record: VolumeEstimate) => {
+    setEditingVolume(record);
+    setVolumeForm({
+      collect_date: record.collect_date,
+      warehouse: record.warehouse,
+      package_count: record.package_count,
+      is_complete: record.is_complete || '是',
+    });
+  };
+  
+  // 删除方数预估记录
+  const deleteVolumeEstimate = async (id: number) => {
+    if (confirm('确定删除此记录？')) {
+      await fetch(`/api/volume-estimate/${id}`, { method: 'DELETE' });
+      loadVolumeEstimates();
+    }
   };
   
   // 主单操作
@@ -879,6 +997,7 @@ export default function LogisticsManagement() {
                 <CardTitle>方数预估</CardTitle>
               </CardHeader>
               <CardContent>
+                {/* 顶部筛选 */}
                 <div className="grid grid-cols-4 gap-4 mb-5">
                   <div>
                     <Label>揽收日期</Label>
@@ -888,7 +1007,7 @@ export default function LogisticsManagement() {
                   <div>
                     <Label>星期</Label>
                     <Input value={volumeForm.collect_date ? getWeekday(volumeForm.collect_date) : ''} readOnly
-                      className="bg-blue-50 text-blue-600 font-semibold" />
+                      className="bg-gray-50" />
                   </div>
                   <div>
                     <Label>仓库</Label>
@@ -903,13 +1022,61 @@ export default function LogisticsManagement() {
                   </div>
                   <div>
                     <Label>揽收大包数</Label>
-                    <Input type="number" value={volumeForm.package_count || ''}
+                    <Input type="number" placeholder="请输入" value={volumeForm.package_count || ''}
                       onChange={e => setVolumeForm(prev => ({ ...prev, package_count: parseInt(e.target.value) || 0 }))} />
                   </div>
                 </div>
                 
-                <div className="grid grid-cols-4 gap-4 mb-5">
-                  <div>
+                {/* 计算结果 */}
+                <div className="mb-5">
+                  <h3 className="font-semibold text-lg mb-3">计算结果</h3>
+                  <div className="grid grid-cols-3 gap-4 mb-3">
+                    <div className="bg-blue-50 rounded-lg p-4 text-center">
+                      <div className="text-2xl font-bold text-blue-600">{volumeResult ? volumeResult.totalVolume.toFixed(3) : '0'}</div>
+                      <div className="text-sm text-gray-600">总方数</div>
+                    </div>
+                    <div className="bg-green-50 rounded-lg p-4 text-center">
+                      <div className="text-2xl font-bold text-green-600">{volumeResult ? volumeResult.kantoTotal.toFixed(3) : '0'}</div>
+                      <div className="text-sm text-gray-600">关东总方数</div>
+                    </div>
+                    <div className="bg-purple-50 rounded-lg p-4 text-center">
+                      <div className="text-2xl font-bold text-purple-600">{volumeResult ? volumeResult.kansaiTotal.toFixed(3) : '0'}</div>
+                      <div className="text-sm text-gray-600">关西总方数</div>
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-4 gap-4 mb-3">
+                    <div className="bg-orange-50 rounded-lg p-3 text-center">
+                      <div className="text-xl font-bold text-orange-600">{volumeResult ? volumeResult.kantoNormal.toFixed(3) : '0'}</div>
+                      <div className="text-sm text-gray-600">关东普货</div>
+                    </div>
+                    <div className="bg-red-50 rounded-lg p-3 text-center">
+                      <div className="text-xl font-bold text-red-600">{volumeResult ? volumeResult.kantoSpecial.toFixed(3) : '0'}</div>
+                      <div className="text-sm text-gray-600">关东特货</div>
+                    </div>
+                    <div className="bg-teal-50 rounded-lg p-3 text-center">
+                      <div className="text-xl font-bold text-teal-600">{volumeResult ? volumeResult.kansaiNormal.toFixed(3) : '0'}</div>
+                      <div className="text-sm text-gray-600">关西普货</div>
+                    </div>
+                    <div className="bg-indigo-50 rounded-lg p-3 text-center">
+                      <div className="text-xl font-bold text-indigo-600">{volumeResult ? volumeResult.kansaiSpecial.toFixed(3) : '0'}</div>
+                      <div className="text-sm text-gray-600">关西特货</div>
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="bg-cyan-50 rounded-lg p-3 text-center">
+                      <div className="text-xl font-bold text-cyan-600">{volumeResult ? volumeResult.airVolume.toFixed(3) : '0'}</div>
+                      <div className="text-sm text-gray-600">空运方数</div>
+                    </div>
+                    <div className="bg-amber-50 rounded-lg p-3 text-center">
+                      <div className="text-xl font-bold text-amber-600">{volumeResult ? volumeResult.seaAirVolume.toFixed(3) : '0'}</div>
+                      <div className="text-sm text-gray-600">海空方数</div>
+                    </div>
+                  </div>
+                </div>
+                
+                {/* 操作区 */}
+                <div className="flex items-center gap-4 mb-5">
+                  <div className="w-48">
                     <Label className="text-red-600">货物袋数是否齐全 <span className="text-red-500">*</span></Label>
                     <Select value={volumeForm.is_complete}
                       onValueChange={v => setVolumeForm(prev => ({ ...prev, is_complete: v }))}>
@@ -920,16 +1087,78 @@ export default function LogisticsManagement() {
                       </SelectContent>
                     </Select>
                   </div>
+                  <div className="flex gap-3 pt-6">
+                    <Button onClick={saveVolumeEstimate} className="bg-green-600 hover:bg-green-700">
+                      保存数据
+                    </Button>
+                    <Button variant="outline" onClick={() => { setEditingVolume(null); setVolumeForm({ collect_date: '', warehouse: '', package_count: 0, is_complete: '是' }); setVolumeResult(null); }}>
+                      清空
+                    </Button>
+                  </div>
                 </div>
-                
-                <div className="flex gap-3 mb-5">
-                  <Button onClick={calculateVolume}>保存数据</Button>
-                  <Button variant="outline" onClick={() => setVolumeHistoryOpen(true)}>查看历史</Button>
-                </div>
-                
-                <div className="text-sm text-gray-500">
-                  选择仓库、填写大包数后点击保存，系统将自动计算各项方数。
-                </div>
+              </CardContent>
+            </Card>
+            
+            {/* 最近保存的记录 */}
+            <Card>
+              <CardHeader>
+                <CardTitle>最近保存的记录</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>揽收日期</TableHead>
+                      <TableHead>仓库</TableHead>
+                      <TableHead>大包数</TableHead>
+                      <TableHead>总方数</TableHead>
+                      <TableHead>关东总</TableHead>
+                      <TableHead>关西总</TableHead>
+                      <TableHead>关东普货</TableHead>
+                      <TableHead>关东特货</TableHead>
+                      <TableHead>关西普货</TableHead>
+                      <TableHead>关西特货</TableHead>
+                      <TableHead>空运</TableHead>
+                      <TableHead>海空</TableHead>
+                      <TableHead>货物袋数齐全</TableHead>
+                      <TableHead>操作</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {volumeEstimates.slice(0, 10).map(record => (
+                      <TableRow key={record.id}>
+                        <TableCell>{record.collect_date}</TableCell>
+                        <TableCell>{record.warehouse}</TableCell>
+                        <TableCell>{record.package_count}</TableCell>
+                        <TableCell>{parseFloat(record.total_volume || '0').toFixed(3)}</TableCell>
+                        <TableCell>{parseFloat(record.kanto_total || '0').toFixed(3)}</TableCell>
+                        <TableCell>{parseFloat(record.kansai_total || '0').toFixed(3)}</TableCell>
+                        <TableCell>{parseFloat(record.kanto_normal || '0').toFixed(3)}</TableCell>
+                        <TableCell>{parseFloat(record.kanto_special || '0').toFixed(3)}</TableCell>
+                        <TableCell>{parseFloat(record.kansai_normal || '0').toFixed(3)}</TableCell>
+                        <TableCell>{parseFloat(record.kansai_special || '0').toFixed(3)}</TableCell>
+                        <TableCell>{parseFloat(record.air_volume || '0').toFixed(3)}</TableCell>
+                        <TableCell>{parseFloat(record.sea_air_volume || '0').toFixed(3)}</TableCell>
+                        <TableCell>{record.is_complete || '-'}</TableCell>
+                        <TableCell>
+                          <Button size="sm" variant="outline" className="mr-2"
+                            onClick={() => editVolumeEstimate(record)}>
+                            编辑
+                          </Button>
+                          <Button size="sm" variant="destructive"
+                            onClick={() => deleteVolumeEstimate(record.id)}>
+                            删除
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                    {volumeEstimates.length === 0 && (
+                      <TableRow>
+                        <TableCell colSpan={14} className="text-center text-gray-500">暂无记录</TableCell>
+                      </TableRow>
+                    )}
+                  </TableBody>
+                </Table>
               </CardContent>
             </Card>
           </div>
