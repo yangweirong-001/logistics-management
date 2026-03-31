@@ -155,6 +155,34 @@ export const volumeEstimateApi = {
     return data;
   },
 
+  async getByDateOrPrevDay(collectDate: string, warehouse: string) {
+    // 先查当天
+    let data = await this.getByDateAndWarehouse(collectDate, warehouse);
+    
+    if (data) {
+      // 如果当天有数据
+      if (data.is_complete === '是') {
+        // 货物袋数齐全，使用当天数据
+        return data;
+      } else {
+        // 货物袋数不齐全，查找前一天
+        const prevDate = this.getPrevDate(collectDate);
+        const prevData = await this.getByDateAndWarehouse(prevDate, warehouse);
+        return prevData || data;
+      }
+    } else {
+      // 当天没有数据，查找前一天
+      const prevDate = this.getPrevDate(collectDate);
+      return await this.getByDateAndWarehouse(prevDate, warehouse);
+    }
+  },
+
+  getPrevDate(dateStr: string) {
+    const date = new Date(dateStr);
+    date.setDate(date.getDate() - 1);
+    return date.toISOString().split('T')[0];
+  },
+
   async getByDateRange(startDate: string, endDate: string) {
     const { data, error } = await client.from('volume_estimates')
       .select('*')

@@ -16,8 +16,8 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // 获取当天的方数预估
-    const estimate = await volumeEstimateApi.getByDateAndWarehouse(collectDate, warehouse);
+    // 获取当天的方数预估（如果当天数据不齐全，自动查询前一天）
+    const estimate = await volumeEstimateApi.getByDateOrPrevDay(collectDate, warehouse);
     
     // 获取主单列表
     const orders = await mainOrderApi.getBalance({
@@ -52,9 +52,9 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({
       success: true,
       data: {
-        estVolume,
-        maxVolume: maxVolumeSum,
-        balance,
+        estVolume: parseFloat(estVolume.toFixed(3)),
+        maxVolume: parseFloat(maxVolumeSum.toFixed(3)),
+        balance: parseFloat(balance.toFixed(3)),
         isDeficit: balance > 0,
         isSurplus: balance < 0,
       },

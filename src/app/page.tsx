@@ -69,6 +69,7 @@ interface VolumeEstimate {
   kansai_special: string | null;
   air_volume: string | null;
   sea_air_volume: string | null;
+  is_complete: string | null;
 }
 
 interface MainOrder {
@@ -100,6 +101,7 @@ interface MainOrder {
   actual_weight: string | null;
   actual_volume: string | null;
   actual_bills: number | null;
+  remark: string | null;
 }
 
 // 工具函数
@@ -146,6 +148,7 @@ export default function LogisticsManagement() {
     collect_date: '',
     warehouse: '',
     package_count: 0,
+    is_complete: '是',
   });
   
   // 主单表单
@@ -170,6 +173,7 @@ export default function LogisticsManagement() {
     actual_weight: '',
     actual_volume: '',
     actual_bills: '',
+    remark: '',
   });
   
   // 欠方余方查询
@@ -445,15 +449,16 @@ export default function LogisticsManagement() {
         weekday,
         warehouse: volumeForm.warehouse,
         package_count: volumeForm.package_count,
-        total_volume: totalVolume.toFixed(2),
-        kanto_total: kantoTotal.toFixed(2),
-        kansai_total: kansaiTotal.toFixed(2),
-        kanto_normal: kantoNormal.toFixed(2),
-        kanto_special: kantoSpecial.toFixed(2),
-        kansai_normal: kansaiNormal.toFixed(2),
-        kansai_special: kansaiSpecial.toFixed(2),
-        air_volume: airVolume.toFixed(2),
-        sea_air_volume: seaAirVolume.toFixed(2),
+        total_volume: totalVolume.toFixed(3),
+        kanto_total: kantoTotal.toFixed(3),
+        kansai_total: kansaiTotal.toFixed(3),
+        kanto_normal: kantoNormal.toFixed(3),
+        kanto_special: kantoSpecial.toFixed(3),
+        kansai_normal: kansaiNormal.toFixed(3),
+        kansai_special: kansaiSpecial.toFixed(3),
+        air_volume: airVolume.toFixed(3),
+        sea_air_volume: seaAirVolume.toFixed(3),
+        is_complete: volumeForm.is_complete,
       }),
     });
     
@@ -505,7 +510,7 @@ export default function LogisticsManagement() {
       depart_weekday: orderForm.depart_date ? getWeekday(orderForm.depart_date) : null,
       category,
       req_flight_date: orderForm.depart_date ? addDays(orderForm.depart_date, 1) : null,
-      est_volume: estVolume.toFixed(2),
+      est_volume: estVolume.toFixed(3),
       est_pieces: estPieces,
       max_pieces: maxPieces,
     };
@@ -903,6 +908,20 @@ export default function LogisticsManagement() {
                   </div>
                 </div>
                 
+                <div className="grid grid-cols-4 gap-4 mb-5">
+                  <div>
+                    <Label className="text-red-600">货物袋数是否齐全 <span className="text-red-500">*</span></Label>
+                    <Select value={volumeForm.is_complete}
+                      onValueChange={v => setVolumeForm(prev => ({ ...prev, is_complete: v }))}>
+                      <SelectTrigger><SelectValue placeholder="请选择" /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="是">是</SelectItem>
+                        <SelectItem value="否">否</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+                
                 <div className="flex gap-3 mb-5">
                   <Button onClick={calculateVolume}>保存数据</Button>
                   <Button variant="outline" onClick={() => setVolumeHistoryOpen(true)}>查看历史</Button>
@@ -1085,6 +1104,24 @@ export default function LogisticsManagement() {
                   </div>
                 </div>
                 
+                <div className="grid grid-cols-4 gap-4 mb-4">
+                  <div>
+                    <Label>实际方数</Label>
+                    <Input type="number" step="0.001" value={orderForm.actual_volume}
+                      onChange={e => setOrderForm(prev => ({ ...prev, actual_volume: e.target.value }))} />
+                  </div>
+                  <div>
+                    <Label>实际票数</Label>
+                    <Input type="number" value={orderForm.actual_bills}
+                      onChange={e => setOrderForm(prev => ({ ...prev, actual_bills: e.target.value }))} />
+                  </div>
+                  <div className="col-span-2">
+                    <Label>备注</Label>
+                    <Input value={orderForm.remark}
+                      onChange={e => setOrderForm(prev => ({ ...prev, remark: e.target.value }))} />
+                  </div>
+                </div>
+                
                 <div className="flex gap-3">
                   <Button onClick={saveMainOrder}>
                     {editingOrder ? '更新主单' : '保存主单'}
@@ -1095,7 +1132,7 @@ export default function LogisticsManagement() {
                       collect_date: '', depart_date: '', warehouse: '', cargo_type: '', port: '',
                       status: '', pack_req: '', max_volume: '', actual_flight_date: '', main_no: '',
                       flight_no: '', origin: '', transfer: '', dest: '', depart_time: '', arrive_time: '',
-                      actual_pieces: '', actual_weight: '', actual_volume: '', actual_bills: '',
+                      actual_pieces: '', actual_weight: '', actual_volume: '', actual_bills: '', remark: '',
                     });
                     setEditingOrder(null);
                   }}>清空表单</Button>
@@ -1193,6 +1230,7 @@ export default function LogisticsManagement() {
                                 actual_weight: order.actual_weight || '',
                                 actual_volume: order.actual_volume || '',
                                 actual_bills: order.actual_bills?.toString() || '',
+                                remark: order.remark || '',
                               });
                               setActiveTab('main-order');
                             }}>
@@ -1653,6 +1691,7 @@ export default function LogisticsManagement() {
                             actual_weight: order.actual_weight || '',
                             actual_volume: order.actual_volume || '',
                             actual_bills: order.actual_bills?.toString() || '',
+                            remark: order.remark || '',
                           });
                           setOrderListOpen(false);
                           setActiveTab('main-order');

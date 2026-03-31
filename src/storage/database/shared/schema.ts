@@ -1,166 +1,155 @@
-import { pgTable, serial, timestamp, varchar, integer, numeric, boolean, index } from "drizzle-orm/pg-core"
+import { pgTable, serial, timestamp, index, pgPolicy, varchar, numeric, integer } from "drizzle-orm/pg-core"
 import { sql } from "drizzle-orm"
 
-// 系统健康检查表（必须保留）
+
+
 export const healthCheck = pgTable("health_check", {
 	id: serial().notNull(),
 	updatedAt: timestamp("updated_at", { withTimezone: true, mode: 'string' }).defaultNow(),
 });
 
-// 区域参数配置表
-export const areaConfigs = pgTable(
-  "area_configs",
-  {
-    id: serial().primaryKey(),
-    warehouse: varchar("warehouse", { length: 50 }).notNull(),
-    package_volume: numeric("package_volume", { precision: 10, scale: 2 }).notNull(),
-    kanto_ratio: numeric("kanto_ratio", { precision: 5, scale: 2 }).notNull(),
-    kansai_ratio: numeric("kansai_ratio", { precision: 5, scale: 2 }).notNull(),
-    kanto_normal_ratio: numeric("kanto_normal_ratio", { precision: 5, scale: 2 }).notNull(),
-    kanto_special_ratio: numeric("kanto_special_ratio", { precision: 5, scale: 2 }).notNull(),
-    kansai_normal_ratio: numeric("kansai_normal_ratio", { precision: 5, scale: 2 }).notNull(),
-    kansai_special_ratio: numeric("kansai_special_ratio", { precision: 5, scale: 2 }).notNull(),
-    created_at: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
-    updated_at: timestamp("updated_at", { withTimezone: true }).defaultNow(),
-  },
-  (table) => [
-    index("area_configs_warehouse_idx").on(table.warehouse),
-  ]
-);
+export const flightConfigs = pgTable("flight_configs", {
+	id: serial().primaryKey().notNull(),
+	warehouse: varchar({ length: 50 }).notNull(),
+	weekday: varchar({ length: 10 }).notNull(),
+	kantoNormal: varchar("kanto_normal", { length: 20 }),
+	kansaiNormal: varchar("kansai_normal", { length: 20 }),
+	kantoSpecial: varchar("kanto_special", { length: 20 }),
+	kansaiSpecial: varchar("kansai_special", { length: 20 }),
+	remark: varchar({ length: 500 }),
+	createdAt: timestamp("created_at", { withTimezone: true, mode: 'string' }).defaultNow().notNull(),
+	updatedAt: timestamp("updated_at", { withTimezone: true, mode: 'string' }).defaultNow(),
+}, (table) => [
+	index("flight_configs_warehouse_idx").using("btree", table.warehouse.asc().nullsLast().op("text_ops")),
+	index("flight_configs_weekday_idx").using("btree", table.weekday.asc().nullsLast().op("text_ops")),
+	pgPolicy("flight_configs_允许公开删除", { as: "permissive", for: "delete", to: ["public"], using: sql`true` }),
+	pgPolicy("flight_configs_允许公开更新", { as: "permissive", for: "update", to: ["public"] }),
+	pgPolicy("flight_configs_允许公开写入", { as: "permissive", for: "insert", to: ["public"] }),
+	pgPolicy("flight_configs_允许公开读取", { as: "permissive", for: "select", to: ["public"] }),
+]);
 
-// 航班配置表
-export const flightConfigs = pgTable(
-  "flight_configs",
-  {
-    id: serial().primaryKey(),
-    warehouse: varchar("warehouse", { length: 50 }).notNull(),
-    weekday: varchar("weekday", { length: 10 }).notNull(),
-    kanto_normal: varchar("kanto_normal", { length: 20 }),
-    kansai_normal: varchar("kansai_normal", { length: 20 }),
-    kanto_special: varchar("kanto_special", { length: 20 }),
-    kansai_special: varchar("kansai_special", { length: 20 }),
-    remark: varchar("remark", { length: 500 }),
-    created_at: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
-    updated_at: timestamp("updated_at", { withTimezone: true }).defaultNow(),
-  },
-  (table) => [
-    index("flight_configs_warehouse_idx").on(table.warehouse),
-    index("flight_configs_weekday_idx").on(table.weekday),
-  ]
-);
+export const areaConfigs = pgTable("area_configs", {
+	id: serial().primaryKey().notNull(),
+	warehouse: varchar({ length: 50 }).notNull(),
+	packageVolume: numeric("package_volume", { precision: 20, scale: 12 }).notNull(),
+	kantoRatio: numeric("kanto_ratio", { precision: 5, scale:  2 }).notNull(),
+	kansaiRatio: numeric("kansai_ratio", { precision: 5, scale:  2 }).notNull(),
+	kantoNormalRatio: numeric("kanto_normal_ratio", { precision: 5, scale:  2 }).notNull(),
+	kantoSpecialRatio: numeric("kanto_special_ratio", { precision: 5, scale:  2 }).notNull(),
+	kansaiNormalRatio: numeric("kansai_normal_ratio", { precision: 5, scale:  2 }).notNull(),
+	kansaiSpecialRatio: numeric("kansai_special_ratio", { precision: 5, scale:  2 }).notNull(),
+	createdAt: timestamp("created_at", { withTimezone: true, mode: 'string' }).defaultNow().notNull(),
+	updatedAt: timestamp("updated_at", { withTimezone: true, mode: 'string' }).defaultNow(),
+}, (table) => [
+	index("area_configs_warehouse_idx").using("btree", table.warehouse.asc().nullsLast().op("text_ops")),
+	pgPolicy("area_configs_允许公开删除", { as: "permissive", for: "delete", to: ["public"], using: sql`true` }),
+	pgPolicy("area_configs_允许公开更新", { as: "permissive", for: "update", to: ["public"] }),
+	pgPolicy("area_configs_允许公开写入", { as: "permissive", for: "insert", to: ["public"] }),
+	pgPolicy("area_configs_允许公开读取", { as: "permissive", for: "select", to: ["public"] }),
+]);
 
-// 目的港配置表
-export const portConfigs = pgTable(
-  "port_configs",
-  {
-    id: serial().primaryKey(),
-    port_code: varchar("port_code", { length: 10 }).notNull(),
-    region: varchar("region", { length: 20 }).notNull(),
-    created_at: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
-    updated_at: timestamp("updated_at", { withTimezone: true }).defaultNow(),
-  },
-  (table) => [
-    index("port_configs_region_idx").on(table.region),
-  ]
-);
+export const portConfigs = pgTable("port_configs", {
+	id: serial().primaryKey().notNull(),
+	portCode: varchar("port_code", { length: 10 }).notNull(),
+	region: varchar({ length: 20 }).notNull(),
+	createdAt: timestamp("created_at", { withTimezone: true, mode: 'string' }).defaultNow().notNull(),
+	updatedAt: timestamp("updated_at", { withTimezone: true, mode: 'string' }).defaultNow(),
+}, (table) => [
+	index("port_configs_region_idx").using("btree", table.region.asc().nullsLast().op("text_ops")),
+	pgPolicy("port_configs_允许公开删除", { as: "permissive", for: "delete", to: ["public"], using: sql`true` }),
+	pgPolicy("port_configs_允许公开更新", { as: "permissive", for: "update", to: ["public"] }),
+	pgPolicy("port_configs_允许公开写入", { as: "permissive", for: "insert", to: ["public"] }),
+	pgPolicy("port_configs_允许公开读取", { as: "permissive", for: "select", to: ["public"] }),
+]);
 
-// 航空路由配置表
-export const routeConfigs = pgTable(
-  "route_configs",
-  {
-    id: serial().primaryKey(),
-    flight_no: varchar("flight_no", { length: 20 }).notNull(),
-    origin: varchar("origin", { length: 10 }).notNull(),
-    transfer: varchar("transfer", { length: 10 }),
-    dest: varchar("dest", { length: 10 }).notNull(),
-    depart_time: varchar("depart_time", { length: 10 }),
-    arrive_time: varchar("arrive_time", { length: 10 }),
-    is_next_day: varchar("is_next_day", { length: 5 }),
-    second_flight: varchar("second_flight", { length: 20 }),
-    route_type: varchar("route_type", { length: 20 }).notNull(),
-    created_at: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
-    updated_at: timestamp("updated_at", { withTimezone: true }).defaultNow(),
-  },
-  (table) => [
-    index("route_configs_flight_no_idx").on(table.flight_no),
-    index("route_configs_route_type_idx").on(table.route_type),
-  ]
-);
+export const routeConfigs = pgTable("route_configs", {
+	id: serial().primaryKey().notNull(),
+	flightNo: varchar("flight_no", { length: 20 }).notNull(),
+	origin: varchar({ length: 10 }).notNull(),
+	transfer: varchar({ length: 10 }),
+	dest: varchar({ length: 10 }).notNull(),
+	departTime: varchar("depart_time", { length: 10 }),
+	arriveTime: varchar("arrive_time", { length: 10 }),
+	isNextDay: varchar("is_next_day", { length: 5 }),
+	secondFlight: varchar("second_flight", { length: 20 }),
+	routeType: varchar("route_type", { length: 20 }).notNull(),
+	createdAt: timestamp("created_at", { withTimezone: true, mode: 'string' }).defaultNow().notNull(),
+	updatedAt: timestamp("updated_at", { withTimezone: true, mode: 'string' }).defaultNow(),
+}, (table) => [
+	index("route_configs_flight_no_idx").using("btree", table.flightNo.asc().nullsLast().op("text_ops")),
+	index("route_configs_route_type_idx").using("btree", table.routeType.asc().nullsLast().op("text_ops")),
+	pgPolicy("route_configs_允许公开删除", { as: "permissive", for: "delete", to: ["public"], using: sql`true` }),
+	pgPolicy("route_configs_允许公开更新", { as: "permissive", for: "update", to: ["public"] }),
+	pgPolicy("route_configs_允许公开写入", { as: "permissive", for: "insert", to: ["public"] }),
+	pgPolicy("route_configs_允许公开读取", { as: "permissive", for: "select", to: ["public"] }),
+]);
 
-// 方数预估表
-export const volumeEstimates = pgTable(
-  "volume_estimates",
-  {
-    id: serial().primaryKey(),
-    collect_date: varchar("collect_date", { length: 20 }).notNull(),
-    weekday: varchar("weekday", { length: 10 }),
-    warehouse: varchar("warehouse", { length: 50 }).notNull(),
-    package_count: integer("package_count").notNull(),
-    total_volume: numeric("total_volume", { precision: 10, scale: 2 }),
-    kanto_total: numeric("kanto_total", { precision: 10, scale: 2 }),
-    kansai_total: numeric("kansai_total", { precision: 10, scale: 2 }),
-    kanto_normal: numeric("kanto_normal", { precision: 10, scale: 2 }),
-    kanto_special: numeric("kanto_special", { precision: 10, scale: 2 }),
-    kansai_normal: numeric("kansai_normal", { precision: 10, scale: 2 }),
-    kansai_special: numeric("kansai_special", { precision: 10, scale: 2 }),
-    air_volume: numeric("air_volume", { precision: 10, scale: 2 }),
-    sea_air_volume: numeric("sea_air_volume", { precision: 10, scale: 2 }),
-    created_at: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
-    updated_at: timestamp("updated_at", { withTimezone: true }).defaultNow(),
-  },
-  (table) => [
-    index("volume_estimates_collect_date_idx").on(table.collect_date),
-    index("volume_estimates_warehouse_idx").on(table.warehouse),
-  ]
-);
+export const volumeEstimates = pgTable("volume_estimates", {
+	id: serial().primaryKey().notNull(),
+	collectDate: varchar("collect_date", { length: 20 }).notNull(),
+	weekday: varchar({ length: 10 }),
+	warehouse: varchar({ length: 50 }).notNull(),
+	packageCount: integer("package_count").notNull(),
+	totalVolume: numeric("total_volume", { precision: 15, scale: 3 }),
+	kantoTotal: numeric("kanto_total", { precision: 15, scale: 3 }),
+	kansaiTotal: numeric("kansai_total", { precision: 15, scale: 3 }),
+	kantoNormal: numeric("kanto_normal", { precision: 15, scale: 3 }),
+	kantoSpecial: numeric("kanto_special", { precision: 15, scale: 3 }),
+	kansaiNormal: numeric("kansai_normal", { precision: 15, scale: 3 }),
+	kansaiSpecial: numeric("kansai_special", { precision: 15, scale: 3 }),
+	airVolume: numeric("air_volume", { precision: 15, scale: 3 }),
+	seaAirVolume: numeric("sea_air_volume", { precision: 15, scale: 3 }),
+	isComplete: varchar("is_complete", { length: 10 }),
+	createdAt: timestamp("created_at", { withTimezone: true, mode: 'string' }).defaultNow().notNull(),
+	updatedAt: timestamp("updated_at", { withTimezone: true, mode: 'string' }).defaultNow(),
+}, (table) => [
+	index("volume_estimates_collect_date_idx").using("btree", table.collectDate.asc().nullsLast().op("text_ops")),
+	index("volume_estimates_warehouse_idx").using("btree", table.warehouse.asc().nullsLast().op("text_ops")),
+	pgPolicy("volume_estimates_允许公开删除", { as: "permissive", for: "delete", to: ["public"], using: sql`true` }),
+	pgPolicy("volume_estimates_允许公开更新", { as: "permissive", for: "update", to: ["public"] }),
+	pgPolicy("volume_estimates_允许公开写入", { as: "permissive", for: "insert", to: ["public"] }),
+	pgPolicy("volume_estimates_允许公开读取", { as: "permissive", for: "select", to: ["public"] }),
+]);
 
-// 主单发放表
-export const mainOrders = pgTable(
-  "main_orders",
-  {
-    id: serial().primaryKey(),
-    collect_date: varchar("collect_date", { length: 20 }).notNull(),
-    collect_weekday: varchar("collect_weekday", { length: 10 }),
-    depart_date: varchar("depart_date", { length: 20 }),
-    depart_weekday: varchar("depart_weekday", { length: 10 }),
-    warehouse: varchar("warehouse", { length: 50 }).notNull(),
-    cargo_type: varchar("cargo_type", { length: 20 }).notNull(),
-    port: varchar("port", { length: 20 }).notNull(),
-    category: varchar("category", { length: 50 }),
-    status: varchar("status", { length: 20 }),
-    pack_req: varchar("pack_req", { length: 20 }),
-    max_volume: numeric("max_volume", { precision: 10, scale: 2 }),
-    max_pieces: integer("max_pieces"),
-    est_volume: numeric("est_volume", { precision: 10, scale: 2 }),
-    est_pieces: integer("est_pieces"),
-    req_flight_date: varchar("req_flight_date", { length: 20 }),
-    actual_flight_date: varchar("actual_flight_date", { length: 20 }),
-    main_no: varchar("main_no", { length: 50 }),
-    flight_no: varchar("flight_no", { length: 20 }),
-    origin: varchar("origin", { length: 10 }),
-    transfer: varchar("transfer", { length: 10 }),
-    dest: varchar("dest", { length: 10 }),
-    depart_time: varchar("depart_time", { length: 10 }),
-    arrive_time: varchar("arrive_time", { length: 10 }),
-    actual_pieces: integer("actual_pieces"),
-    actual_weight: numeric("actual_weight", { precision: 10, scale: 2 }),
-    actual_volume: numeric("actual_volume", { precision: 10, scale: 2 }),
-    actual_bills: integer("actual_bills"),
-    created_at: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
-    updated_at: timestamp("updated_at", { withTimezone: true }).defaultNow(),
-  },
-  (table) => [
-    index("main_orders_collect_date_idx").on(table.collect_date),
-    index("main_orders_warehouse_idx").on(table.warehouse),
-    index("main_orders_port_idx").on(table.port),
-    index("main_orders_cargo_type_idx").on(table.cargo_type),
-  ]
-);
-
-// 类型导出
-export type AreaConfig = typeof areaConfigs.$inferSelect;
-export type FlightConfig = typeof flightConfigs.$inferSelect;
-export type PortConfig = typeof portConfigs.$inferSelect;
-export type RouteConfig = typeof routeConfigs.$inferSelect;
-export type VolumeEstimate = typeof volumeEstimates.$inferSelect;
-export type MainOrder = typeof mainOrders.$inferSelect;
+export const mainOrders = pgTable("main_orders", {
+	id: serial().primaryKey().notNull(),
+	collectDate: varchar("collect_date", { length: 20 }).notNull(),
+	collectWeekday: varchar("collect_weekday", { length: 10 }),
+	departDate: varchar("depart_date", { length: 20 }),
+	departWeekday: varchar("depart_weekday", { length: 10 }),
+	warehouse: varchar({ length: 50 }).notNull(),
+	cargoType: varchar("cargo_type", { length: 20 }).notNull(),
+	port: varchar({ length: 20 }).notNull(),
+	category: varchar({ length: 50 }),
+	status: varchar({ length: 20 }),
+	packReq: varchar("pack_req", { length: 20 }),
+	maxVolume: numeric("max_volume", { precision: 15, scale: 3 }),
+	maxPieces: integer("max_pieces"),
+	estVolume: numeric("est_volume", { precision: 15, scale: 3 }),
+	estPieces: integer("est_pieces"),
+	reqFlightDate: varchar("req_flight_date", { length: 20 }),
+	actualFlightDate: varchar("actual_flight_date", { length: 20 }),
+	mainNo: varchar("main_no", { length: 50 }),
+	flightNo: varchar("flight_no", { length: 20 }),
+	origin: varchar({ length: 10 }),
+	transfer: varchar({ length: 10 }),
+	dest: varchar({ length: 10 }),
+	departTime: varchar("depart_time", { length: 20 }),
+	arriveTime: varchar("arrive_time", { length: 20 }),
+	actualPieces: integer("actual_pieces"),
+	actualWeight: numeric("actual_weight", { precision: 15, scale: 3 }),
+	actualVolume: numeric("actual_volume", { precision: 15, scale: 3 }),
+	actualBills: integer("actual_bills"),
+	remark: varchar({ length: 500 }),
+	createdAt: timestamp("created_at", { withTimezone: true, mode: 'string' }).defaultNow().notNull(),
+	updatedAt: timestamp("updated_at", { withTimezone: true, mode: 'string' }).defaultNow(),
+}, (table) => [
+	index("main_orders_cargo_type_idx").using("btree", table.cargoType.asc().nullsLast().op("text_ops")),
+	index("main_orders_collect_date_idx").using("btree", table.collectDate.asc().nullsLast().op("text_ops")),
+	index("main_orders_port_idx").using("btree", table.port.asc().nullsLast().op("text_ops")),
+	index("main_orders_warehouse_idx").using("btree", table.warehouse.asc().nullsLast().op("text_ops")),
+	pgPolicy("main_orders_允许公开删除", { as: "permissive", for: "delete", to: ["public"], using: sql`true` }),
+	pgPolicy("main_orders_允许公开更新", { as: "permissive", for: "update", to: ["public"] }),
+	pgPolicy("main_orders_允许公开写入", { as: "permissive", for: "insert", to: ["public"] }),
+	pgPolicy("main_orders_允许公开读取", { as: "permissive", for: "select", to: ["public"] }),
+]);

@@ -6,8 +6,14 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const collectDate = searchParams.get('collectDate');
     const warehouse = searchParams.get('warehouse');
+    const checkPrevDay = searchParams.get('checkPrevDay');
     
     if (collectDate && warehouse) {
+      if (checkPrevDay === 'true') {
+        // 检查当天和前一天数据，根据 is_complete 决定使用哪个
+        const data = await volumeEstimateApi.getByDateOrPrevDay(collectDate, warehouse);
+        return NextResponse.json({ success: true, data });
+      }
       const data = await volumeEstimateApi.getByDateAndWarehouse(collectDate, warehouse);
       return NextResponse.json({ success: true, data });
     }
