@@ -1135,15 +1135,15 @@ function calcVolume() {
     }
   }
 
-  document.getElementById('res-total').textContent = total.toFixed(12);
-  document.getElementById('res-kanto').textContent = kanto.toFixed(12);
-  document.getElementById('res-kansai').textContent = kansai.toFixed(12);
-  document.getElementById('res-kn').textContent = kn.toFixed(12);
-  document.getElementById('res-ks').textContent = ks.toFixed(12);
-  document.getElementById('res-wn').textContent = wn.toFixed(12);
-  document.getElementById('res-ws').textContent = ws.toFixed(12);
-  document.getElementById('res-air').textContent = air.toFixed(12);
-  document.getElementById('res-sea').textContent = sea.toFixed(12);
+  document.getElementById('res-total').textContent = total.toFixed(2);
+  document.getElementById('res-kanto').textContent = kanto.toFixed(2);
+  document.getElementById('res-kansai').textContent = kansai.toFixed(2);
+  document.getElementById('res-kn').textContent = kn.toFixed(2);
+  document.getElementById('res-ks').textContent = ks.toFixed(2);
+  document.getElementById('res-wn').textContent = wn.toFixed(2);
+  document.getElementById('res-ws').textContent = ws.toFixed(2);
+  document.getElementById('res-air').textContent = air.toFixed(2);
+  document.getElementById('res-sea').textContent = sea.toFixed(2);
 }
 
 function saveVolume() {
@@ -1170,6 +1170,21 @@ function saveVolume() {
   };
   saveData(KEYS.VOL, [...getData(KEYS.VOL), data]);
   alert('保存成功！');
+  // 清空输入，准备下一次输入
+  document.getElementById('vol-date').value = '';
+  document.getElementById('vol-weekday').value = '';
+  document.getElementById('vol-warehouse').value = '';
+  document.getElementById('vol-count').value = '';
+  // 重置计算结果
+  document.getElementById('res-total').textContent = '0';
+  document.getElementById('res-kanto').textContent = '0';
+  document.getElementById('res-kansai').textContent = '0';
+  document.getElementById('res-kn').textContent = '0';
+  document.getElementById('res-ks').textContent = '0';
+  document.getElementById('res-wn').textContent = '0';
+  document.getElementById('res-ws').textContent = '0';
+  document.getElementById('res-air').textContent = '0';
+  document.getElementById('res-sea').textContent = '0';
   renderVolRecent(); // 刷新最近记录列表
 }
 
