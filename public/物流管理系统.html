@@ -864,10 +864,11 @@ function openAreaModal(editId = null) {
 
 function saveArea() {
   const id = document.getElementById('area-id').value;
+  const pvolValue = parseFloat(document.getElementById('area-pvol').value) || 0;
   const data = {
     id: id || genId(),
     warehouse: document.getElementById('area-wh').value,
-    package_volume: document.getElementById('area-pvol').value,
+    package_volume: pvolValue.toFixed(12),
     kanto_ratio: document.getElementById('area-kr').value,
     kansai_ratio: document.getElementById('area-wr').value,
     kanto_normal_ratio: document.getElementById('area-kn').value,
@@ -1135,15 +1136,15 @@ function calcVolume() {
     }
   }
 
-  document.getElementById('res-total').textContent = total.toFixed(12);
-  document.getElementById('res-kanto').textContent = kanto.toFixed(12);
-  document.getElementById('res-kansai').textContent = kansai.toFixed(12);
-  document.getElementById('res-kn').textContent = kn.toFixed(12);
-  document.getElementById('res-ks').textContent = ks.toFixed(12);
-  document.getElementById('res-wn').textContent = wn.toFixed(12);
-  document.getElementById('res-ws').textContent = ws.toFixed(12);
-  document.getElementById('res-air').textContent = air.toFixed(12);
-  document.getElementById('res-sea').textContent = sea.toFixed(12);
+  document.getElementById('res-total').textContent = total.toFixed(3);
+  document.getElementById('res-kanto').textContent = kanto.toFixed(3);
+  document.getElementById('res-kansai').textContent = kansai.toFixed(3);
+  document.getElementById('res-kn').textContent = kn.toFixed(3);
+  document.getElementById('res-ks').textContent = ks.toFixed(3);
+  document.getElementById('res-wn').textContent = wn.toFixed(3);
+  document.getElementById('res-ws').textContent = ws.toFixed(3);
+  document.getElementById('res-air').textContent = air.toFixed(3);
+  document.getElementById('res-sea').textContent = sea.toFixed(3);
 }
 
 function saveVolume() {
