@@ -1,6 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { mainOrderApi } from '@/lib/db';
 
+// 处理空字符串，转为null
+function sanitizeData(body: Record<string, unknown>) {
+  const result: Record<string, unknown> = {};
+  for (const [key, value] of Object.entries(body)) {
+    if (value === '') {
+      result[key] = null;
+    } else {
+      result[key] = value;
+    }
+  }
+  return result;
+}
+
 export async function PUT(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -8,7 +21,7 @@ export async function PUT(
   try {
     const { id } = await params;
     const body = await request.json();
-    const data = await mainOrderApi.update(parseInt(id), body);
+    const data = await mainOrderApi.update(parseInt(id), sanitizeData(body));
     return NextResponse.json({ success: true, data });
   } catch (error) {
     return NextResponse.json(

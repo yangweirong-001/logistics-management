@@ -638,7 +638,7 @@ export default function LogisticsManagement() {
     );
     
     let estVolume = 0;
-    let estPieces = 0;
+    let estPieces: number | null = null;
     
     if (estimate) {
       if (orderForm.port === '关东' && orderForm.cargo_type === '普货') {
@@ -656,7 +656,7 @@ export default function LogisticsManagement() {
     }
     
     // 计算打货上限件数
-    let maxPieces = 0;
+    let maxPieces: number | null = null;
     if (orderForm.max_volume && orderForm.pack_req && orderForm.warehouse) {
       const maxVolume = parseFloat(orderForm.max_volume);
       if (orderForm.warehouse === '东莞') {
@@ -666,15 +666,40 @@ export default function LogisticsManagement() {
       }
     }
     
+    // 辅助函数：空字符串转null
+    const toNull = (v: string) => v === '' ? null : v;
+    const toNumberOrNull = (v: string) => v === '' ? null : (isNaN(parseFloat(v)) ? null : parseFloat(v));
+    const toIntOrNull = (v: string) => v === '' ? null : (isNaN(parseInt(v)) ? null : parseInt(v));
+    
     const data = {
-      ...orderForm,
+      collect_date: orderForm.collect_date,
+      depart_date: toNull(orderForm.depart_date),
       collect_weekday: orderForm.collect_date ? getWeekday(orderForm.collect_date) : null,
       depart_weekday: orderForm.depart_date ? getWeekday(orderForm.depart_date) : null,
+      warehouse: orderForm.warehouse,
+      cargo_type: orderForm.cargo_type,
+      port: orderForm.port,
       category,
-      req_flight_date: orderForm.depart_date ? addDays(orderForm.depart_date, 1) : null,
-      est_volume: estVolume.toFixed(3),
-      est_pieces: estPieces,
+      status: toNull(orderForm.status),
+      pack_req: toNull(orderForm.pack_req),
+      max_volume: toNumberOrNull(orderForm.max_volume),
       max_pieces: maxPieces,
+      est_volume: estVolume > 0 ? estVolume.toFixed(3) : null,
+      est_pieces: estPieces,
+      req_flight_date: orderForm.depart_date ? addDays(orderForm.depart_date, 1) : null,
+      actual_flight_date: toNull(orderForm.actual_flight_date),
+      main_no: toNull(orderForm.main_no),
+      flight_no: toNull(orderForm.flight_no),
+      origin: toNull(orderForm.origin),
+      transfer: toNull(orderForm.transfer),
+      dest: toNull(orderForm.dest),
+      depart_time: toNull(orderForm.depart_time),
+      arrive_time: toNull(orderForm.arrive_time),
+      actual_pieces: toIntOrNull(orderForm.actual_pieces),
+      actual_weight: toNumberOrNull(orderForm.actual_weight),
+      actual_volume: toNumberOrNull(orderForm.actual_volume),
+      actual_bills: toIntOrNull(orderForm.actual_bills),
+      remark: toNull(orderForm.remark),
     };
     
     try {
@@ -1312,32 +1337,33 @@ export default function LogisticsManagement() {
         {/* 主单发放 */}
         {activeTab === 'main-order' && (
           <div>
-            <Card className="mb-5">
-              <CardHeader>
-                <CardTitle>主单发放</CardTitle>
-              </CardHeader>
-              <CardContent>
+            <div className="bg-gray-700 text-white px-6 py-3 rounded-t-lg">
+              <h2 className="text-lg font-bold">主单发放</h2>
+            </div>
+            <Card className="rounded-t-none">
+              <CardContent className="p-6">
+                {/* 第一行 */}
                 <div className="grid grid-cols-4 gap-4 mb-4">
                   <div>
-                    <Label>揽收日期</Label>
+                    <Label className="text-sm text-gray-600 mb-1 block">揽收日期</Label>
                     <div className="flex gap-2">
                       <Input type="date" className="flex-1" value={orderForm.collect_date}
                         onChange={e => setOrderForm(prev => ({ ...prev, collect_date: e.target.value }))} />
-                      <Input className="w-14 bg-blue-50 text-blue-600 font-semibold text-center text-sm"
+                      <Input className="w-12 bg-blue-50 text-blue-600 font-semibold text-center text-sm px-1"
                         value={orderForm.collect_date ? getWeekday(orderForm.collect_date) : ''} readOnly />
                     </div>
                   </div>
                   <div>
-                    <Label>发车日期</Label>
+                    <Label className="text-sm text-gray-600 mb-1 block">发车日期</Label>
                     <div className="flex gap-2">
                       <Input type="date" className="flex-1" value={orderForm.depart_date}
                         onChange={e => setOrderForm(prev => ({ ...prev, depart_date: e.target.value }))} />
-                      <Input className="w-14 bg-blue-50 text-blue-600 font-semibold text-center text-sm"
+                      <Input className="w-12 bg-blue-50 text-blue-600 font-semibold text-center text-sm px-1"
                         value={orderForm.depart_date ? getWeekday(orderForm.depart_date) : ''} readOnly />
                     </div>
                   </div>
                   <div>
-                    <Label>仓库</Label>
+                    <Label className="text-sm text-gray-600 mb-1 block">仓库</Label>
                     <Select value={orderForm.warehouse}
                       onValueChange={v => setOrderForm(prev => ({ ...prev, warehouse: v }))}>
                       <SelectTrigger><SelectValue placeholder="请选择" /></SelectTrigger>
@@ -1348,22 +1374,23 @@ export default function LogisticsManagement() {
                     </Select>
                   </div>
                   <div>
-                    <Label>货物属性</Label>
+                    <Label className="text-sm text-gray-600 mb-1 block">货物属性</Label>
                     <Select value={orderForm.cargo_type}
                       onValueChange={v => setOrderForm(prev => ({ ...prev, cargo_type: v }))}>
                       <SelectTrigger><SelectValue placeholder="请选择" /></SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="特货">特货</SelectItem>
                         <SelectItem value="普货">普货</SelectItem>
+                        <SelectItem value="特货">特货</SelectItem>
                         <SelectItem value="混打">混打</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
                 </div>
                 
+                {/* 第二行 */}
                 <div className="grid grid-cols-4 gap-4 mb-4">
                   <div>
-                    <Label>口岸</Label>
+                    <Label className="text-sm text-gray-600 mb-1 block">口岸</Label>
                     <Select value={orderForm.port}
                       onValueChange={v => setOrderForm(prev => ({ ...prev, port: v }))}>
                       <SelectTrigger><SelectValue placeholder="请选择" /></SelectTrigger>
@@ -1374,12 +1401,12 @@ export default function LogisticsManagement() {
                     </Select>
                   </div>
                   <div>
-                    <Label>类别（路由）</Label>
-                    <Input className="bg-gray-50" value={orderForm.port && orderForm.cargo_type ? `${orderForm.port}${orderForm.cargo_type}` : ''} readOnly placeholder="自动计算" />
+                    <Label className="text-sm text-gray-600 mb-1 block">类别(路由)</Label>
+                    <Input className="bg-gray-100" value={orderForm.port && orderForm.cargo_type ? `${orderForm.port}${orderForm.cargo_type}` : ''} readOnly placeholder="自动计算" />
                   </div>
                   <div>
-                    <Label>主单状态</Label>
-                    <Select value={orderForm.status}
+                    <Label className="text-sm text-gray-600 mb-1 block">主单状态</Label>
+                    <Select value={orderForm.status || ''}
                       onValueChange={v => setOrderForm(prev => ({ ...prev, status: v }))}>
                       <SelectTrigger><SelectValue placeholder="请选择" /></SelectTrigger>
                       <SelectContent>
@@ -1391,8 +1418,8 @@ export default function LogisticsManagement() {
                     </Select>
                   </div>
                   <div>
-                    <Label>打货要求</Label>
-                    <Select value={orderForm.pack_req}
+                    <Label className="text-sm text-gray-600 mb-1 block">打货要求</Label>
+                    <Select value={orderForm.pack_req || ''}
                       onValueChange={v => setOrderForm(prev => ({ ...prev, pack_req: v }))}>
                       <SelectTrigger><SelectValue placeholder="请选择" /></SelectTrigger>
                       <SelectContent>
@@ -1403,15 +1430,16 @@ export default function LogisticsManagement() {
                   </div>
                 </div>
                 
+                {/* 第三行 */}
                 <div className="grid grid-cols-4 gap-4 mb-4">
                   <div>
-                    <Label>打货上限（航线提供）</Label>
+                    <Label className="text-sm text-gray-600 mb-1 block">打货上限(航线提供)</Label>
                     <Input type="number" step="0.001" value={orderForm.max_volume}
                       onChange={e => setOrderForm(prev => ({ ...prev, max_volume: e.target.value }))} />
                   </div>
                   <div>
-                    <Label>打货上限件数</Label>
-                    <Input className="bg-gray-50" readOnly placeholder="自动计算"
+                    <Label className="text-sm text-gray-600 mb-1 block">打货上限件数</Label>
+                    <Input className="bg-gray-100" readOnly placeholder="自动计算"
                       value={orderForm.max_volume && orderForm.pack_req && orderForm.warehouse
                         ? Math.round(parseFloat(orderForm.max_volume) / (orderForm.warehouse === '东莞'
                           ? (orderForm.pack_req === '纸箱' ? 0.12 : 0.159)
@@ -1419,8 +1447,8 @@ export default function LogisticsManagement() {
                         : ''} />
                   </div>
                   <div>
-                    <Label>预估方数</Label>
-                    <Input className="bg-gray-50" readOnly placeholder="自动计算"
+                    <Label className="text-sm text-gray-600 mb-1 block">预估方数</Label>
+                    <Input className="bg-gray-100" readOnly placeholder="自动计算"
                       value={(() => {
                         if (!orderForm.collect_date || !orderForm.warehouse || !orderForm.port || !orderForm.cargo_type) return '';
                         const estimate = volumeEstimates.find(e => e.collect_date === orderForm.collect_date && e.warehouse === orderForm.warehouse);
@@ -1433,8 +1461,8 @@ export default function LogisticsManagement() {
                       })()} />
                   </div>
                   <div>
-                    <Label>预估件数</Label>
-                    <Input className="bg-gray-50" readOnly placeholder="自动计算"
+                    <Label className="text-sm text-gray-600 mb-1 block">预估件数</Label>
+                    <Input className="bg-gray-100" readOnly placeholder="自动计算"
                       value={(() => {
                         if (!orderForm.collect_date || !orderForm.warehouse || !orderForm.port || !orderForm.cargo_type) return '';
                         const estimate = volumeEstimates.find(e => e.collect_date === orderForm.collect_date && e.warehouse === orderForm.warehouse);
@@ -1449,20 +1477,21 @@ export default function LogisticsManagement() {
                   </div>
                 </div>
                 
+                {/* 第四行 */}
                 <div className="grid grid-cols-4 gap-4 mb-4">
                   <div>
-                    <Label>实际航班日期</Label>
+                    <Label className="text-sm text-gray-600 mb-1 block">实际航班日期</Label>
                     <Input type="date" value={orderForm.actual_flight_date}
                       onChange={e => setOrderForm(prev => ({ ...prev, actual_flight_date: e.target.value }))} />
                   </div>
                   <div>
-                    <Label>主单号</Label>
-                    <Input value={orderForm.main_no}
+                    <Label className="text-sm text-gray-600 mb-1 block">主单号</Label>
+                    <Input value={orderForm.main_no || ''}
                       onChange={e => setOrderForm(prev => ({ ...prev, main_no: e.target.value }))} />
                   </div>
                   <div>
-                    <Label>航班号</Label>
-                    <Select value={orderForm.flight_no}
+                    <Label className="text-sm text-gray-600 mb-1 block">航班号</Label>
+                    <Select value={orderForm.flight_no || ''}
                       onValueChange={v => { setOrderForm(prev => ({ ...prev, flight_no: v })); fillFlightInfo(v); }}>
                       <SelectTrigger><SelectValue placeholder="请选择" /></SelectTrigger>
                       <SelectContent>
@@ -1473,31 +1502,32 @@ export default function LogisticsManagement() {
                     </Select>
                   </div>
                   <div>
-                    <Label>始发港</Label>
-                    <Input className="bg-gray-50" value={orderForm.origin} readOnly placeholder="自动填充" />
+                    <Label className="text-sm text-gray-600 mb-1 block">始发港</Label>
+                    <Input className="bg-gray-100" value={orderForm.origin || ''} readOnly placeholder="自动填充" />
                   </div>
                 </div>
                 
+                {/* 第五行 */}
                 <div className="grid grid-cols-4 gap-4 mb-4">
                   <div>
-                    <Label>中转站</Label>
-                    <Input className="bg-gray-50" value={orderForm.transfer} readOnly placeholder="自动填充" />
+                    <Label className="text-sm text-gray-600 mb-1 block">中转站</Label>
+                    <Input className="bg-gray-100" value={orderForm.transfer || ''} readOnly placeholder="自动填充" />
                   </div>
                   <div>
-                    <Label>目的港</Label>
-                    <Input className="bg-gray-50" value={orderForm.dest} readOnly placeholder="自动填充" />
+                    <Label className="text-sm text-gray-600 mb-1 block">目的港</Label>
+                    <Input className="bg-gray-100" value={orderForm.dest || ''} readOnly placeholder="自动填充" />
                   </div>
                   <div>
-                    <Label>起飞时间</Label>
-                    <Input className="bg-gray-50" value={
+                    <Label className="text-sm text-gray-600 mb-1 block">起飞时间</Label>
+                    <Input className="bg-gray-100" value={
                       orderForm.actual_flight_date && orderForm.depart_time 
                         ? `${orderForm.actual_flight_date} ${orderForm.depart_time}`
                         : orderForm.depart_time || ''
                     } readOnly placeholder="自动填充" />
                   </div>
                   <div>
-                    <Label>到港时间</Label>
-                    <Input className="bg-gray-50" value={
+                    <Label className="text-sm text-gray-600 mb-1 block">到港时间</Label>
+                    <Input className="bg-gray-100" value={
                       orderForm.actual_flight_date && orderForm.arrive_time 
                         ? `${orderForm.actual_flight_date} ${orderForm.arrive_time}`
                         : orderForm.arrive_time || ''
@@ -1505,41 +1535,46 @@ export default function LogisticsManagement() {
                   </div>
                 </div>
                 
+                {/* 第六行 */}
                 <div className="grid grid-cols-4 gap-4 mb-4">
                   <div>
-                    <Label>实际件数</Label>
-                    <Input type="number" value={orderForm.actual_pieces}
+                    <Label className="text-sm text-gray-600 mb-1 block">实际件数</Label>
+                    <Input type="number" value={orderForm.actual_pieces || ''}
                       onChange={e => setOrderForm(prev => ({ ...prev, actual_pieces: e.target.value }))} />
                   </div>
                   <div>
-                    <Label>实际重量</Label>
-                    <Input type="number" step="0.01" value={orderForm.actual_weight}
+                    <Label className="text-sm text-gray-600 mb-1 block">实际重量</Label>
+                    <Input type="number" step="0.01" value={orderForm.actual_weight || ''}
                       onChange={e => setOrderForm(prev => ({ ...prev, actual_weight: e.target.value }))} />
                   </div>
                   <div>
-                    <Label>实际体积</Label>
-                    <Input type="number" step="0.001" value={orderForm.actual_volume}
+                    <Label className="text-sm text-gray-600 mb-1 block">实际体积</Label>
+                    <Input type="number" step="0.001" value={orderForm.actual_volume || ''}
                       onChange={e => setOrderForm(prev => ({ ...prev, actual_volume: e.target.value }))} />
                   </div>
                   <div>
-                    <Label>实际票数</Label>
-                    <Input type="number" value={orderForm.actual_bills}
+                    <Label className="text-sm text-gray-600 mb-1 block">实际票数</Label>
+                    <Input type="number" value={orderForm.actual_bills || ''}
                       onChange={e => setOrderForm(prev => ({ ...prev, actual_bills: e.target.value }))} />
                   </div>
                 </div>
                 
-                <div className="mb-4">
-                  <Label>备注</Label>
-                  <Input placeholder="请输入备注信息" value={orderForm.remark}
+                {/* 第七行 */}
+                <div className="mb-6">
+                  <Label className="text-sm text-gray-600 mb-1 block">备注</Label>
+                  <Input placeholder="请输入备注信息" value={orderForm.remark || ''}
                     onChange={e => setOrderForm(prev => ({ ...prev, remark: e.target.value }))} />
                 </div>
                 
-                <div className="flex gap-3">
-                  <Button onClick={saveMainOrder} className="bg-green-600 hover:bg-green-700">
+                {/* 按钮区域 */}
+                <div className="flex gap-3 pt-2">
+                  <Button onClick={saveMainOrder} className="bg-green-600 hover:bg-green-700 text-white px-6">
                     保存主单
                   </Button>
-                  <Button variant="default" onClick={() => setOrderListOpen(true)}>查看主单列表</Button>
-                  <Button variant="secondary" className="bg-orange-500 hover:bg-orange-600 text-white" onClick={() => {
+                  <Button variant="default" className="bg-blue-600 hover:bg-blue-700 text-white px-6" onClick={() => setOrderListOpen(true)}>
+                    查看主单列表
+                  </Button>
+                  <Button variant="secondary" className="bg-orange-500 hover:bg-orange-600 text-white px-6" onClick={() => {
                     setOrderForm({
                       collect_date: '', depart_date: '', warehouse: '', cargo_type: '', port: '',
                       status: '', pack_req: '', max_volume: '', actual_flight_date: '', main_no: '',
