@@ -625,6 +625,11 @@ export default function LogisticsManagement() {
   
   // 主单操作
   const saveMainOrder = async () => {
+    if (!orderForm.collect_date || !orderForm.warehouse || !orderForm.port || !orderForm.cargo_type) {
+      alert('请填写揽收日期、仓库、口岸、货物属性');
+      return;
+    }
+    
     const category = `${orderForm.port}${orderForm.cargo_type}`;
     
     // 计算预估方数
@@ -672,22 +677,33 @@ export default function LogisticsManagement() {
       max_pieces: maxPieces,
     };
     
-    if (editingOrder) {
-      await fetch(`/api/main-order/${editingOrder.id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
-      });
-    } else {
-      await fetch('/api/main-order', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
-      });
+    try {
+      let response;
+      if (editingOrder) {
+        response = await fetch(`/api/main-order/${editingOrder.id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data),
+        });
+      } else {
+        response = await fetch('/api/main-order', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data),
+        });
+      }
+      
+      const result = await response.json();
+      if (result.success) {
+        alert('保存成功！');
+        setEditingOrder(null);
+        loadMainOrders();
+      } else {
+        alert('保存失败: ' + (result.error || '未知错误'));
+      }
+    } catch (err) {
+      alert('保存失败: ' + (err instanceof Error ? err.message : '网络错误'));
     }
-    
-    loadMainOrders();
-    alert('保存成功！');
     setEditingOrder(null);
   };
   
@@ -2045,11 +2061,11 @@ export default function LogisticsManagement() {
       
       {/* 主单列表模态框 */}
       <Dialog open={orderListOpen} onOpenChange={setOrderListOpen}>
-        <DialogContent className="w-[90vw] max-w-[800px] max-h-[90vh] overflow-hidden flex flex-col">
+        <DialogContent className="w-[95vw] max-w-[1400px] h-[90vh] max-h-[90vh] p-4 flex flex-col">
           <DialogHeader>
             <DialogTitle className="text-xl">主单列表</DialogTitle>
           </DialogHeader>
-          <div className="mb-4 grid grid-cols-4 gap-3">
+          <div className="mb-4 grid grid-cols-5 gap-3">
             <Input type="date" id="filter-order-date" placeholder="揽收日期" />
             <Select defaultValue="全部">
               <SelectTrigger><SelectValue placeholder="仓库" /></SelectTrigger>
@@ -2067,76 +2083,62 @@ export default function LogisticsManagement() {
                 <SelectItem value="关西">关西</SelectItem>
               </SelectContent>
             </Select>
+            <Select defaultValue="全部">
+              <SelectTrigger><SelectValue placeholder="货物属性" /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="全部">全部</SelectItem>
+                <SelectItem value="普货">普货</SelectItem>
+                <SelectItem value="特货">特货</SelectItem>
+              </SelectContent>
+            </Select>
             <Button onClick={() => {
               const date = (document.getElementById('filter-order-date') as HTMLInputElement).value;
               loadMainOrdersWithFilter(date);
             }}>查询</Button>
           </div>
-          <div className="flex-1 overflow-auto space-y-4" style={{ maxHeight: 'calc(90vh - 180px)' }}>
-            {mainOrders.length === 0 ? (
-              <div className="text-center text-gray-500 py-8">暂无记录</div>
-            ) : (
-              mainOrders.slice(0, 50).map(order => (
-                <Card key={order.id} className="overflow-hidden">
-                  <div className="grid grid-cols-2 gap-0 text-sm">
-                    <div className="border-b border-r p-3 bg-gray-50 font-medium text-gray-600">揽收日期</div>
-                    <div className="border-b p-3">{order.collect_date}</div>
-                    
-                    <div className="border-b border-r p-3 bg-gray-50 font-medium text-gray-600">仓库</div>
-                    <div className="border-b p-3">{order.warehouse}</div>
-                    
-                    <div className="border-b border-r p-3 bg-gray-50 font-medium text-gray-600">口岸</div>
-                    <div className="border-b p-3">{order.port}</div>
-                    
-                    <div className="border-b border-r p-3 bg-gray-50 font-medium text-gray-600">货物属性</div>
-                    <div className="border-b p-3">{order.cargo_type}</div>
-                    
-                    <div className="border-b border-r p-3 bg-gray-50 font-medium text-gray-600">类别</div>
-                    <div className="border-b p-3">{order.category}</div>
-                    
-                    <div className="border-b border-r p-3 bg-gray-50 font-medium text-gray-600">主单号</div>
-                    <div className="border-b p-3">{order.main_no || '-'}</div>
-                    
-                    <div className="border-b border-r p-3 bg-gray-50 font-medium text-gray-600">航班号</div>
-                    <div className="border-b p-3">{order.flight_no || '-'}</div>
-                    
-                    <div className="border-b border-r p-3 bg-gray-50 font-medium text-gray-600">目的港</div>
-                    <div className="border-b p-3">{order.dest || '-'}</div>
-                    
-                    <div className="border-b border-r p-3 bg-gray-50 font-medium text-gray-600">打货上限</div>
-                    <div className="border-b p-3">{order.max_volume || '-'}</div>
-                    
-                    <div className="border-b border-r p-3 bg-gray-50 font-medium text-gray-600">起飞时间</div>
-                    <div className="border-b p-3">
+          <div className="flex-1 overflow-auto border rounded-lg" style={{ height: 'calc(90vh - 160px)' }}>
+            <Table>
+              <TableHeader className="sticky top-0 bg-white z-10">
+                <TableRow>
+                  <TableHead className="whitespace-nowrap bg-gray-50">揽收日期</TableHead>
+                  <TableHead className="whitespace-nowrap bg-gray-50">仓库</TableHead>
+                  <TableHead className="whitespace-nowrap bg-gray-50">口岸</TableHead>
+                  <TableHead className="whitespace-nowrap bg-gray-50">货物属性</TableHead>
+                  <TableHead className="whitespace-nowrap bg-gray-50">主单号</TableHead>
+                  <TableHead className="whitespace-nowrap bg-gray-50">航班号</TableHead>
+                  <TableHead className="whitespace-nowrap bg-gray-50">目的港</TableHead>
+                  <TableHead className="whitespace-nowrap bg-gray-50">起飞时间</TableHead>
+                  <TableHead className="whitespace-nowrap bg-gray-50">到港时间</TableHead>
+                  <TableHead className="whitespace-nowrap bg-gray-50">实际件数</TableHead>
+                  <TableHead className="whitespace-nowrap bg-gray-50">实际重量</TableHead>
+                  <TableHead className="whitespace-nowrap bg-gray-50">备注</TableHead>
+                  <TableHead className="whitespace-nowrap bg-gray-50 sticky right-0">操作</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {mainOrders.slice(0, 100).map(order => (
+                  <TableRow key={order.id}>
+                    <TableCell className="whitespace-nowrap">{order.collect_date}</TableCell>
+                    <TableCell>{order.warehouse}</TableCell>
+                    <TableCell>{order.port}</TableCell>
+                    <TableCell>{order.cargo_type}</TableCell>
+                    <TableCell>{order.main_no || '-'}</TableCell>
+                    <TableCell>{order.flight_no || '-'}</TableCell>
+                    <TableCell>{order.dest || '-'}</TableCell>
+                    <TableCell className="whitespace-nowrap">
                       {order.actual_flight_date && order.depart_time 
                         ? `${order.actual_flight_date} ${order.depart_time}` 
                         : order.depart_time || '-'}
-                    </div>
-                    
-                    <div className="border-b border-r p-3 bg-gray-50 font-medium text-gray-600">到港时间</div>
-                    <div className="border-b p-3">
+                    </TableCell>
+                    <TableCell className="whitespace-nowrap">
                       {order.actual_flight_date && order.arrive_time 
                         ? `${order.actual_flight_date} ${order.arrive_time}` 
                         : order.arrive_time || '-'}
-                    </div>
-                    
-                    <div className="border-b border-r p-3 bg-gray-50 font-medium text-gray-600">实际件数</div>
-                    <div className="border-b p-3">{order.actual_pieces || '-'}</div>
-                    
-                    <div className="border-b border-r p-3 bg-gray-50 font-medium text-gray-600">实际重量</div>
-                    <div className="border-b p-3">{order.actual_weight || '-'}</div>
-                    
-                    <div className="border-b border-r p-3 bg-gray-50 font-medium text-gray-600">实际体积</div>
-                    <div className="border-b p-3">{order.actual_volume || '-'}</div>
-                    
-                    <div className="border-b border-r p-3 bg-gray-50 font-medium text-gray-600">实际票数</div>
-                    <div className="border-b p-3">{order.actual_bills || '-'}</div>
-                    
-                    <div className="border-b border-r p-3 bg-gray-50 font-medium text-gray-600">备注</div>
-                    <div className="border-b p-3">{order.remark || '-'}</div>
-                    
-                    <div className="border-r p-3 bg-gray-50 font-medium text-gray-600">操作</div>
-                    <div className="p-3">
+                    </TableCell>
+                    <TableCell>{order.actual_pieces || '-'}</TableCell>
+                    <TableCell>{order.actual_weight || '-'}</TableCell>
+                    <TableCell className="max-w-[150px] truncate" title={order.remark || ''}>{order.remark || '-'}</TableCell>
+                    <TableCell className="whitespace-nowrap sticky right-0 bg-white">
                       <Button size="sm" variant="outline" className="mr-2"
                         onClick={() => {
                           setEditingOrder(order);
@@ -2172,11 +2174,16 @@ export default function LogisticsManagement() {
                         onClick={() => deleteMainOrder(order.id)}>
                         删除
                       </Button>
-                    </div>
-                  </div>
-                </Card>
-              ))
-            )}
+                    </TableCell>
+                  </TableRow>
+                ))}
+                {mainOrders.length === 0 && (
+                  <TableRow>
+                    <TableCell colSpan={13} className="text-center text-gray-500 py-8">暂无记录</TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
           </div>
           <DialogFooter className="mt-4">
             <div className="text-sm text-gray-500 mr-auto">共 {mainOrders.length} 条记录</div>
