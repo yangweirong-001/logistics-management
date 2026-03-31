@@ -64,7 +64,7 @@
     .tag-warning { background: #fffbe6; color: var(--warning); border: 1px solid #ffe58f; }
     .stat-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; margin-bottom: 20px; }
     .stat-card { background: var(--card); padding: 20px; border-radius: 4px; box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
-    .stat-value { font-size: 24px; font-weight: bold; color: var(--primary); }
+    .stat-value { font-size: 28px; font-weight: bold; color: var(--primary); }
     .stat-label { color: var(--text2); font-size: 14px; margin-top: 5px; }
     .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center; }
     .modal.show { display: flex; }
@@ -195,6 +195,7 @@
         <div class="page-header"><h1 class="page-title">方数预估</h1></div>
         <div class="card">
           <div class="card-body">
+            <input type="hidden" id="vol-edit-id">
             <div class="form-row">
               <div class="form-col">
                 <div class="form-group">
@@ -226,22 +227,35 @@
               </div>
             </div>
 
-            <h3 style="margin: 20px 0 15px; color: var(--primary);">计算结果</h3>
+            <h3 style="margin: 20px 0 15px; color: #1890ff; font-size: 18px; font-weight: bold; border-left: 4px solid #1890ff; padding-left: 10px;">计算结果</h3>
 
             <div class="stat-cards">
-              <div class="stat-card"><div class="stat-value" id="res-total">0</div><div class="stat-label">总方数</div></div>
-              <div class="stat-card"><div class="stat-value" id="res-kanto">0</div><div class="stat-label">关东总方数</div></div>
-              <div class="stat-card"><div class="stat-value" id="res-kansai">0</div><div class="stat-label">关西总方数</div></div>
+              <div class="stat-card"><div class="stat-value" id="res-total">0</div><div class="stat-label" style="font-size: 16px; font-weight: bold; color: #333;">总方数</div></div>
+              <div class="stat-card"><div class="stat-value" id="res-kanto">0</div><div class="stat-label" style="font-size: 16px; font-weight: bold; color: #333;">关东总方数</div></div>
+              <div class="stat-card"><div class="stat-value" id="res-kansai">0</div><div class="stat-label" style="font-size: 16px; font-weight: bold; color: #333;">关西总方数</div></div>
             </div>
             <div class="stat-cards">
-              <div class="stat-card"><div class="stat-value" id="res-kn">0</div><div class="stat-label">关东普货</div></div>
-              <div class="stat-card"><div class="stat-value" id="res-ks">0</div><div class="stat-label">关东特货</div></div>
-              <div class="stat-card"><div class="stat-value" id="res-wn">0</div><div class="stat-label">关西普货</div></div>
-              <div class="stat-card"><div class="stat-value" id="res-ws">0</div><div class="stat-label">关西特货</div></div>
+              <div class="stat-card"><div class="stat-value" id="res-kn">0</div><div class="stat-label" style="font-size: 16px; font-weight: bold; color: #333;">关东普货</div></div>
+              <div class="stat-card"><div class="stat-value" id="res-ks">0</div><div class="stat-label" style="font-size: 16px; font-weight: bold; color: #333;">关东特货</div></div>
+              <div class="stat-card"><div class="stat-value" id="res-wn">0</div><div class="stat-label" style="font-size: 16px; font-weight: bold; color: #333;">关西普货</div></div>
+              <div class="stat-card"><div class="stat-value" id="res-ws">0</div><div class="stat-label" style="font-size: 16px; font-weight: bold; color: #333;">关西特货</div></div>
             </div>
             <div class="stat-cards">
-              <div class="stat-card"><div class="stat-value" id="res-air">0</div><div class="stat-label">空运方数</div></div>
-              <div class="stat-card"><div class="stat-value" id="res-sea">0</div><div class="stat-label">海空方数</div></div>
+              <div class="stat-card"><div class="stat-value" id="res-air">0</div><div class="stat-label" style="font-size: 16px; font-weight: bold; color: #333;">空运方数</div></div>
+              <div class="stat-card"><div class="stat-value" id="res-sea">0</div><div class="stat-label" style="font-size: 16px; font-weight: bold; color: #333;">海空方数</div></div>
+            </div>
+
+            <div class="form-row" style="margin-top: 20px;">
+              <div class="form-col" style="max-width: 300px;">
+                <div class="form-group">
+                  <label class="form-label">货物袋数是否齐全</label>
+                  <select class="form-control" id="vol-complete">
+                    <option value="">请选择</option>
+                    <option value="是">是</option>
+                    <option value="否">否</option>
+                  </select>
+                </div>
+              </div>
             </div>
 
             <div class="btn-group">
@@ -250,7 +264,7 @@
             </div>
             
             <!-- 最近记录 -->
-            <h3 style="margin: 30px 0 15px; color: var(--primary);">最近保存的记录</h3>
+            <h3 style="margin: 30px 0 15px; color: #1890ff; font-size: 18px; font-weight: bold; border-left: 4px solid #1890ff; padding-left: 10px;">最近保存的记录</h3>
             <div class="scroll-table">
               <table id="vol-recent-table">
                 <thead>
@@ -267,6 +281,7 @@
                     <th>关西特货</th>
                     <th>空运</th>
                     <th>海空</th>
+                    <th>货物袋数齐全</th>
                     <th>操作</th>
                   </tr>
                 </thead>
@@ -288,7 +303,7 @@
                 <div class="form-group">
                   <label class="form-label">揽收日期</label>
                   <div style="display:flex;gap:8px">
-                    <input type="date" class="form-control" id="o-cdate" onchange="updateOrderWeekday()" style="flex:1">
+                    <input type="date" class="form-control" id="o-cdate" onchange="updateOrderWeekday(); calcEstVolume();" style="flex:1">
                     <input type="text" class="form-control weekday" id="o-cw" readonly>
                   </div>
                 </div>
@@ -305,7 +320,7 @@
               <div class="form-col">
                 <div class="form-group">
                   <label class="form-label">仓库</label>
-                  <select class="form-control" id="o-wh" onchange="updateCategory()">
+                  <select class="form-control" id="o-wh" onchange="updateCategory(); calcEstVolume();">
                     <option value="">请选择</option>
                     <option value="东莞">东莞</option>
                     <option value="加工区">加工区</option>
@@ -357,7 +372,7 @@
               <div class="form-col">
                 <div class="form-group">
                   <label class="form-label">打货要求</label>
-                  <select class="form-control" id="o-pack" onchange="calcMaxPieces()">
+                  <select class="form-control" id="o-pack" onchange="calcMaxPieces(); calcEstVolume();">
                     <option value="">请选择</option>
                     <option value="纸箱">纸箱</option>
                     <option value="麻袋">麻袋</option>
@@ -1148,13 +1163,15 @@ function calcVolume() {
 }
 
 function saveVolume() {
+  const editId = document.getElementById('vol-edit-id').value;
   const date = document.getElementById('vol-date').value;
   const wh = document.getElementById('vol-warehouse').value;
   const cnt = document.getElementById('vol-count').value;
+  const complete = document.getElementById('vol-complete').value;
   if (!date || !wh || !cnt) { alert('请填写完整'); return; }
 
   const data = {
-    id: genId(),
+    id: editId || genId(),
     collect_date: date,
     weekday: getWeekday(date),
     warehouse: wh,
@@ -1168,14 +1185,25 @@ function saveVolume() {
     kansai_special: document.getElementById('res-ws').textContent,
     air_volume: document.getElementById('res-air').textContent,
     sea_air_volume: document.getElementById('res-sea').textContent,
+    is_complete: complete,
   };
-  saveData(KEYS.VOL, [...getData(KEYS.VOL), data]);
+  
+  let list = getData(KEYS.VOL);
+  if (editId) {
+    const idx = list.findIndex(i => i.id === editId);
+    if (idx > -1) list[idx] = data;
+  } else {
+    list.push(data);
+  }
+  saveData(KEYS.VOL, list);
   alert('保存成功！');
   // 清空输入，准备下一次输入
+  document.getElementById('vol-edit-id').value = '';
   document.getElementById('vol-date').value = '';
   document.getElementById('vol-weekday').value = '';
   document.getElementById('vol-warehouse').value = '';
   document.getElementById('vol-count').value = '';
+  document.getElementById('vol-complete').value = '';
   // 重置计算结果
   document.getElementById('res-total').textContent = '0';
   document.getElementById('res-kanto').textContent = '0';
@@ -1223,6 +1251,7 @@ function updateCategory() {
   const cargo = document.getElementById('o-cargo').value;
   document.getElementById('o-cat').value = `${port}${cargo}`;
   initFlightOpts();
+  calcEstVolume(); // 自动计算预估方数和预估件数
 }
 
 function calcMaxPieces() {
@@ -1242,18 +1271,47 @@ function calcEstVolume() {
   const wh = document.getElementById('o-wh').value;
   const port = document.getElementById('o-port').value;
   const cargo = document.getElementById('o-cargo').value;
+  const pack = document.getElementById('o-pack').value;
 
-  if (!date || !wh || !port || !cargo) return;
+  if (!date || !wh || !port || !cargo) {
+    document.getElementById('o-estvol').value = '';
+    document.getElementById('o-estpieces').value = '';
+    return;
+  }
 
-  const vol = getData(KEYS.VOL).find(i => i.collect_date === date && i.warehouse === wh);
+  // 先查找当天数据
+  let vol = getData(KEYS.VOL).find(i => i.collect_date === date && i.warehouse === wh);
+  
+  // 如果当天没有，查找前一天数据
+  if (!vol) {
+    const prevDate = addDays(date, -1);
+    vol = getData(KEYS.VOL).find(i => i.collect_date === prevDate && i.warehouse === wh);
+  }
+  
   if (vol) {
     let est = 0;
     if (port === '关东' && cargo === '普货') est = parseFloat(vol.kanto_normal) || 0;
     else if (port === '关东' && cargo === '特货') est = parseFloat(vol.kanto_special) || 0;
     else if (port === '关西' && cargo === '普货') est = parseFloat(vol.kansai_normal) || 0;
     else if (port === '关西' && cargo === '特货') est = parseFloat(vol.kansai_special) || 0;
-    document.getElementById('o-estvol').value = est.toFixed(12);
-    document.getElementById('o-estpieces').value = Math.round(est / 0.06);
+    
+    document.getElementById('o-estvol').value = est.toFixed(3);
+    
+    // 预估件数计算
+    if (pack && est > 0) {
+      let piecesMultiplier = 0;
+      if (wh === '东莞') {
+        piecesMultiplier = pack === '纸箱' ? 0.12 : 0.159;
+      } else {
+        piecesMultiplier = pack === '纸箱' ? 0.12 : 0.18;
+      }
+      document.getElementById('o-estpieces').value = Math.round(est * piecesMultiplier);
+    } else {
+      document.getElementById('o-estpieces').value = '';
+    }
+  } else {
+    document.getElementById('o-estvol').value = '无对应方数数据';
+    document.getElementById('o-estpieces').value = '';
   }
 }
 
@@ -1464,14 +1522,14 @@ function queryBalance() {
   const maxSum = orders.reduce((s, i) => s + (parseFloat(i.max_volume) || 0), 0);
 
   const balance = est - maxSum;
-  document.getElementById('b-est').textContent = est.toFixed(12);
-  document.getElementById('b-max').textContent = maxSum.toFixed(12);
+  document.getElementById('b-est').textContent = est.toFixed(3);
+  document.getElementById('b-max').textContent = maxSum.toFixed(3);
   if (balance > 0) {
-    document.getElementById('b-def').textContent = balance.toFixed(12);
-    document.getElementById('b-sur').textContent = '0.000000000000';
+    document.getElementById('b-def').textContent = balance.toFixed(3);
+    document.getElementById('b-sur').textContent = '0.000';
   } else {
-    document.getElementById('b-def').textContent = '0.000000000000';
-    document.getElementById('b-sur').textContent = Math.abs(balance).toFixed(12);
+    document.getElementById('b-def').textContent = '0.000';
+    document.getElementById('b-sur').textContent = Math.abs(balance).toFixed(3);
   }
 }
 
@@ -1483,8 +1541,35 @@ function renderVolRecent() {
     <td>${i.total_volume}</td><td>${i.kanto_total}</td><td>${i.kansai_total}</td>
     <td>${i.kanto_normal}</td><td>${i.kanto_special}</td><td>${i.kansai_normal}</td><td>${i.kansai_special}</td>
     <td>${i.air_volume}</td><td>${i.sea_air_volume}</td>
-    <td><button class="btn btn-sm btn-danger" onclick="deleteVolRecent('${i.id}')">删除</button></td>
+    <td>${i.is_complete || '-'}</td>
+    <td>
+      <button class="btn btn-sm btn-primary" onclick="editVolume('${i.id}')">编辑</button>
+      <button class="btn btn-sm btn-danger" onclick="deleteVolRecent('${i.id}')">删除</button>
+    </td>
   </tr>`).join('');
+}
+
+function editVolume(id) {
+  const item = getData(KEYS.VOL).find(i => i.id === id);
+  if (item) {
+    document.getElementById('vol-edit-id').value = item.id;
+    document.getElementById('vol-date').value = item.collect_date;
+    document.getElementById('vol-weekday').value = item.weekday || '';
+    document.getElementById('vol-warehouse').value = item.warehouse;
+    document.getElementById('vol-count').value = item.package_count;
+    document.getElementById('vol-complete').value = item.is_complete || '';
+    // 显示计算结果
+    document.getElementById('res-total').textContent = item.total_volume;
+    document.getElementById('res-kanto').textContent = item.kanto_total;
+    document.getElementById('res-kansai').textContent = item.kansai_total;
+    document.getElementById('res-kn').textContent = item.kanto_normal;
+    document.getElementById('res-ks').textContent = item.kanto_special;
+    document.getElementById('res-wn').textContent = item.kansai_normal;
+    document.getElementById('res-ws').textContent = item.kansai_special;
+    document.getElementById('res-air').textContent = item.air_volume;
+    document.getElementById('res-sea').textContent = item.sea_air_volume;
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
 }
 
 function deleteVolRecent(id) {
