@@ -73,7 +73,8 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
-    "@types/pg": "^8.16.0"
+    "@types/pg": "^8.16.0",
+    "tsup": "^8.3.5"
   },
   "devDependencies": {
     "@react-dev-inspector/babel-plugin": "^2.0.1",
