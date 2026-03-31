@@ -60,15 +60,15 @@ interface VolumeEstimate {
   weekday: string | null;
   warehouse: string;
   package_count: number;
-  total_volume: string | null;
-  kanto_total: string | null;
-  kansai_total: string | null;
-  kanto_normal: string | null;
-  kanto_special: string | null;
-  kansai_normal: string | null;
-  kansai_special: string | null;
-  air_volume: string | null;
-  sea_air_volume: string | null;
+  total_volume: number | null;
+  kanto_total: number | null;
+  kansai_total: number | null;
+  kanto_normal: number | null;
+  kanto_special: number | null;
+  kansai_normal: number | null;
+  kansai_special: number | null;
+  air_volume: number | null;
+  sea_air_volume: number | null;
   is_complete: string | null;
 }
 
@@ -644,13 +644,13 @@ export default function LogisticsManagement() {
     
     if (estimate) {
       if (orderForm.port === '关东' && orderForm.cargo_type === '普货') {
-        estVolume = parseFloat(estimate.kanto_normal || '0');
+        estVolume = estimate.kanto_normal || 0;
       } else if (orderForm.port === '关东' && orderForm.cargo_type === '特货') {
-        estVolume = parseFloat(estimate.kanto_special || '0');
+        estVolume = estimate.kanto_special || 0;
       } else if (orderForm.port === '关西' && orderForm.cargo_type === '普货') {
-        estVolume = parseFloat(estimate.kansai_normal || '0');
+        estVolume = estimate.kansai_normal || 0;
       } else if (orderForm.port === '关西' && orderForm.cargo_type === '特货') {
-        estVolume = parseFloat(estimate.kansai_special || '0');
+        estVolume = estimate.kansai_special || 0;
       }
       
       // 预估件数 = 预估方数 / 0.06
@@ -800,13 +800,13 @@ export default function LogisticsManagement() {
           let estVolume = 0;
           if (estimate) {
             if (pt === '关东' && ct === '普货') {
-              estVolume = parseFloat(estimate.kanto_normal || '0');
+              estVolume = estimate.kanto_normal || 0;
             } else if (pt === '关东' && ct === '特货') {
-              estVolume = parseFloat(estimate.kanto_special || '0');
+              estVolume = estimate.kanto_special || 0;
             } else if (pt === '关西' && ct === '普货') {
-              estVolume = parseFloat(estimate.kansai_normal || '0');
+              estVolume = estimate.kansai_normal || 0;
             } else if (pt === '关西' && ct === '特货') {
-              estVolume = parseFloat(estimate.kansai_special || '0');
+              estVolume = estimate.kansai_special || 0;
             }
           }
           
@@ -1317,15 +1317,15 @@ export default function LogisticsManagement() {
                         <TableCell>{record.collect_date}</TableCell>
                         <TableCell>{record.warehouse}</TableCell>
                         <TableCell>{record.package_count}</TableCell>
-                        <TableCell>{parseFloat(record.total_volume || '0').toFixed(3)}</TableCell>
-                        <TableCell>{parseFloat(record.kanto_total || '0').toFixed(3)}</TableCell>
-                        <TableCell>{parseFloat(record.kansai_total || '0').toFixed(3)}</TableCell>
-                        <TableCell>{parseFloat(record.kanto_normal || '0').toFixed(3)}</TableCell>
-                        <TableCell>{parseFloat(record.kanto_special || '0').toFixed(3)}</TableCell>
-                        <TableCell>{parseFloat(record.kansai_normal || '0').toFixed(3)}</TableCell>
-                        <TableCell>{parseFloat(record.kansai_special || '0').toFixed(3)}</TableCell>
-                        <TableCell>{parseFloat(record.air_volume || '0').toFixed(3)}</TableCell>
-                        <TableCell>{parseFloat(record.sea_air_volume || '0').toFixed(3)}</TableCell>
+                        <TableCell>{(record.total_volume || 0).toFixed(3)}</TableCell>
+                        <TableCell>{(record.kanto_total || 0).toFixed(3)}</TableCell>
+                        <TableCell>{(record.kansai_total || 0).toFixed(3)}</TableCell>
+                        <TableCell>{(record.kanto_normal || 0).toFixed(3)}</TableCell>
+                        <TableCell>{(record.kanto_special || 0).toFixed(3)}</TableCell>
+                        <TableCell>{(record.kansai_normal || 0).toFixed(3)}</TableCell>
+                        <TableCell>{(record.kansai_special || 0).toFixed(3)}</TableCell>
+                        <TableCell>{(record.air_volume || 0).toFixed(3)}</TableCell>
+                        <TableCell>{(record.sea_air_volume || 0).toFixed(3)}</TableCell>
                         <TableCell>{record.is_complete || '-'}</TableCell>
                         <TableCell>
                           <Button size="sm" variant="outline" className="mr-2"
@@ -1470,10 +1470,10 @@ export default function LogisticsManagement() {
                         if (!orderForm.collect_date || !orderForm.warehouse || !orderForm.port || !orderForm.cargo_type) return '';
                         const estimate = volumeEstimates.find(e => e.collect_date === orderForm.collect_date && e.warehouse === orderForm.warehouse);
                         if (!estimate) return '';
-                        if (orderForm.port === '关东' && orderForm.cargo_type === '普货') return parseFloat(estimate.kanto_normal || '0').toFixed(3);
-                        if (orderForm.port === '关东' && orderForm.cargo_type === '特货') return parseFloat(estimate.kanto_special || '0').toFixed(3);
-                        if (orderForm.port === '关西' && orderForm.cargo_type === '普货') return parseFloat(estimate.kansai_normal || '0').toFixed(3);
-                        if (orderForm.port === '关西' && orderForm.cargo_type === '特货') return parseFloat(estimate.kansai_special || '0').toFixed(3);
+                        if (orderForm.port === '关东' && orderForm.cargo_type === '普货') return (estimate.kanto_normal || 0).toFixed(3);
+                        if (orderForm.port === '关东' && orderForm.cargo_type === '特货') return (estimate.kanto_special || 0).toFixed(3);
+                        if (orderForm.port === '关西' && orderForm.cargo_type === '普货') return (estimate.kansai_normal || 0).toFixed(3);
+                        if (orderForm.port === '关西' && orderForm.cargo_type === '特货') return (estimate.kansai_special || 0).toFixed(3);
                         return '';
                       })()} />
                   </div>
@@ -1485,10 +1485,10 @@ export default function LogisticsManagement() {
                         const estimate = volumeEstimates.find(e => e.collect_date === orderForm.collect_date && e.warehouse === orderForm.warehouse);
                         if (!estimate) return '';
                         let estVol = 0;
-                        if (orderForm.port === '关东' && orderForm.cargo_type === '普货') estVol = parseFloat(estimate.kanto_normal || '0');
-                        else if (orderForm.port === '关东' && orderForm.cargo_type === '特货') estVol = parseFloat(estimate.kanto_special || '0');
-                        else if (orderForm.port === '关西' && orderForm.cargo_type === '普货') estVol = parseFloat(estimate.kansai_normal || '0');
-                        else if (orderForm.port === '关西' && orderForm.cargo_type === '特货') estVol = parseFloat(estimate.kansai_special || '0');
+                        if (orderForm.port === '关东' && orderForm.cargo_type === '普货') estVol = estimate.kanto_normal || 0;
+                        else if (orderForm.port === '关东' && orderForm.cargo_type === '特货') estVol = estimate.kanto_special || 0;
+                        else if (orderForm.port === '关西' && orderForm.cargo_type === '普货') estVol = estimate.kansai_normal || 0;
+                        else if (orderForm.port === '关西' && orderForm.cargo_type === '特货') estVol = estimate.kansai_special || 0;
                         return Math.round(estVol / 0.06);
                       })()} />
                   </div>
@@ -2131,7 +2131,7 @@ export default function LogisticsManagement() {
       
       {/* 主单列表模态框 */}
       <Dialog open={orderListOpen} onOpenChange={setOrderListOpen}>
-        <DialogContent className="w-[98vw] max-w-[1600px] h-auto max-h-[60vh] p-4 flex flex-col">
+        <DialogContent className="w-[99vw] max-w-[99vw] h-auto max-h-[50vh] p-4 flex flex-col">
           <DialogHeader>
             <DialogTitle className="text-xl">主单列表</DialogTitle>
           </DialogHeader>
@@ -2166,49 +2166,49 @@ export default function LogisticsManagement() {
               loadMainOrdersWithFilter(date);
             }}>查询</Button>
           </div>
-          <div className="flex-1 overflow-auto border rounded-lg" style={{ maxHeight: 'calc(60vh - 160px)' }}>
-            <Table>
+          <div className="flex-1 overflow-auto border rounded-lg" style={{ maxHeight: 'calc(50vh - 140px)' }}>
+            <Table className="w-full">
               <TableHeader className="sticky top-0 bg-white z-10">
                 <TableRow>
-                  <TableHead className="whitespace-nowrap bg-gray-50">揽收日期</TableHead>
-                  <TableHead className="whitespace-nowrap bg-gray-50">仓库</TableHead>
-                  <TableHead className="whitespace-nowrap bg-gray-50">口岸</TableHead>
-                  <TableHead className="whitespace-nowrap bg-gray-50">货物属性</TableHead>
-                  <TableHead className="whitespace-nowrap bg-gray-50">主单号</TableHead>
-                  <TableHead className="whitespace-nowrap bg-gray-50">航班号</TableHead>
-                  <TableHead className="whitespace-nowrap bg-gray-50">目的港</TableHead>
-                  <TableHead className="whitespace-nowrap bg-gray-50">起飞时间</TableHead>
-                  <TableHead className="whitespace-nowrap bg-gray-50">到港时间</TableHead>
-                  <TableHead className="whitespace-nowrap bg-gray-50">实际件数</TableHead>
-                  <TableHead className="whitespace-nowrap bg-gray-50">实际重量</TableHead>
-                  <TableHead className="whitespace-nowrap bg-gray-50">备注</TableHead>
-                  <TableHead className="whitespace-nowrap bg-gray-50 sticky right-0">操作</TableHead>
+                  <TableHead className="bg-gray-50 w-[100px]">揽收日期</TableHead>
+                  <TableHead className="bg-gray-50 w-[80px]">仓库</TableHead>
+                  <TableHead className="bg-gray-50 w-[80px]">口岸</TableHead>
+                  <TableHead className="bg-gray-50 w-[80px]">货物属性</TableHead>
+                  <TableHead className="bg-gray-50 w-[120px]">主单号</TableHead>
+                  <TableHead className="bg-gray-50 w-[100px]">航班号</TableHead>
+                  <TableHead className="bg-gray-50 w-[80px]">目的港</TableHead>
+                  <TableHead className="bg-gray-50 w-[140px]">起飞时间</TableHead>
+                  <TableHead className="bg-gray-50 w-[140px]">到港时间</TableHead>
+                  <TableHead className="bg-gray-50 w-[80px]">实际件数</TableHead>
+                  <TableHead className="bg-gray-50 w-[100px]">实际重量</TableHead>
+                  <TableHead className="bg-gray-50">备注</TableHead>
+                  <TableHead className="bg-gray-50 w-[120px] sticky right-0">操作</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {mainOrders.slice(0, 100).map(order => (
                   <TableRow key={order.id}>
-                    <TableCell className="whitespace-nowrap">{order.collect_date}</TableCell>
+                    <TableCell>{order.collect_date}</TableCell>
                     <TableCell>{order.warehouse}</TableCell>
                     <TableCell>{order.port}</TableCell>
                     <TableCell>{order.cargo_type}</TableCell>
                     <TableCell>{order.main_no || '-'}</TableCell>
                     <TableCell>{order.flight_no || '-'}</TableCell>
                     <TableCell>{order.dest || '-'}</TableCell>
-                    <TableCell className="whitespace-nowrap">
+                    <TableCell>
                       {order.actual_flight_date && order.depart_time 
                         ? `${order.actual_flight_date} ${order.depart_time}` 
                         : order.depart_time || '-'}
                     </TableCell>
-                    <TableCell className="whitespace-nowrap">
+                    <TableCell>
                       {order.actual_flight_date && order.arrive_time 
                         ? `${order.actual_flight_date} ${order.arrive_time}` 
                         : order.arrive_time || '-'}
                     </TableCell>
                     <TableCell>{order.actual_pieces || '-'}</TableCell>
                     <TableCell>{order.actual_weight || '-'}</TableCell>
-                    <TableCell className="max-w-[150px] truncate" title={order.remark || ''}>{order.remark || '-'}</TableCell>
-                    <TableCell className="whitespace-nowrap sticky right-0 bg-white">
+                    <TableCell className="truncate max-w-[100px]" title={order.remark || ''}>{order.remark || '-'}</TableCell>
+                    <TableCell className="sticky right-0 bg-white">
                       <Button size="sm" variant="outline" className="mr-2"
                         onClick={() => {
                           setEditingOrder(order);
