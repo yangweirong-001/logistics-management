@@ -248,8 +248,8 @@
             <div class="form-row" style="margin-top: 20px;">
               <div class="form-col" style="max-width: 300px;">
                 <div class="form-group">
-                  <label class="form-label">货物袋数是否齐全</label>
-                  <select class="form-control" id="vol-complete">
+                  <label class="form-label">货物袋数是否齐全 <span style="color:#f5222d">*</span></label>
+                  <select class="form-control" id="vol-complete" required>
                     <option value="">请选择</option>
                     <option value="是">是</option>
                     <option value="否">否</option>
@@ -491,6 +491,15 @@
               </div>
             </div>
 
+            <div class="form-row">
+              <div class="form-col" style="flex: 2;">
+                <div class="form-group">
+                  <label class="form-label">备注</label>
+                  <input type="text" class="form-control" id="o-remark" placeholder="请输入备注信息">
+                </div>
+              </div>
+            </div>
+
             <div class="btn-group">
               <button class="btn btn-success" onclick="saveOrder()">保存主单</button>
               <button class="btn btn-primary" onclick="showOrderList()">查看主单列表</button>
@@ -524,6 +533,7 @@
               </div>
               <div class="form-col">
                 <button class="btn btn-primary" style="margin-top:25px" onclick="queryOrders()">查询</button>
+                <button class="btn btn-success" style="margin-top:25px;margin-left:10px" onclick="exportOrdersToExcel()">导出Excel</button>
               </div>
             </div>
           </div>
@@ -532,8 +542,25 @@
           <div class="card-header">查询结果</div>
           <div class="card-body">
             <div class="scroll-table">
-              <table>
-                <thead><tr><th>揽收日期</th><th>仓库</th><th>口岸</th><th>货物属性</th><th>类别</th><th>主单号</th><th>航班号</th><th>目的港</th><th>起飞时间</th><th>到港时间</th><th>操作</th></tr></thead>
+              <table id="query-result-table">
+                <thead><tr>
+                  <th>揽收日期</th>
+                  <th>仓库</th>
+                  <th>口岸</th>
+                  <th>货物属性</th>
+                  <th>类别</th>
+                  <th>主单号</th>
+                  <th>航班号</th>
+                  <th>目的港</th>
+                  <th>打货上限</th>
+                  <th>起飞时间</th>
+                  <th>到港时间</th>
+                  <th>实际件数</th>
+                  <th>实际重量</th>
+                  <th>实际体积</th>
+                  <th>实际票数</th>
+                  <th>备注</th>
+                </tr></thead>
                 <tbody id="q-tbody"></tbody>
               </table>
             </div>
@@ -809,7 +836,7 @@
 
   <!-- 主单列表模态框 -->
   <div class="modal" id="modal-orderlist">
-    <div class="modal-content" style="max-width:1400px">
+    <div class="modal-content" style="max-width:95%;width:95%;">
       <div class="modal-header">
         <span class="modal-title">主单列表</span>
         <button class="modal-close" onclick="closeModal('modal-orderlist')">&times;</button>
@@ -817,7 +844,25 @@
       <div class="modal-body">
         <div class="scroll-table">
           <table>
-            <thead><tr><th>揽收日期</th><th>仓库</th><th>口岸</th><th>货物属性</th><th>类别</th><th>主单号</th><th>航班号</th><th>目的港</th><th>打货上限</th><th>起飞时间</th><th>到港时间</th><th>操作</th></tr></thead>
+            <thead><tr>
+              <th>揽收日期</th>
+              <th>仓库</th>
+              <th>口岸</th>
+              <th>货物属性</th>
+              <th>类别</th>
+              <th>主单号</th>
+              <th>航班号</th>
+              <th>目的港</th>
+              <th>打货上限</th>
+              <th>起飞时间</th>
+              <th>到港时间</th>
+              <th>实际件数</th>
+              <th>实际重量</th>
+              <th>实际体积</th>
+              <th>实际票数</th>
+              <th>备注</th>
+              <th>操作</th>
+            </tr></thead>
             <tbody id="orderlist-tbody"></tbody>
           </table>
         </div>
@@ -1182,7 +1227,7 @@ function saveVolume() {
   const wh = document.getElementById('vol-warehouse').value;
   const cnt = document.getElementById('vol-count').value;
   const complete = document.getElementById('vol-complete').value;
-  if (!date || !wh || !cnt) { alert('请填写完整'); return; }
+  if (!date || !wh || !cnt || !complete) { alert('请填写完整（货物袋数是否齐全为必填项）'); return; }
 
   const data = {
     id: editId || genId(),
@@ -1413,6 +1458,7 @@ function saveOrder() {
     actual_weight: document.getElementById('o-aweight').value,
     actual_volume: document.getElementById('o-avol').value,
     actual_bills: document.getElementById('o-abills').value,
+    remark: document.getElementById('o-remark').value,
   };
 
   let list = getData(KEYS.ORDER);
@@ -1453,6 +1499,7 @@ function clearOrderForm() {
   document.getElementById('o-aweight').value = '';
   document.getElementById('o-avol').value = '';
   document.getElementById('o-abills').value = '';
+  document.getElementById('o-remark').value = '';
   initFlightOpts();
 }
 
@@ -1462,6 +1509,8 @@ function showOrderList() {
     <td>${i.collect_date}</td><td>${i.warehouse}</td><td>${i.port}</td><td>${i.cargo_type}</td>
     <td>${i.category}</td><td>${i.main_no || '-'}</td><td>${i.flight_no || '-'}</td><td>${i.dest || '-'}</td>
     <td>${i.max_volume || '-'}</td><td>${i.depart_time || '-'}</td><td>${i.arrive_time || '-'}</td>
+    <td>${i.actual_pieces || '-'}</td><td>${i.actual_weight || '-'}</td><td>${i.actual_volume || '-'}</td><td>${i.actual_bills || '-'}</td>
+    <td style="max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${i.remark || ''}">${i.remark || '-'}</td>
     <td><button class="btn btn-sm btn-primary" onclick="editOrder('${i.id}')">编辑</button> <button class="btn btn-sm btn-danger" onclick="deleteOrder('${i.id}')">删除</button></td>
   </tr>`).join('');
   openModal('modal-orderlist');
@@ -1498,7 +1547,8 @@ function editOrder(id) {
     document.getElementById('o-aweight').value = item.actual_weight || '';
     document.getElementById('o-avol').value = item.actual_volume || '';
     document.getElementById('o-abills').value = item.actual_bills || '';
-    document.querySelector('.menu-item[data-page="main-order"]').click();
+    document.getElementById('o-remark').value = item.remark || '';
+    document.querySelector('.menu-item[data-page=\"main-order\"]').click();
   }
 }
 
@@ -1519,9 +1569,62 @@ function queryOrders() {
   document.getElementById('q-tbody').innerHTML = list.map(i => `<tr>
     <td>${i.collect_date}</td><td>${i.warehouse}</td><td>${i.port}</td><td>${i.cargo_type}</td>
     <td>${i.category}</td><td>${i.main_no || '-'}</td><td>${i.flight_no || '-'}</td><td>${i.dest || '-'}</td>
-    <td>${i.depart_time || '-'}</td><td>${i.arrive_time || '-'}</td>
-    <td><button class="btn btn-sm btn-primary" onclick="editOrder('${i.id}')">编辑</button> <button class="btn btn-sm btn-danger" onclick="deleteOrder('${i.id}')">删除</button></td>
+    <td>${i.max_volume || '-'}</td><td>${i.depart_time || '-'}</td><td>${i.arrive_time || '-'}</td>
+    <td>${i.actual_pieces || '-'}</td><td>${i.actual_weight || '-'}</td><td>${i.actual_volume || '-'}</td><td>${i.actual_bills || '-'}</td>
+    <td style="max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${i.remark || ''}">${i.remark || '-'}</td>
   </tr>`).join('');
+}
+
+// 导出Excel
+function exportOrdersToExcel() {
+  const date = document.getElementById('q-date').value;
+  const wh = document.getElementById('q-wh').value;
+  let list = getData(KEYS.ORDER);
+  if (date) list = list.filter(i => i.collect_date === date);
+  if (wh) list = list.filter(i => i.warehouse === wh);
+  
+  if (list.length === 0) {
+    alert('没有数据可导出');
+    return;
+  }
+  
+  // 构建CSV内容
+  const headers = ['揽收日期', '仓库', '口岸', '货物属性', '类别', '主单号', '航班号', '目的港', '打货上限', '起飞时间', '到港时间', '实际件数', '实际重量', '实际体积', '实际票数', '备注'];
+  const rows = list.map(i => [
+    i.collect_date || '',
+    i.warehouse || '',
+    i.port || '',
+    i.cargo_type || '',
+    i.category || '',
+    i.main_no || '',
+    i.flight_no || '',
+    i.dest || '',
+    i.max_volume || '',
+    i.depart_time || '',
+    i.arrive_time || '',
+    i.actual_pieces || '',
+    i.actual_weight || '',
+    i.actual_volume || '',
+    i.actual_bills || '',
+    i.remark || ''
+  ]);
+  
+  // 添加BOM以支持中文
+  let csvContent = '\uFEFF' + headers.join(',') + '\n';
+  rows.forEach(row => {
+    csvContent += row.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(',') + '\n';
+  });
+  
+  // 下载文件
+  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `主单查询结果_${new Date().toISOString().slice(0,10)}.csv`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
 }
 
 // ==================== 欠方余方查询 ====================
