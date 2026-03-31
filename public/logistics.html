@@ -1,0 +1,1446 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>物流管理系统</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    * { box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; margin: 0; }
+    input, select { 
+      width: 100%; 
+      padding: 8px 12px; 
+      border: 1px solid #d1d5db; 
+      border-radius: 6px; 
+      font-size: 14px; 
+      background: white;
+    }
+    input:focus, select:focus { outline: none; border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1); }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { padding: 12px 8px; text-align: center; border-bottom: 1px solid #e5e7eb; }
+    th { background: #f9fafb; font-weight: 600; }
+    .btn { padding: 8px 16px; border-radius: 6px; font-weight: 500; cursor: pointer; border: none; font-size: 14px; }
+    .btn-primary { background: #2563eb; color: white; }
+    .btn-primary:hover { background: #1d4ed8; }
+    .btn-success { background: #16a34a; color: white; }
+    .btn-success:hover { background: #15803d; }
+    .btn-danger { background: #dc2626; color: white; }
+    .btn-danger:hover { background: #b91c1c; }
+    .btn-secondary { background: #6b7280; color: white; }
+    .btn-secondary:hover { background: #4b5563; }
+    .btn-outline { background: white; color: #374151; border: 1px solid #d1d5db; }
+    .btn-outline:hover { background: #f9fafb; }
+    .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center; }
+    .modal.show { display: flex; }
+    .modal-content { background: white; border-radius: 12px; max-height: 95vh; overflow: auto; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); }
+    .card { background: white; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+    .form-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+    .form-group { display: flex; flex-direction: column; gap: 4px; }
+    .form-group label { font-size: 13px; font-weight: 500; color: #374151; }
+    .table-container { max-height: 500px; overflow: auto; }
+    .toast { position: fixed; bottom: 20px; right: 20px; padding: 12px 24px; background: #16a34a; color: white; border-radius: 8px; z-index: 2000; animation: slideIn 0.3s ease; }
+    @keyframes slideIn { from { transform: translateY(100px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+    .sidebar-btn { width: 100%; padding: 12px 20px; text-align: left; background: transparent; border: none; color: white; cursor: pointer; }
+    .sidebar-btn:hover { background: rgba(255,255,255,0.1); }
+    .sidebar-btn.active { background: #2563eb; }
+    .stat-card { padding: 20px; border-radius: 12px; text-align: center; }
+    .stat-card .label { font-size: 13px; color: #6b7280; margin-bottom: 8px; }
+    .stat-card .value { font-size: 28px; font-weight: 700; }
+    .badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 12px; font-weight: 500; }
+    .badge-green { background: #dcfce7; color: #16a34a; }
+    .badge-red { background: #fee2e2; color: #dc2626; }
+    .badge-blue { background: #dbeafe; color: #2563eb; }
+  </style>
+</head>
+<body class="bg-gray-100">
+  <div class="flex min-h-screen">
+    <!-- 侧边栏 -->
+    <aside class="w-60 bg-slate-900 text-white flex flex-col flex-shrink-0">
+      <div class="p-5 text-lg font-bold border-b border-white/10 text-center">
+        物流管理系统
+      </div>
+      <nav class="flex-1 py-2">
+        <div class="px-4 py-2 text-xs text-white/50 uppercase">配置管理</div>
+        <button class="sidebar-btn" data-tab="config-area">区域参数配置</button>
+        <button class="sidebar-btn" data-tab="config-flight">航班配置</button>
+        <button class="sidebar-btn" data-tab="config-port">目的港配置</button>
+        <button class="sidebar-btn" data-tab="config-route">航空路由配置</button>
+        
+        <div class="px-4 py-2 text-xs text-white/50 uppercase mt-4">业务操作</div>
+        <button class="sidebar-btn" data-tab="volume-estimate">方数预估</button>
+        <button class="sidebar-btn" data-tab="main-order">主单发放</button>
+        <button class="sidebar-btn" data-tab="order-query">主单查询</button>
+        <button class="sidebar-btn" data-tab="balance-query">欠方余方查询</button>
+      </nav>
+      <div class="p-4 border-t border-white/10">
+        <div class="text-sm text-white/70 mb-2">本地版本</div>
+        <div class="text-xs text-green-400">数据保存在浏览器</div>
+      </div>
+    </aside>
+    
+    <!-- 主内容区 -->
+    <main class="flex-1 p-5" id="main-content">
+    </main>
+  </div>
+
+  <!-- 主单列表弹窗 -->
+  <div id="orderListModal" class="modal">
+    <div class="modal-content" style="width: 95vw; max-width: 1600px;">
+      <div class="p-6">
+        <div class="flex justify-between items-center mb-4">
+          <h2 class="text-xl font-bold">主单列表</h2>
+          <button onclick="closeOrderList()" class="text-gray-500 hover:text-gray-700 text-2xl">&times;</button>
+        </div>
+        <div class="flex gap-4 mb-4 flex-wrap items-end">
+          <div>
+            <label class="text-sm text-gray-600 block mb-1">揽收日期</label>
+            <input type="date" id="filterOrderDate" class="w-40">
+          </div>
+          <div>
+            <label class="text-sm text-gray-600 block mb-1">仓库</label>
+            <select id="filterWarehouse" class="w-32">
+              <option value="">全部</option>
+              <option value="东莞">东莞</option>
+              <option value="加工区">加工区</option>
+            </select>
+          </div>
+          <div>
+            <label class="text-sm text-gray-600 block mb-1">口岸</label>
+            <select id="filterPort" class="w-32">
+              <option value="">全部</option>
+              <option value="关东">关东</option>
+              <option value="关西">关西</option>
+            </select>
+          </div>
+          <div>
+            <label class="text-sm text-gray-600 block mb-1">货物属性</label>
+            <select id="filterCargoType" class="w-32">
+              <option value="">全部</option>
+              <option value="普货">普货</option>
+              <option value="特货">特货</option>
+            </select>
+          </div>
+          <button class="btn btn-primary" onclick="filterOrders()">查询</button>
+        </div>
+        <div class="border rounded-lg overflow-auto" style="max-height: 65vh;">
+          <table>
+            <thead class="sticky top-0 bg-white">
+              <tr>
+                <th>揽收日期</th><th>仓库</th><th>口岸</th><th>货物属性</th>
+                <th>类别</th><th>主单号</th><th>航班号</th><th>目的港</th>
+                <th>打货上限</th><th>起飞时间</th><th>到港时间</th>
+                <th>实际件数</th><th>实际重量</th><th>实际体积</th>
+                <th>实际票数</th><th>备注</th><th>操作</th>
+              </tr>
+            </thead>
+            <tbody id="orderListBody"></tbody>
+          </table>
+        </div>
+        <div class="mt-4 text-gray-600" id="orderListCount">共 0 条记录</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 编辑弹窗 -->
+  <div id="editModal" class="modal">
+    <div class="modal-content w-[600px] p-6">
+      <div class="flex justify-between items-center mb-4">
+        <h2 class="text-xl font-bold" id="editModalTitle">编辑</h2>
+        <button onclick="closeEditModal()" class="text-gray-500 hover:text-gray-700 text-2xl">&times;</button>
+      </div>
+      <div id="editModalContent"></div>
+    </div>
+  </div>
+
+  <script>
+    // 数据存储
+    const DB = {
+      get: (key) => JSON.parse(localStorage.getItem('logistics_' + key) || '[]'),
+      set: (key, data) => localStorage.setItem('logistics_' + key, JSON.stringify(data)),
+      nextId: (key) => {
+        const items = DB.get(key);
+        return items.length > 0 ? Math.max(...items.map(i => i.id || 0)) + 1 : 1;
+      }
+    };
+
+    // 工具函数
+    const getWeekday = (dateStr) => {
+      const weekdays = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'];
+      return weekdays[new Date(dateStr).getDay()];
+    };
+
+    const showToast = (msg) => {
+      const t = document.createElement('div');
+      t.className = 'toast';
+      t.textContent = msg;
+      document.body.appendChild(t);
+      setTimeout(() => t.remove(), 2000);
+    };
+
+    // 初始化示例数据
+    function initSampleData() {
+      if (DB.get('areaConfig').length === 0) {
+        DB.set('areaConfig', [
+          { id: 1, warehouse: '东莞', package_volume: '0.020000000000', kanto_ratio: '45', kansai_ratio: '55', kanto_normal_ratio: '70', kanto_special_ratio: '30', kansai_normal_ratio: '80', kansai_special_ratio: '20' },
+          { id: 2, warehouse: '加工区', package_volume: '0.018000000000', kanto_ratio: '50', kansai_ratio: '50', kanto_normal_ratio: '75', kanto_special_ratio: '25', kansai_normal_ratio: '85', kansai_special_ratio: '15' }
+        ]);
+      }
+      if (DB.get('portConfig').length === 0) {
+        DB.set('portConfig', [
+          { id: 1, port_code: 'NRT', region: '关东' },
+          { id: 2, port_code: 'KIX', region: '关西' },
+          { id: 3, port_code: 'HND', region: '关东' }
+        ]);
+      }
+      if (DB.get('flightConfig').length === 0) {
+        DB.set('flightConfig', [
+          { id: 1, warehouse: '东莞', weekday: '周一', kanto_normal: '空运', kansai_normal: '空运', kanto_special: '空运', kansai_special: '海空', remark: '' },
+          { id: 2, warehouse: '东莞', weekday: '周三', kanto_normal: '空运', kansai_normal: '海空', kanto_special: '空运', kansai_special: '空运', remark: '' },
+          { id: 3, warehouse: '东莞', weekday: '周五', kanto_normal: '空运', kansai_normal: '空运', kanto_special: '海空', kansai_special: '空运', remark: '' }
+        ]);
+      }
+      if (DB.get('routeConfig').length === 0) {
+        DB.set('routeConfig', [
+          { id: 1, flight_no: 'CZ001', origin: 'SZX', transfer: '', dest: 'NRT', depart_time: '08:00', arrive_time: '13:00', is_next_day: '否', second_flight: '', route_type: '空运' },
+          { id: 2, flight_no: 'CZ002', origin: 'SZX', transfer: 'PVG', dest: 'KIX', depart_time: '10:00', arrive_time: '16:00', is_next_day: '否', second_flight: '', route_type: '空运' },
+          { id: 3, flight_no: 'NH932', origin: 'SZX', transfer: '', dest: 'HND', depart_time: '14:00', arrive_time: '19:00', is_next_day: '否', second_flight: '', route_type: '空运' }
+        ]);
+      }
+    }
+    initSampleData();
+
+    // 当前状态
+    let currentTab = 'config-area';
+    let editingId = null;
+    let editingType = null;
+
+    // 标签页切换
+    document.querySelectorAll('.sidebar-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.sidebar-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        currentTab = btn.dataset.tab;
+        renderContent();
+      });
+    });
+
+    // 初始化
+    document.querySelector('[data-tab="config-area"]').classList.add('active');
+    renderContent();
+
+    function renderContent() {
+      const main = document.getElementById('main-content');
+      switch(currentTab) {
+        case 'config-area': renderAreaConfig(); break;
+        case 'config-flight': renderFlightConfig(); break;
+        case 'config-port': renderPortConfig(); break;
+        case 'config-route': renderRouteConfig(); break;
+        case 'volume-estimate': renderVolumeEstimate(); break;
+        case 'main-order': renderMainOrder(); break;
+        case 'order-query': renderOrderQuery(); break;
+        case 'balance-query': renderBalanceQuery(); break;
+      }
+    }
+
+    // ============ 区域参数配置 ============
+    function renderAreaConfig() {
+      const data = DB.get('areaConfig');
+      document.getElementById('main-content').innerHTML = `
+        <div class="card">
+          <div class="p-4 border-b flex justify-between items-center">
+            <h2 class="text-lg font-bold">区域参数配置</h2>
+            <button class="btn btn-primary" onclick="openAreaModal()">新增配置</button>
+          </div>
+          <div class="p-4">
+            <table>
+              <thead>
+                <tr>
+                  <th>仓库</th><th>大包预估体积</th><th>关东占比</th><th>关西占比</th>
+                  <th>关东普货占比</th><th>关东特货占比</th><th>关西普货占比</th><th>关西特货占比</th>
+                  <th>操作</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${data.map(item => `
+                  <tr>
+                    <td>${item.warehouse}</td>
+                    <td style="font-family: monospace;">${item.package_volume}</td>
+                    <td>${item.kanto_ratio}%</td>
+                    <td>${item.kansai_ratio}%</td>
+                    <td>${item.kanto_normal_ratio}%</td>
+                    <td>${item.kanto_special_ratio}%</td>
+                    <td>${item.kansai_normal_ratio}%</td>
+                    <td>${item.kansai_special_ratio}%</td>
+                    <td>
+                      <button class="btn btn-primary text-xs px-2 py-1" onclick="editArea(${item.id})">编辑</button>
+                      <button class="btn btn-danger text-xs px-2 py-1" onclick="deleteArea(${item.id})">删除</button>
+                    </td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      `;
+    }
+
+    function openAreaModal(id = null) {
+      editingId = id;
+      editingType = 'area';
+      const item = id ? DB.get('areaConfig').find(i => i.id === id) : {};
+      
+      document.getElementById('editModalTitle').textContent = id ? '编辑区域参数' : '新增区域参数';
+      document.getElementById('editModalContent').innerHTML = `
+        <form onsubmit="saveArea(event)" class="space-y-4">
+          <div class="grid grid-cols-2 gap-4">
+            <div class="form-group">
+              <label>仓库</label>
+              <select id="areaWarehouse" required>
+                <option value="东莞" ${item.warehouse === '东莞' ? 'selected' : ''}>东莞</option>
+                <option value="加工区" ${item.warehouse === '加工区' ? 'selected' : ''}>加工区</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>大包预估体积(12位小数)</label>
+              <input type="text" id="areaPackageVolume" value="${item.package_volume || '0.020000000000'}" required>
+            </div>
+            <div class="form-group">
+              <label>关东目的港占比(%)</label>
+              <input type="number" id="areaKantoRatio" value="${item.kanto_ratio || '45'}" required>
+            </div>
+            <div class="form-group">
+              <label>关西目的港占比(%)</label>
+              <input type="number" id="areaKansaiRatio" value="${item.kansai_ratio || '55'}" required>
+            </div>
+            <div class="form-group">
+              <label>关东普货占比(%)</label>
+              <input type="number" id="areaKantoNormal" value="${item.kanto_normal_ratio || '70'}" required>
+            </div>
+            <div class="form-group">
+              <label>关东特货占比(%)</label>
+              <input type="number" id="areaKantoSpecial" value="${item.kanto_special_ratio || '30'}" required>
+            </div>
+            <div class="form-group">
+              <label>关西普货占比(%)</label>
+              <input type="number" id="areaKansaiNormal" value="${item.kansai_normal_ratio || '80'}" required>
+            </div>
+            <div class="form-group">
+              <label>关西特货占比(%)</label>
+              <input type="number" id="areaKansaiSpecial" value="${item.kansai_special_ratio || '20'}" required>
+            </div>
+          </div>
+          <div class="flex justify-end gap-2 pt-4">
+            <button type="button" class="btn btn-outline" onclick="closeEditModal()">取消</button>
+            <button type="submit" class="btn btn-success">保存</button>
+          </div>
+        </form>
+      `;
+      document.getElementById('editModal').classList.add('show');
+    }
+
+    function saveArea(e) {
+      e.preventDefault();
+      const data = DB.get('areaConfig');
+      const newItem = {
+        id: editingId || DB.nextId('areaConfig'),
+        warehouse: document.getElementById('areaWarehouse').value,
+        package_volume: document.getElementById('areaPackageVolume').value,
+        kanto_ratio: document.getElementById('areaKantoRatio').value,
+        kansai_ratio: document.getElementById('areaKansaiRatio').value,
+        kanto_normal_ratio: document.getElementById('areaKantoNormal').value,
+        kanto_special_ratio: document.getElementById('areaKantoSpecial').value,
+        kansai_normal_ratio: document.getElementById('areaKansaiNormal').value,
+        kansai_special_ratio: document.getElementById('areaKansaiSpecial').value
+      };
+      
+      if (editingId) {
+        const index = data.findIndex(i => i.id === editingId);
+        data[index] = newItem;
+      } else {
+        data.push(newItem);
+      }
+      DB.set('areaConfig', data);
+      closeEditModal();
+      showToast('保存成功');
+      renderAreaConfig();
+    }
+
+    function editArea(id) { openAreaModal(id); }
+    function deleteArea(id) {
+      if (confirm('确定删除？')) {
+        DB.set('areaConfig', DB.get('areaConfig').filter(i => i.id !== id));
+        showToast('删除成功');
+        renderAreaConfig();
+      }
+    }
+
+    // ============ 航班配置 ============
+    function renderFlightConfig() {
+      const data = DB.get('flightConfig');
+      document.getElementById('main-content').innerHTML = `
+        <div class="card">
+          <div class="p-4 border-b flex justify-between items-center">
+            <h2 class="text-lg font-bold">航班配置</h2>
+            <button class="btn btn-primary" onclick="openFlightModal()">新增配置</button>
+          </div>
+          <div class="p-4">
+            <table>
+              <thead>
+                <tr>
+                  <th>仓库</th><th>星期</th><th>关东普货</th><th>关西普货</th>
+                  <th>关东特货</th><th>关西特货</th><th>备注</th><th>操作</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${data.map(item => `
+                  <tr>
+                    <td>${item.warehouse}</td>
+                    <td>${item.weekday}</td>
+                    <td><span class="badge badge-blue">${item.kanto_normal || '-'}</span></td>
+                    <td><span class="badge badge-blue">${item.kansai_normal || '-'}</span></td>
+                    <td><span class="badge badge-blue">${item.kanto_special || '-'}</span></td>
+                    <td><span class="badge badge-blue">${item.kansai_special || '-'}</span></td>
+                    <td>${item.remark || '-'}</td>
+                    <td>
+                      <button class="btn btn-primary text-xs px-2 py-1" onclick="editFlight(${item.id})">编辑</button>
+                      <button class="btn btn-danger text-xs px-2 py-1" onclick="deleteFlight(${item.id})">删除</button>
+                    </td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      `;
+    }
+
+    function openFlightModal(id = null) {
+      editingId = id;
+      editingType = 'flight';
+      const item = id ? DB.get('flightConfig').find(i => i.id === id) : {};
+      
+      document.getElementById('editModalTitle').textContent = id ? '编辑航班配置' : '新增航班配置';
+      document.getElementById('editModalContent').innerHTML = `
+        <form onsubmit="saveFlight(event)" class="space-y-4">
+          <div class="grid grid-cols-2 gap-4">
+            <div class="form-group">
+              <label>仓库</label>
+              <select id="flightWarehouse" required>
+                <option value="东莞" ${item.warehouse === '东莞' ? 'selected' : ''}>东莞</option>
+                <option value="加工区" ${item.warehouse === '加工区' ? 'selected' : ''}>加工区</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>星期</label>
+              <select id="flightWeekday" required>
+                ${['周一','周二','周三','周四','周五','周六','周日'].map(d => `<option value="${d}" ${item.weekday === d ? 'selected' : ''}>${d}</option>`).join('')}
+              </select>
+            </div>
+            <div class="form-group">
+              <label>关东普货</label>
+              <select id="flightKantoNormal">
+                <option value="">-</option>
+                <option value="空运" ${item.kanto_normal === '空运' ? 'selected' : ''}>空运</option>
+                <option value="海空" ${item.kanto_normal === '海空' ? 'selected' : ''}>海空</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>关西普货</label>
+              <select id="flightKansaiNormal">
+                <option value="">-</option>
+                <option value="空运" ${item.kansai_normal === '空运' ? 'selected' : ''}>空运</option>
+                <option value="海空" ${item.kansai_normal === '海空' ? 'selected' : ''}>海空</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>关东特货</label>
+              <select id="flightKantoSpecial">
+                <option value="">-</option>
+                <option value="空运" ${item.kanto_special === '空运' ? 'selected' : ''}>空运</option>
+                <option value="海空" ${item.kanto_special === '海空' ? 'selected' : ''}>海空</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>关西特货</label>
+              <select id="flightKansaiSpecial">
+                <option value="">-</option>
+                <option value="空运" ${item.kansai_special === '空运' ? 'selected' : ''}>空运</option>
+                <option value="海空" ${item.kansai_special === '海空' ? 'selected' : ''}>海空</option>
+              </select>
+            </div>
+            <div class="form-group col-span-2">
+              <label>备注</label>
+              <input type="text" id="flightRemark" value="${item.remark || ''}" placeholder="备注">
+            </div>
+          </div>
+          <div class="flex justify-end gap-2 pt-4">
+            <button type="button" class="btn btn-outline" onclick="closeEditModal()">取消</button>
+            <button type="submit" class="btn btn-success">保存</button>
+          </div>
+        </form>
+      `;
+      document.getElementById('editModal').classList.add('show');
+    }
+
+    function saveFlight(e) {
+      e.preventDefault();
+      const data = DB.get('flightConfig');
+      const newItem = {
+        id: editingId || DB.nextId('flightConfig'),
+        warehouse: document.getElementById('flightWarehouse').value,
+        weekday: document.getElementById('flightWeekday').value,
+        kanto_normal: document.getElementById('flightKantoNormal').value || null,
+        kansai_normal: document.getElementById('flightKansaiNormal').value || null,
+        kanto_special: document.getElementById('flightKantoSpecial').value || null,
+        kansai_special: document.getElementById('flightKansaiSpecial').value || null,
+        remark: document.getElementById('flightRemark').value || null
+      };
+      
+      if (editingId) {
+        const index = data.findIndex(i => i.id === editingId);
+        data[index] = newItem;
+      } else {
+        data.push(newItem);
+      }
+      DB.set('flightConfig', data);
+      closeEditModal();
+      showToast('保存成功');
+      renderFlightConfig();
+    }
+
+    function editFlight(id) { openFlightModal(id); }
+    function deleteFlight(id) {
+      if (confirm('确定删除？')) {
+        DB.set('flightConfig', DB.get('flightConfig').filter(i => i.id !== id));
+        showToast('删除成功');
+        renderFlightConfig();
+      }
+    }
+
+    // ============ 目的港配置 ============
+    function renderPortConfig() {
+      const data = DB.get('portConfig');
+      document.getElementById('main-content').innerHTML = `
+        <div class="card">
+          <div class="p-4 border-b flex justify-between items-center">
+            <h2 class="text-lg font-bold">目的港配置</h2>
+            <button class="btn btn-primary" onclick="openPortModal()">新增配置</button>
+          </div>
+          <div class="p-4">
+            <table>
+              <thead><tr><th>港口代码</th><th>区域</th><th>操作</th></tr></thead>
+              <tbody>
+                ${data.map(item => `
+                  <tr>
+                    <td class="font-mono">${item.port_code}</td>
+                    <td><span class="badge ${item.region === '关东' ? 'badge-blue' : 'badge-green'}">${item.region}</span></td>
+                    <td>
+                      <button class="btn btn-primary text-xs px-2 py-1" onclick="editPort(${item.id})">编辑</button>
+                      <button class="btn btn-danger text-xs px-2 py-1" onclick="deletePort(${item.id})">删除</button>
+                    </td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      `;
+    }
+
+    function openPortModal(id = null) {
+      editingId = id;
+      editingType = 'port';
+      const item = id ? DB.get('portConfig').find(i => i.id === id) : {};
+      
+      document.getElementById('editModalTitle').textContent = id ? '编辑目的港' : '新增目的港';
+      document.getElementById('editModalContent').innerHTML = `
+        <form onsubmit="savePort(event)" class="space-y-4">
+          <div class="grid grid-cols-2 gap-4">
+            <div class="form-group">
+              <label>港口代码</label>
+              <input type="text" id="portCode" value="${item.port_code || ''}" placeholder="如: NRT" required>
+            </div>
+            <div class="form-group">
+              <label>区域</label>
+              <select id="portRegion" required>
+                <option value="关东" ${item.region === '关东' ? 'selected' : ''}>关东</option>
+                <option value="关西" ${item.region === '关西' ? 'selected' : ''}>关西</option>
+              </select>
+            </div>
+          </div>
+          <div class="flex justify-end gap-2 pt-4">
+            <button type="button" class="btn btn-outline" onclick="closeEditModal()">取消</button>
+            <button type="submit" class="btn btn-success">保存</button>
+          </div>
+        </form>
+      `;
+      document.getElementById('editModal').classList.add('show');
+    }
+
+    function savePort(e) {
+      e.preventDefault();
+      const data = DB.get('portConfig');
+      const newItem = {
+        id: editingId || DB.nextId('portConfig'),
+        port_code: document.getElementById('portCode').value,
+        region: document.getElementById('portRegion').value
+      };
+      
+      if (editingId) {
+        const index = data.findIndex(i => i.id === editingId);
+        data[index] = newItem;
+      } else {
+        data.push(newItem);
+      }
+      DB.set('portConfig', data);
+      closeEditModal();
+      showToast('保存成功');
+      renderPortConfig();
+    }
+
+    function editPort(id) { openPortModal(id); }
+    function deletePort(id) {
+      if (confirm('确定删除？')) {
+        DB.set('portConfig', DB.get('portConfig').filter(i => i.id !== id));
+        showToast('删除成功');
+        renderPortConfig();
+      }
+    }
+
+    // ============ 航空路由配置 ============
+    function renderRouteConfig() {
+      const data = DB.get('routeConfig');
+      document.getElementById('main-content').innerHTML = `
+        <div class="card">
+          <div class="p-4 border-b flex justify-between items-center">
+            <h2 class="text-lg font-bold">航空路由配置</h2>
+            <button class="btn btn-primary" onclick="openRouteModal()">新增配置</button>
+          </div>
+          <div class="p-4">
+            <table>
+              <thead>
+                <tr>
+                  <th>航班号</th><th>始发港</th><th>中转港</th><th>目的港</th>
+                  <th>起飞时间</th><th>到达时间</th><th>次日达</th><th>类型</th><th>操作</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${data.map(item => `
+                  <tr>
+                    <td class="font-mono">${item.flight_no}</td>
+                    <td>${item.origin}</td>
+                    <td>${item.transfer || '-'}</td>
+                    <td>${item.dest}</td>
+                    <td>${item.depart_time || '-'}</td>
+                    <td>${item.arrive_time || '-'}</td>
+                    <td>${item.is_next_day || '-'}</td>
+                    <td><span class="badge badge-blue">${item.route_type}</span></td>
+                    <td>
+                      <button class="btn btn-primary text-xs px-2 py-1" onclick="editRoute(${item.id})">编辑</button>
+                      <button class="btn btn-danger text-xs px-2 py-1" onclick="deleteRoute(${item.id})">删除</button>
+                    </td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      `;
+    }
+
+    function openRouteModal(id = null) {
+      editingId = id;
+      editingType = 'route';
+      const item = id ? DB.get('routeConfig').find(i => i.id === id) : {};
+      
+      document.getElementById('editModalTitle').textContent = id ? '编辑航空路由' : '新增航空路由';
+      document.getElementById('editModalContent').innerHTML = `
+        <form onsubmit="saveRoute(event)" class="space-y-4">
+          <div class="grid grid-cols-2 gap-4">
+            <div class="form-group">
+              <label>航班号</label>
+              <input type="text" id="routeFlightNo" value="${item.flight_no || ''}" required>
+            </div>
+            <div class="form-group">
+              <label>路由类型</label>
+              <select id="routeType" required>
+                <option value="空运" ${item.route_type === '空运' ? 'selected' : ''}>空运</option>
+                <option value="海空" ${item.route_type === '海空' ? 'selected' : ''}>海空</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>始发港</label>
+              <input type="text" id="routeOrigin" value="${item.origin || ''}" required>
+            </div>
+            <div class="form-group">
+              <label>中转港</label>
+              <input type="text" id="routeTransfer" value="${item.transfer || ''}" placeholder="可选">
+            </div>
+            <div class="form-group">
+              <label>目的港</label>
+              <input type="text" id="routeDest" value="${item.dest || ''}" required>
+            </div>
+            <div class="form-group">
+              <label>是否次日达</label>
+              <select id="routeIsNextDay">
+                <option value="否" ${item.is_next_day === '否' ? 'selected' : ''}>否</option>
+                <option value="是" ${item.is_next_day === '是' ? 'selected' : ''}>是</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>起飞时间</label>
+              <input type="time" id="routeDepartTime" value="${item.depart_time || ''}">
+            </div>
+            <div class="form-group">
+              <label>到达时间</label>
+              <input type="time" id="routeArriveTime" value="${item.arrive_time || ''}">
+            </div>
+          </div>
+          <div class="flex justify-end gap-2 pt-4">
+            <button type="button" class="btn btn-outline" onclick="closeEditModal()">取消</button>
+            <button type="submit" class="btn btn-success">保存</button>
+          </div>
+        </form>
+      `;
+      document.getElementById('editModal').classList.add('show');
+    }
+
+    function saveRoute(e) {
+      e.preventDefault();
+      const data = DB.get('routeConfig');
+      const newItem = {
+        id: editingId || DB.nextId('routeConfig'),
+        flight_no: document.getElementById('routeFlightNo').value,
+        origin: document.getElementById('routeOrigin').value,
+        transfer: document.getElementById('routeTransfer').value || null,
+        dest: document.getElementById('routeDest').value,
+        depart_time: document.getElementById('routeDepartTime').value || null,
+        arrive_time: document.getElementById('routeArriveTime').value || null,
+        is_next_day: document.getElementById('routeIsNextDay').value,
+        route_type: document.getElementById('routeType').value
+      };
+      
+      if (editingId) {
+        const index = data.findIndex(i => i.id === editingId);
+        data[index] = newItem;
+      } else {
+        data.push(newItem);
+      }
+      DB.set('routeConfig', data);
+      closeEditModal();
+      showToast('保存成功');
+      renderRouteConfig();
+    }
+
+    function editRoute(id) { openRouteModal(id); }
+    function deleteRoute(id) {
+      if (confirm('确定删除？')) {
+        DB.set('routeConfig', DB.get('routeConfig').filter(i => i.id !== id));
+        showToast('删除成功');
+        renderRouteConfig();
+      }
+    }
+
+    // ============ 方数预估 ============
+    let volumeForm = { collect_date: '', warehouse: '', package_count: 0, is_complete: '是' };
+
+    function renderVolumeEstimate() {
+      const data = DB.get('volumeEstimate');
+      document.getElementById('main-content').innerHTML = `
+        <div class="card mb-5">
+          <div class="p-4 border-b">
+            <h2 class="text-lg font-bold">方数预估</h2>
+          </div>
+          <div class="p-4">
+            <div class="form-grid mb-6">
+              <div class="form-group">
+                <label>揽收日期</label>
+                <input type="date" id="volumeDate" value="${volumeForm.collect_date}" onchange="calcVolume()">
+              </div>
+              <div class="form-group">
+                <label>仓库</label>
+                <select id="volumeWarehouse" onchange="calcVolume()">
+                  <option value="">请选择</option>
+                  <option value="东莞" ${volumeForm.warehouse === '东莞' ? 'selected' : ''}>东莞</option>
+                  <option value="加工区" ${volumeForm.warehouse === '加工区' ? 'selected' : ''}>加工区</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>袋数</label>
+                <input type="number" id="volumePackageCount" value="${volumeForm.package_count || ''}" placeholder="输入袋数" onchange="calcVolume()">
+              </div>
+              <div class="form-group">
+                <label>货物袋数是否齐全</label>
+                <select id="volumeIsComplete">
+                  <option value="是" ${volumeForm.is_complete === '是' ? 'selected' : ''}>是</option>
+                  <option value="否" ${volumeForm.is_complete === '否' ? 'selected' : ''}>否</option>
+                </select>
+              </div>
+            </div>
+            
+            <div class="grid grid-cols-4 gap-4 mb-6">
+              <div class="stat-card bg-blue-50">
+                <div class="label">预估总方数</div>
+                <div class="value text-blue-600" id="calcTotalVolume">-</div>
+              </div>
+              <div class="stat-card bg-green-50">
+                <div class="label">关东方数</div>
+                <div class="value text-green-600" id="calcKantoTotal">-</div>
+              </div>
+              <div class="stat-card bg-purple-50">
+                <div class="label">关西方数</div>
+                <div class="value text-purple-600" id="calcKansaiTotal">-</div>
+              </div>
+              <div class="stat-card bg-orange-50">
+                <div class="label">星期</div>
+                <div class="value text-orange-600" id="calcWeekday">-</div>
+              </div>
+            </div>
+            
+            <div class="grid grid-cols-4 gap-4 mb-6">
+              <div class="bg-gray-50 p-3 rounded text-center">
+                <div class="text-xs text-gray-500">关东普货</div>
+                <div class="font-bold" id="calcKantoNormal">-</div>
+              </div>
+              <div class="bg-gray-50 p-3 rounded text-center">
+                <div class="text-xs text-gray-500">关东特货</div>
+                <div class="font-bold" id="calcKantoSpecial">-</div>
+              </div>
+              <div class="bg-gray-50 p-3 rounded text-center">
+                <div class="text-xs text-gray-500">关西普货</div>
+                <div class="font-bold" id="calcKansaiNormal">-</div>
+              </div>
+              <div class="bg-gray-50 p-3 rounded text-center">
+                <div class="text-xs text-gray-500">关西特货</div>
+                <div class="font-bold" id="calcKansaiSpecial">-</div>
+              </div>
+            </div>
+            
+            <div class="flex gap-3">
+              <button class="btn btn-success" onclick="saveVolumeEstimate()">保存记录</button>
+              <button class="btn btn-outline" onclick="clearVolumeForm()">清空</button>
+            </div>
+          </div>
+        </div>
+        
+        <div class="card">
+          <div class="p-4 border-b">
+            <h2 class="text-lg font-bold">历史记录</h2>
+          </div>
+          <div class="p-4 table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th>揽收日期</th><th>星期</th><th>仓库</th><th>袋数</th>
+                  <th>总方数</th><th>关东</th><th>关西</th>
+                  <th>关东普货</th><th>关东特货</th><th>关西普货</th><th>关西特货</th>
+                  <th>是否齐全</th><th>操作</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${data.map(item => `
+                  <tr>
+                    <td>${item.collect_date}</td>
+                    <td>${item.weekday || '-'}</td>
+                    <td>${item.warehouse}</td>
+                    <td>${item.package_count}</td>
+                    <td>${item.total_volume?.toFixed(3) || '-'}</td>
+                    <td>${item.kanto_total?.toFixed(3) || '-'}</td>
+                    <td>${item.kansai_total?.toFixed(3) || '-'}</td>
+                    <td>${item.kanto_normal?.toFixed(3) || '-'}</td>
+                    <td>${item.kanto_special?.toFixed(3) || '-'}</td>
+                    <td>${item.kansai_normal?.toFixed(3) || '-'}</td>
+                    <td>${item.kansai_special?.toFixed(3) || '-'}</td>
+                    <td><span class="badge ${item.is_complete === '是' ? 'badge-green' : 'badge-red'}">${item.is_complete || '-'}</span></td>
+                    <td>
+                      <button class="btn btn-danger text-xs px-2 py-1" onclick="deleteVolume(${item.id})">删除</button>
+                    </td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      `;
+    }
+
+    function calcVolume() {
+      const date = document.getElementById('volumeDate').value;
+      const warehouse = document.getElementById('volumeWarehouse').value;
+      const packageCount = parseFloat(document.getElementById('volumePackageCount').value) || 0;
+      
+      volumeForm = { collect_date: date, warehouse, package_count: packageCount, is_complete: document.getElementById('volumeIsComplete').value };
+      
+      if (!date || !warehouse || !packageCount) {
+        document.getElementById('calcTotalVolume').textContent = '-';
+        document.getElementById('calcKantoTotal').textContent = '-';
+        document.getElementById('calcKansaiTotal').textContent = '-';
+        document.getElementById('calcWeekday').textContent = '-';
+        document.getElementById('calcKantoNormal').textContent = '-';
+        document.getElementById('calcKantoSpecial').textContent = '-';
+        document.getElementById('calcKansaiNormal').textContent = '-';
+        document.getElementById('calcKansaiSpecial').textContent = '-';
+        return;
+      }
+      
+      const areaConfig = DB.get('areaConfig').find(a => a.warehouse === warehouse);
+      if (!areaConfig) return;
+      
+      const packageVolume = parseFloat(areaConfig.package_volume) || 0.02;
+      const totalVolume = packageCount * packageVolume;
+      
+      const kantoRatio = parseFloat(areaConfig.kanto_ratio) / 100;
+      const kansaiRatio = parseFloat(areaConfig.kansai_ratio) / 100;
+      const kantoNormalRatio = parseFloat(areaConfig.kanto_normal_ratio) / 100;
+      const kantoSpecialRatio = parseFloat(areaConfig.kanto_special_ratio) / 100;
+      const kansaiNormalRatio = parseFloat(areaConfig.kansai_normal_ratio) / 100;
+      const kansaiSpecialRatio = parseFloat(areaConfig.kansai_special_ratio) / 100;
+      
+      const kantoTotal = totalVolume * kantoRatio;
+      const kansaiTotal = totalVolume * kansaiRatio;
+      
+      document.getElementById('calcTotalVolume').textContent = totalVolume.toFixed(3);
+      document.getElementById('calcKantoTotal').textContent = kantoTotal.toFixed(3);
+      document.getElementById('calcKansaiTotal').textContent = kansaiTotal.toFixed(3);
+      document.getElementById('calcWeekday').textContent = getWeekday(date);
+      document.getElementById('calcKantoNormal').textContent = (kantoTotal * kantoNormalRatio).toFixed(3);
+      document.getElementById('calcKantoSpecial').textContent = (kantoTotal * kantoSpecialRatio).toFixed(3);
+      document.getElementById('calcKansaiNormal').textContent = (kansaiTotal * kansaiNormalRatio).toFixed(3);
+      document.getElementById('calcKansaiSpecial').textContent = (kansaiTotal * kansaiSpecialRatio).toFixed(3);
+    }
+
+    function saveVolumeEstimate() {
+      const date = document.getElementById('volumeDate').value;
+      const warehouse = document.getElementById('volumeWarehouse').value;
+      const packageCount = parseFloat(document.getElementById('volumePackageCount').value) || 0;
+      const isComplete = document.getElementById('volumeIsComplete').value;
+      
+      if (!date || !warehouse || !packageCount) {
+        showToast('请填写完整信息');
+        return;
+      }
+      
+      const areaConfig = DB.get('areaConfig').find(a => a.warehouse === warehouse);
+      if (!areaConfig) {
+        showToast('请先配置该仓库的区域参数');
+        return;
+      }
+      
+      const packageVolume = parseFloat(areaConfig.package_volume) || 0.02;
+      const totalVolume = packageCount * packageVolume;
+      const kantoRatio = parseFloat(areaConfig.kanto_ratio) / 100;
+      const kansaiRatio = parseFloat(areaConfig.kansai_ratio) / 100;
+      const kantoNormalRatio = parseFloat(areaConfig.kanto_normal_ratio) / 100;
+      const kantoSpecialRatio = parseFloat(areaConfig.kanto_special_ratio) / 100;
+      const kansaiNormalRatio = parseFloat(areaConfig.kansai_normal_ratio) / 100;
+      const kansaiSpecialRatio = parseFloat(areaConfig.kansai_special_ratio) / 100;
+      
+      const kantoTotal = totalVolume * kantoRatio;
+      const kansaiTotal = totalVolume * kansaiRatio;
+      
+      const data = DB.get('volumeEstimate');
+      data.push({
+        id: DB.nextId('volumeEstimate'),
+        collect_date: date,
+        weekday: getWeekday(date),
+        warehouse,
+        package_count: packageCount,
+        total_volume: totalVolume,
+        kanto_total: kantoTotal,
+        kansai_total: kansaiTotal,
+        kanto_normal: kantoTotal * kantoNormalRatio,
+        kanto_special: kantoTotal * kantoSpecialRatio,
+        kansai_normal: kansaiTotal * kansaiNormalRatio,
+        kansai_special: kansaiTotal * kansaiSpecialRatio,
+        is_complete: isComplete
+      });
+      
+      DB.set('volumeEstimate', data);
+      showToast('保存成功');
+      clearVolumeForm();
+      renderVolumeEstimate();
+    }
+
+    function clearVolumeForm() {
+      volumeForm = { collect_date: '', warehouse: '', package_count: 0, is_complete: '是' };
+      renderVolumeEstimate();
+    }
+
+    function deleteVolume(id) {
+      if (confirm('确定删除？')) {
+        DB.set('volumeEstimate', DB.get('volumeEstimate').filter(i => i.id !== id));
+        showToast('删除成功');
+        renderVolumeEstimate();
+      }
+    }
+
+    // ============ 主单发放 ============
+    let orderForm = {};
+
+    function renderMainOrder() {
+      document.getElementById('main-content').innerHTML = `
+        <div class="card">
+          <div class="p-4 border-b">
+            <h2 class="text-lg font-bold">主单发放</h2>
+          </div>
+          <div class="p-4">
+            <div class="form-grid mb-4">
+              <div class="form-group">
+                <label>揽收日期 *</label>
+                <input type="date" id="orderCollectDate" value="${orderForm.collect_date || ''}" onchange="updateOrderCategory()">
+              </div>
+              <div class="form-group">
+                <label>仓库 *</label>
+                <select id="orderWarehouse" onchange="updateOrderCategory()">
+                  <option value="">请选择</option>
+                  <option value="东莞" ${orderForm.warehouse === '东莞' ? 'selected' : ''}>东莞</option>
+                  <option value="加工区" ${orderForm.warehouse === '加工区' ? 'selected' : ''}>加工区</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>口岸 *</label>
+                <select id="orderPort" onchange="updateOrderCategory()">
+                  <option value="">请选择</option>
+                  <option value="关东" ${orderForm.port === '关东' ? 'selected' : ''}>关东</option>
+                  <option value="关西" ${orderForm.port === '关西' ? 'selected' : ''}>关西</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>货物属性 *</label>
+                <select id="orderCargoType" onchange="updateOrderCategory()">
+                  <option value="">请选择</option>
+                  <option value="普货" ${orderForm.cargo_type === '普货' ? 'selected' : ''}>普货</option>
+                  <option value="特货" ${orderForm.cargo_type === '特货' ? 'selected' : ''}>特货</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>类别</label>
+                <input type="text" id="orderCategory" value="${orderForm.category || ''}" readonly class="bg-gray-50">
+              </div>
+              <div class="form-group">
+                <label>打货上限</label>
+                <input type="text" id="orderMaxVolume" value="${orderForm.max_volume || ''}" placeholder="如: 10">
+              </div>
+              <div class="form-group">
+                <label>货物袋数是否齐全 *</label>
+                <select id="orderPackReq">
+                  <option value="是" ${orderForm.pack_req === '是' ? 'selected' : ''}>是</option>
+                  <option value="否" ${orderForm.pack_req === '否' ? 'selected' : ''}>否</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>主单号</label>
+                <input type="text" id="orderMainNo" value="${orderForm.main_no || ''}" placeholder="主单号">
+              </div>
+              <div class="form-group">
+                <label>航班号</label>
+                <select id="orderFlightNo" onchange="fillFlightInfo()">
+                  <option value="">请选择</option>
+                  ${DB.get('routeConfig').map(r => `<option value="${r.flight_no}" ${orderForm.flight_no === r.flight_no ? 'selected' : ''}>${r.flight_no}</option>`).join('')}
+                </select>
+              </div>
+              <div class="form-group">
+                <label>目的港</label>
+                <select id="orderDest">
+                  <option value="">请选择</option>
+                  ${DB.get('portConfig').map(p => `<option value="${p.port_code}" ${orderForm.dest === p.port_code ? 'selected' : ''}>${p.port_code} (${p.region})</option>`).join('')}
+                </select>
+              </div>
+              <div class="form-group">
+                <label>起飞时间</label>
+                <input type="time" id="orderDepartTime" value="${orderForm.depart_time || ''}">
+              </div>
+              <div class="form-group">
+                <label>到港时间</label>
+                <input type="time" id="orderArriveTime" value="${orderForm.arrive_time || ''}">
+              </div>
+              <div class="form-group">
+                <label>实际件数</label>
+                <input type="number" id="orderActualPieces" value="${orderForm.actual_pieces || ''}" placeholder="件数">
+              </div>
+              <div class="form-group">
+                <label>实际重量</label>
+                <input type="text" id="orderActualWeight" value="${orderForm.actual_weight || ''}" placeholder="重量">
+              </div>
+              <div class="form-group">
+                <label>实际体积</label>
+                <input type="text" id="orderActualVolume" value="${orderForm.actual_volume || ''}" placeholder="体积">
+              </div>
+              <div class="form-group">
+                <label>实际票数</label>
+                <input type="number" id="orderActualBills" value="${orderForm.actual_bills || ''}" placeholder="票数">
+              </div>
+              <div class="form-group">
+                <label>备注</label>
+                <input type="text" id="orderRemark" value="${orderForm.remark || ''}" placeholder="备注">
+              </div>
+            </div>
+            <div class="flex gap-3">
+              <button class="btn btn-success" onclick="saveMainOrder()">保存主单</button>
+              <button class="btn btn-primary" onclick="openOrderList()">查看列表</button>
+              <button class="btn btn-secondary" onclick="clearOrderForm()">清空表单</button>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function updateOrderCategory() {
+      const port = document.getElementById('orderPort').value;
+      const cargoType = document.getElementById('orderCargoType').value;
+      document.getElementById('orderCategory').value = port && cargoType ? `${port}${cargoType}` : '';
+    }
+
+    function fillFlightInfo() {
+      const flightNo = document.getElementById('orderFlightNo').value;
+      const route = DB.get('routeConfig').find(r => r.flight_no === flightNo);
+      if (route) {
+        document.getElementById('orderDest').value = route.dest;
+        document.getElementById('orderDepartTime').value = route.depart_time || '';
+        document.getElementById('orderArriveTime').value = route.arrive_time || '';
+      }
+    }
+
+    function saveMainOrder() {
+      const collectDate = document.getElementById('orderCollectDate').value;
+      const warehouse = document.getElementById('orderWarehouse').value;
+      const port = document.getElementById('orderPort').value;
+      const cargoType = document.getElementById('orderCargoType').value;
+      
+      if (!collectDate || !warehouse || !port || !cargoType) {
+        showToast('请填写必填项');
+        return;
+      }
+      
+      const data = DB.get('mainOrders');
+      const order = {
+        id: editingId || DB.nextId('mainOrders'),
+        collect_date: collectDate,
+        warehouse,
+        port,
+        cargo_type: cargoType,
+        category: document.getElementById('orderCategory').value,
+        max_volume: document.getElementById('orderMaxVolume').value || null,
+        pack_req: document.getElementById('orderPackReq').value,
+        main_no: document.getElementById('orderMainNo').value || null,
+        flight_no: document.getElementById('orderFlightNo').value || null,
+        dest: document.getElementById('orderDest').value || null,
+        depart_time: document.getElementById('orderDepartTime').value || null,
+        arrive_time: document.getElementById('orderArriveTime').value || null,
+        actual_pieces: document.getElementById('orderActualPieces').value || null,
+        actual_weight: document.getElementById('orderActualWeight').value || null,
+        actual_volume: document.getElementById('orderActualVolume').value || null,
+        actual_bills: document.getElementById('orderActualBills').value || null,
+        remark: document.getElementById('orderRemark').value || null
+      };
+      
+      if (editingId) {
+        const index = data.findIndex(i => i.id === editingId);
+        data[index] = order;
+        editingId = null;
+      } else {
+        data.push(order);
+      }
+      
+      DB.set('mainOrders', data);
+      showToast('保存成功');
+      clearOrderForm();
+    }
+
+    function clearOrderForm() {
+      orderForm = {};
+      editingId = null;
+      renderMainOrder();
+    }
+
+    function openOrderList() {
+      document.getElementById('orderListModal').classList.add('show');
+      renderOrderList(DB.get('mainOrders'));
+    }
+
+    function closeOrderList() {
+      document.getElementById('orderListModal').classList.remove('show');
+    }
+
+    function renderOrderList(data) {
+      document.getElementById('orderListBody').innerHTML = data.length === 0 ? 
+        '<tr><td colspan="17" class="text-gray-500 py-8">暂无数据</td></tr>' :
+        data.map(item => `
+          <tr>
+            <td>${item.collect_date}</td>
+            <td>${item.warehouse}</td>
+            <td>${item.port}</td>
+            <td>${item.cargo_type}</td>
+            <td>${item.category || '-'}</td>
+            <td class="font-mono">${item.main_no || '-'}</td>
+            <td class="font-mono">${item.flight_no || '-'}</td>
+            <td class="font-mono">${item.dest || '-'}</td>
+            <td>${item.max_volume || '-'}</td>
+            <td>${item.depart_time || '-'}</td>
+            <td>${item.arrive_time || '-'}</td>
+            <td>${item.actual_pieces || '-'}</td>
+            <td>${item.actual_weight || '-'}</td>
+            <td>${item.actual_volume || '-'}</td>
+            <td>${item.actual_bills || '-'}</td>
+            <td class="truncate max-w-[100px]" title="${item.remark || ''}">${item.remark || '-'}</td>
+            <td>
+              <button class="btn btn-primary text-xs px-2 py-1" onclick="editOrder(${item.id})">编辑</button>
+              <button class="btn btn-danger text-xs px-2 py-1" onclick="deleteOrder(${item.id})">删除</button>
+            </td>
+          </tr>
+        `).join('');
+      document.getElementById('orderListCount').textContent = `共 ${data.length} 条记录`;
+    }
+
+    function filterOrders() {
+      const date = document.getElementById('filterOrderDate').value;
+      const warehouse = document.getElementById('filterWarehouse').value;
+      const port = document.getElementById('filterPort').value;
+      const cargoType = document.getElementById('filterCargoType').value;
+      
+      let data = DB.get('mainOrders');
+      if (date) data = data.filter(i => i.collect_date === date);
+      if (warehouse) data = data.filter(i => i.warehouse === warehouse);
+      if (port) data = data.filter(i => i.port === port);
+      if (cargoType) data = data.filter(i => i.cargo_type === cargoType);
+      
+      renderOrderList(data);
+    }
+
+    function editOrder(id) {
+      const item = DB.get('mainOrders').find(i => i.id === id);
+      if (item) {
+        editingId = id;
+        orderForm = { ...item };
+        closeOrderList();
+        renderMainOrder();
+      }
+    }
+
+    function deleteOrder(id) {
+      if (confirm('确定删除？')) {
+        DB.set('mainOrders', DB.get('mainOrders').filter(i => i.id !== id));
+        showToast('删除成功');
+        renderOrderList(DB.get('mainOrders'));
+      }
+    }
+
+    // ============ 主单查询 ============
+    function renderOrderQuery() {
+      const data = DB.get('mainOrders');
+      document.getElementById('main-content').innerHTML = `
+        <div class="card mb-5">
+          <div class="p-4 border-b">
+            <h2 class="text-lg font-bold">主单查询</h2>
+          </div>
+          <div class="p-4">
+            <div class="grid grid-cols-4 gap-4 mb-4">
+              <div class="form-group">
+                <label>揽收日期</label>
+                <input type="date" id="queryOrderDate">
+              </div>
+              <div class="form-group">
+                <label>仓库</label>
+                <select id="queryOrderWarehouse">
+                  <option value="">全部</option>
+                  <option value="东莞">东莞</option>
+                  <option value="加工区">加工区</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>口岸</label>
+                <select id="queryOrderPort">
+                  <option value="">全部</option>
+                  <option value="关东">关东</option>
+                  <option value="关西">关西</option>
+                </select>
+              </div>
+              <div class="flex items-end">
+                <button class="btn btn-primary" onclick="queryOrders()">查询</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="card">
+          <div class="p-4 border-b">
+            <h2 class="text-lg font-bold">查询结果</h2>
+          </div>
+          <div class="p-4 table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th>揽收日期</th><th>仓库</th><th>口岸</th><th>货物属性</th>
+                  <th>类别</th><th>主单号</th><th>航班号</th><th>目的港</th>
+                  <th>打货上限</th><th>实际件数</th><th>实际重量</th><th>实际体积</th>
+                </tr>
+              </thead>
+              <tbody id="queryResultBody">
+                <tr><td colspan="12" class="text-gray-500 py-8">请输入查询条件</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      `;
+    }
+
+    function queryOrders() {
+      const date = document.getElementById('queryOrderDate').value;
+      const warehouse = document.getElementById('queryOrderWarehouse').value;
+      const port = document.getElementById('queryOrderPort').value;
+      
+      let data = DB.get('mainOrders');
+      if (date) data = data.filter(i => i.collect_date === date);
+      if (warehouse) data = data.filter(i => i.warehouse === warehouse);
+      if (port) data = data.filter(i => i.port === port);
+      
+      document.getElementById('queryResultBody').innerHTML = data.length === 0 ?
+        '<tr><td colspan="12" class="text-gray-500 py-8">无匹配数据</td></tr>' :
+        data.map(item => `
+          <tr>
+            <td>${item.collect_date}</td>
+            <td>${item.warehouse}</td>
+            <td>${item.port}</td>
+            <td>${item.cargo_type}</td>
+            <td>${item.category || '-'}</td>
+            <td class="font-mono">${item.main_no || '-'}</td>
+            <td class="font-mono">${item.flight_no || '-'}</td>
+            <td class="font-mono">${item.dest || '-'}</td>
+            <td>${item.max_volume || '-'}</td>
+            <td>${item.actual_pieces || '-'}</td>
+            <td>${item.actual_weight || '-'}</td>
+            <td>${item.actual_volume || '-'}</td>
+          </tr>
+        `).join('');
+    }
+
+    // ============ 欠方余方查询 ============
+    function renderBalanceQuery() {
+      document.getElementById('main-content').innerHTML = `
+        <div class="card mb-5">
+          <div class="p-4 border-b">
+            <h2 class="text-lg font-bold">欠方余方查询</h2>
+          </div>
+          <div class="p-4">
+            <div class="grid grid-cols-4 gap-4 mb-4">
+              <div class="form-group">
+                <label>揽收日期</label>
+                <input type="date" id="balanceDate">
+              </div>
+              <div class="form-group">
+                <label>仓库</label>
+                <select id="balanceWarehouse">
+                  <option value="">全部</option>
+                  <option value="东莞">东莞</option>
+                  <option value="加工区">加工区</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>口岸</label>
+                <select id="balancePort">
+                  <option value="">全部</option>
+                  <option value="关东">关东</option>
+                  <option value="关西">关西</option>
+                </select>
+              </div>
+              <div class="flex items-end">
+                <button class="btn btn-primary" onclick="queryBalance()">查询</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="card">
+          <div class="p-4 border-b">
+            <h2 class="text-lg font-bold">汇总结果</h2>
+          </div>
+          <div class="p-4">
+            <table>
+              <thead>
+                <tr>
+                  <th>仓库</th><th>口岸</th><th>货物属性</th>
+                  <th>预估方数</th><th>打货上限汇总</th><th>差额</th>
+                </tr>
+              </thead>
+              <tbody id="balanceResultBody">
+                <tr><td colspan="6" class="text-gray-500 py-8">请输入查询条件</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      `;
+    }
+
+    function queryBalance() {
+      const date = document.getElementById('balanceDate').value;
+      const warehouseFilter = document.getElementById('balanceWarehouse').value;
+      const portFilter = document.getElementById('balancePort').value;
+      
+      if (!date) {
+        showToast('请选择揽收日期');
+        return;
+      }
+      
+      const warehouses = warehouseFilter ? [warehouseFilter] : ['东莞', '加工区'];
+      const ports = portFilter ? [portFilter] : ['关东', '关西'];
+      const cargoTypes = ['普货', '特货'];
+      
+      const results = [];
+      
+      for (const wh of warehouses) {
+        for (const pt of ports) {
+          for (const ct of cargoTypes) {
+            const estimates = DB.get('volumeEstimate').filter(e => e.collect_date === date && e.warehouse === wh);
+            let estVolume = 0;
+            
+            if (estimates.length > 0) {
+              const estimate = estimates[0];
+              if (pt === '关东' && ct === '普货') estVolume = estimate.kanto_normal || 0;
+              else if (pt === '关东' && ct === '特货') estVolume = estimate.kanto_special || 0;
+              else if (pt === '关西' && ct === '普货') estVolume = estimate.kansai_normal || 0;
+              else if (pt === '关西' && ct === '特货') estVolume = estimate.kansai_special || 0;
+            }
+            
+            const orders = DB.get('mainOrders').filter(
+              o => o.collect_date === date && o.warehouse === wh && o.port === pt && o.cargo_type === ct
+            );
+            const maxVolume = orders.reduce((sum, o) => sum + (parseFloat(o.max_volume) || 0), 0);
+            const diff = estVolume - maxVolume;
+            
+            results.push({ warehouse: wh, port: pt, cargoType: ct, estVolume, maxVolume, diff });
+          }
+        }
+      }
+      
+      document.getElementById('balanceResultBody').innerHTML = results.map(r => `
+        <tr>
+          <td>${r.warehouse}</td>
+          <td>${r.port}</td>
+          <td>${r.cargoType}</td>
+          <td>${r.estVolume.toFixed(3)}</td>
+          <td>${r.maxVolume.toFixed(3)}</td>
+          <td class="${r.diff > 0 ? 'text-red-600 font-bold' : r.diff < 0 ? 'text-green-600 font-bold' : ''}">
+            ${r.diff > 0 ? '欠 ' + r.diff.toFixed(3) : r.diff < 0 ? '余 ' + Math.abs(r.diff).toFixed(3) : '0'}
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    // 关闭弹窗
+    function closeEditModal() {
+      document.getElementById('editModal').classList.remove('show');
+      editingId = null;
+      editingType = null;
+    }
+
+    // 点击遮罩关闭弹窗
+    document.getElementById('editModal').addEventListener('click', (e) => {
+      if (e.target === document.getElementById('editModal')) closeEditModal();
+    });
+    document.getElementById('orderListModal').addEventListener('click', (e) => {
+      if (e.target === document.getElementById('orderListModal')) closeOrderList();
+    });
+  </script>
+</body>
+</html>
