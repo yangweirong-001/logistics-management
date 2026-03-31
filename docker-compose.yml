@@ -1,0 +1,26 @@
+version: '3.8'
+
+services:
+  logistics-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        COZE_SUPABASE_URL: ${COZE_SUPABASE_URL}
+        COZE_SUPABASE_ANON_KEY: ${COZE_SUPABASE_ANON_KEY}
+        COZE_SUPABASE_SERVICE_ROLE_KEY: ${COZE_SUPABASE_SERVICE_ROLE_KEY}
+    container_name: logistics-management
+    ports:
+      - "5000:5000"
+    environment:
+      - NODE_ENV=production
+      - COZE_SUPABASE_URL=${COZE_SUPABASE_URL}
+      - COZE_SUPABASE_ANON_KEY=${COZE_SUPABASE_ANON_KEY}
+      - COZE_SUPABASE_SERVICE_ROLE_KEY=${COZE_SUPABASE_SERVICE_ROLE_KEY}
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:5000"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
