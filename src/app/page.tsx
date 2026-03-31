@@ -2143,7 +2143,7 @@ export default function LogisticsManagement() {
       
       {/* 主单列表模态框 */}
       <Dialog open={orderListOpen} onOpenChange={setOrderListOpen}>
-        <DialogContent className="w-[99vw] max-w-[99vw] h-[80vh] max-h-[80vh] p-5 flex flex-col">
+        <DialogContent className="!w-[95vw] !max-w-[95vw] !h-[90vh] !max-h-[90vh] p-6 flex flex-col" style={{ width: '95vw', maxWidth: '95vw', height: '90vh', maxHeight: '90vh' }}>
           <DialogHeader>
             <DialogTitle className="text-xl">主单列表</DialogTitle>
           </DialogHeader>
@@ -2178,7 +2178,7 @@ export default function LogisticsManagement() {
               loadMainOrdersWithFilter(date);
             }}>查询</Button>
           </div>
-          <div className="flex-1 overflow-auto border rounded-lg" style={{ maxHeight: 'calc(80vh - 180px)' }}>
+          <div className="flex-1 overflow-auto border rounded-lg" style={{ maxHeight: 'calc(90vh - 200px)' }}>
             <Table className="w-full text-base">
               <TableHeader className="sticky top-0 bg-white z-10">
                 <TableRow>
