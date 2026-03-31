@@ -1,0 +1,1164 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>物流管理系统</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    * { box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+    .tab-btn { transition: all 0.2s; }
+    .tab-btn.active { background: #2563eb; color: white; }
+    .card { background: white; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+    input, select { width: 100%; padding: 8px 12px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px; }
+    input:focus, select:focus { outline: none; border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1); }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { padding: 10px 8px; text-align: center; border-bottom: 1px solid #e5e7eb; }
+    th { background: #f9fafb; font-weight: 600; position: sticky; top: 0; }
+    .btn { padding: 8px 16px; border-radius: 6px; font-weight: 500; cursor: pointer; transition: all 0.2s; }
+    .btn-primary { background: #2563eb; color: white; }
+    .btn-primary:hover { background: #1d4ed8; }
+    .btn-success { background: #16a34a; color: white; }
+    .btn-success:hover { background: #15803d; }
+    .btn-danger { background: #dc2626; color: white; }
+    .btn-danger:hover { background: #b91c1c; }
+    .btn-secondary { background: #6b7280; color: white; }
+    .btn-secondary:hover { background: #4b5563; }
+    .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center; }
+    .modal.show { display: flex; }
+    .modal-content { background: white; border-radius: 12px; max-height: 95vh; overflow: auto; }
+    .form-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+    .form-group label { display: block; font-size: 13px; font-weight: 500; color: #374151; margin-bottom: 4px; }
+    .table-container { max-height: 500px; overflow: auto; }
+    .toast { position: fixed; bottom: 20px; right: 20px; padding: 12px 24px; background: #16a34a; color: white; border-radius: 8px; z-index: 2000; animation: slideIn 0.3s ease; }
+    @keyframes slideIn { from { transform: translateY(100px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+  </style>
+</head>
+<body class="bg-gray-100 min-h-screen">
+  <div class="container mx-auto p-4 max-w-7xl">
+    <!-- 头部 -->
+    <div class="mb-6">
+      <h1 class="text-2xl font-bold text-gray-800">📦 物流管理系统</h1>
+      <p class="text-gray-500 text-sm mt-1">数据保存在浏览器本地存储中</p>
+    </div>
+
+    <!-- 标签页 -->
+    <div class="flex gap-2 mb-4 flex-wrap">
+      <button class="tab-btn px-4 py-2 rounded-lg bg-gray-200 text-gray-700 active" data-tab="area">区域参数配置</button>
+      <button class="tab-btn px-4 py-2 rounded-lg bg-gray-200 text-gray-700" data-tab="flight">航班配置</button>
+      <button class="tab-btn px-4 py-2 rounded-lg bg-gray-200 text-gray-700" data-tab="port">目的港配置</button>
+      <button class="tab-btn px-4 py-2 rounded-lg bg-gray-200 text-gray-700" data-tab="route">航空路由配置</button>
+      <button class="tab-btn px-4 py-2 rounded-lg bg-gray-200 text-gray-700" data-tab="volume">方数预估</button>
+      <button class="tab-btn px-4 py-2 rounded-lg bg-gray-200 text-gray-700" data-tab="order">主单发放</button>
+      <button class="tab-btn px-4 py-2 rounded-lg bg-gray-200 text-gray-700" data-tab="balance">欠方余方查询</button>
+    </div>
+
+    <!-- 内容区域 -->
+    <div id="content-area"></div>
+  </div>
+
+  <!-- 主单列表弹窗 -->
+  <div id="orderListModal" class="modal">
+    <div class="modal-content w-[95vw]" style="max-width: 1600px;">
+      <div class="p-6">
+        <div class="flex justify-between items-center mb-4">
+          <h2 class="text-xl font-bold">主单列表</h2>
+          <button onclick="closeOrderList()" class="text-gray-500 hover:text-gray-700 text-2xl">&times;</button>
+        </div>
+        <div class="flex gap-4 mb-4 flex-wrap">
+          <input type="date" id="filterOrderDate" class="w-40">
+          <select id="filterWarehouse" class="w-32">
+            <option value="">全部仓库</option>
+            <option value="东莞">东莞</option>
+            <option value="加工区">加工区</option>
+          </select>
+          <select id="filterPort" class="w-32">
+            <option value="">全部口岸</option>
+            <option value="关东">关东</option>
+            <option value="关西">关西</option>
+          </select>
+          <button class="btn btn-primary" onclick="filterOrders()">查询</button>
+        </div>
+        <div class="table-container border rounded-lg" style="max-height: 65vh;">
+          <table>
+            <thead>
+              <tr>
+                <th>揽收日期</th><th>仓库</th><th>口岸</th><th>货物属性</th>
+                <th>类别</th><th>主单号</th><th>航班号</th><th>目的港</th>
+                <th>打货上限</th><th>起飞时间</th><th>到港时间</th>
+                <th>实际件数</th><th>实际重量</th><th>实际体积</th>
+                <th>实际票数</th><th>备注</th><th>操作</th>
+              </tr>
+            </thead>
+            <tbody id="orderListBody"></tbody>
+          </table>
+        </div>
+        <div class="mt-4 text-gray-600" id="orderListCount">共 0 条记录</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // 数据存储
+    const DB = {
+      get: (key) => JSON.parse(localStorage.getItem(key) || '[]'),
+      set: (key, data) => localStorage.setItem(key, JSON.stringify(data)),
+      nextId: (key) => {
+        const items = DB.get(key);
+        return items.length > 0 ? Math.max(...items.map(i => i.id || 0)) + 1 : 1;
+      }
+    };
+
+    // 初始化示例数据
+    function initSampleData() {
+      if (DB.get('areaConfig').length === 0) {
+        DB.set('areaConfig', [
+          { id: 1, warehouse: '东莞', package_volume: '0.020000000000', kanto_ratio: '0.45', kansai_ratio: '0.55', kanto_normal_ratio: '0.7', kanto_special_ratio: '0.3', kansai_normal_ratio: '0.8', kansai_special_ratio: '0.2' },
+          { id: 2, warehouse: '加工区', package_volume: '0.018000000000', kanto_ratio: '0.5', kansai_ratio: '0.5', kanto_normal_ratio: '0.75', kanto_special_ratio: '0.25', kansai_normal_ratio: '0.85', kansai_special_ratio: '0.15' }
+        ]);
+      }
+      if (DB.get('portConfig').length === 0) {
+        DB.set('portConfig', [
+          { id: 1, port_code: 'NRT', region: '关东' },
+          { id: 2, port_code: 'KIX', region: '关西' },
+          { id: 3, port_code: 'HND', region: '关东' }
+        ]);
+      }
+      if (DB.get('flightConfig').length === 0) {
+        DB.set('flightConfig', [
+          { id: 1, warehouse: '东莞', weekday: '周一', kanto_normal: 'CZ001', kansai_normal: 'CZ002', kanto_special: 'CZ003', kansai_special: 'CZ004', remark: '' },
+          { id: 2, warehouse: '东莞', weekday: '周三', kanto_normal: 'CZ005', kansai_normal: 'CZ006', kanto_special: 'CZ007', kansai_special: 'CZ008', remark: '' },
+          { id: 3, warehouse: '东莞', weekday: '周五', kanto_normal: 'CZ009', kansai_normal: 'CZ010', kanto_special: 'CZ011', kansai_special: 'CZ012', remark: '' }
+        ]);
+      }
+      if (DB.get('routeConfig').length === 0) {
+        DB.set('routeConfig', [
+          { id: 1, flight_no: 'CZ001', origin: 'SZX', transfer: null, dest: 'NRT', depart_time: '08:00', arrive_time: '13:00', is_next_day: '否', route_type: '直达' },
+          { id: 2, flight_no: 'CZ002', origin: 'SZX', transfer: 'PVG', dest: 'KIX', depart_time: '10:00', arrive_time: '16:00', is_next_day: '否', route_type: '中转' }
+        ]);
+      }
+    }
+    initSampleData();
+
+    // Toast 提示
+    function showToast(msg) {
+      const t = document.createElement('div');
+      t.className = 'toast';
+      t.textContent = msg;
+      document.body.appendChild(t);
+      setTimeout(() => t.remove(), 2000);
+    }
+
+    // 标签页切换
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        renderTab(btn.dataset.tab);
+      });
+    });
+
+    function renderTab(tab) {
+      const content = document.getElementById('content-area');
+      switch(tab) {
+        case 'area': renderAreaConfig(); break;
+        case 'flight': renderFlightConfig(); break;
+        case 'port': renderPortConfig(); break;
+        case 'route': renderRouteConfig(); break;
+        case 'volume': renderVolumeEstimate(); break;
+        case 'order': renderMainOrder(); break;
+        case 'balance': renderBalance(); break;
+      }
+    }
+
+    // ============ 区域参数配置 ============
+    function renderAreaConfig() {
+      const data = DB.get('areaConfig');
+      document.getElementById('content-area').innerHTML = `
+        <div class="card p-6">
+          <h2 class="text-lg font-bold mb-4">区域参数配置</h2>
+          <div class="form-grid mb-6">
+            <div class="form-group">
+              <label>仓库</label>
+              <select id="areaWarehouse">
+                <option value="东莞">东莞</option>
+                <option value="加工区">加工区</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>大包预估体积</label>
+              <input type="text" id="areaPackageVolume" placeholder="0.020000000000">
+            </div>
+            <div class="form-group">
+              <label>关东比例</label>
+              <input type="text" id="areaKantoRatio" placeholder="0.45">
+            </div>
+            <div class="form-group">
+              <label>关西比例</label>
+              <input type="text" id="areaKansaiRatio" placeholder="0.55">
+            </div>
+            <div class="form-group">
+              <label>关东普货比例</label>
+              <input type="text" id="areaKantoNormal" placeholder="0.7">
+            </div>
+            <div class="form-group">
+              <label>关东特货比例</label>
+              <input type="text" id="areaKantoSpecial" placeholder="0.3">
+            </div>
+            <div class="form-group">
+              <label>关西普货比例</label>
+              <input type="text" id="areaKansaiNormal" placeholder="0.8">
+            </div>
+            <div class="form-group">
+              <label>关西特货比例</label>
+              <input type="text" id="areaKansaiSpecial" placeholder="0.2">
+            </div>
+          </div>
+          <button class="btn btn-success" onclick="saveAreaConfig()">保存配置</button>
+          
+          <h3 class="text-md font-bold mt-6 mb-3">已保存配置</h3>
+          <div class="table-container border rounded-lg">
+            <table>
+              <thead>
+                <tr>
+                  <th>仓库</th><th>大包预估体积</th><th>关东比例</th><th>关西比例</th>
+                  <th>关东普货</th><th>关东特货</th><th>关西普货</th><th>关西特货</th><th>操作</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${data.map(item => `
+                  <tr>
+                    <td>${item.warehouse}</td>
+                    <td>${item.package_volume}</td>
+                    <td>${item.kanto_ratio}</td>
+                    <td>${item.kansai_ratio}</td>
+                    <td>${item.kanto_normal_ratio}</td>
+                    <td>${item.kanto_special_ratio}</td>
+                    <td>${item.kansai_normal_ratio}</td>
+                    <td>${item.kansai_special_ratio}</td>
+                    <td>
+                      <button class="btn btn-primary text-xs px-2 py-1" onclick="editArea(${item.id})">编辑</button>
+                      <button class="btn btn-danger text-xs px-2 py-1" onclick="deleteArea(${item.id})">删除</button>
+                    </td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      `;
+    }
+
+    function saveAreaConfig() {
+      const data = DB.get('areaConfig');
+      const newItem = {
+        id: DB.nextId('areaConfig'),
+        warehouse: document.getElementById('areaWarehouse').value,
+        package_volume: document.getElementById('areaPackageVolume').value || '0.020000000000',
+        kanto_ratio: document.getElementById('areaKantoRatio').value || '0.45',
+        kansai_ratio: document.getElementById('areaKansaiRatio').value || '0.55',
+        kanto_normal_ratio: document.getElementById('areaKantoNormal').value || '0.7',
+        kanto_special_ratio: document.getElementById('areaKantoSpecial').value || '0.3',
+        kansai_normal_ratio: document.getElementById('areaKansaiNormal').value || '0.8',
+        kansai_special_ratio: document.getElementById('areaKansaiSpecial').value || '0.2'
+      };
+      data.push(newItem);
+      DB.set('areaConfig', data);
+      showToast('保存成功');
+      renderAreaConfig();
+    }
+
+    function deleteArea(id) {
+      if (confirm('确定删除？')) {
+        const data = DB.get('areaConfig').filter(i => i.id !== id);
+        DB.set('areaConfig', data);
+        showToast('删除成功');
+        renderAreaConfig();
+      }
+    }
+
+    function editArea(id) {
+      const item = DB.get('areaConfig').find(i => i.id === id);
+      if (item) {
+        document.getElementById('areaWarehouse').value = item.warehouse;
+        document.getElementById('areaPackageVolume').value = item.package_volume;
+        document.getElementById('areaKantoRatio').value = item.kanto_ratio;
+        document.getElementById('areaKansaiRatio').value = item.kansai_ratio;
+        document.getElementById('areaKantoNormal').value = item.kanto_normal_ratio;
+        document.getElementById('areaKantoSpecial').value = item.kanto_special_ratio;
+        document.getElementById('areaKansaiNormal').value = item.kansai_normal_ratio;
+        document.getElementById('areaKansaiSpecial').value = item.kansai_special_ratio;
+        deleteArea(id);
+      }
+    }
+
+    // ============ 航班配置 ============
+    function renderFlightConfig() {
+      const data = DB.get('flightConfig');
+      document.getElementById('content-area').innerHTML = `
+        <div class="card p-6">
+          <h2 class="text-lg font-bold mb-4">航班配置</h2>
+          <div class="form-grid mb-6">
+            <div class="form-group">
+              <label>仓库</label>
+              <select id="flightWarehouse">
+                <option value="东莞">东莞</option>
+                <option value="加工区">加工区</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>星期</label>
+              <select id="flightWeekday">
+                <option value="周一">周一</option>
+                <option value="周二">周二</option>
+                <option value="周三">周三</option>
+                <option value="周四">周四</option>
+                <option value="周五">周五</option>
+                <option value="周六">周六</option>
+                <option value="周日">周日</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>关东普货航班</label>
+              <input type="text" id="flightKantoNormal" placeholder="航班号">
+            </div>
+            <div class="form-group">
+              <label>关西普货航班</label>
+              <input type="text" id="flightKansaiNormal" placeholder="航班号">
+            </div>
+            <div class="form-group">
+              <label>关东特货航班</label>
+              <input type="text" id="flightKantoSpecial" placeholder="航班号">
+            </div>
+            <div class="form-group">
+              <label>关西特货航班</label>
+              <input type="text" id="flightKansaiSpecial" placeholder="航班号">
+            </div>
+            <div class="form-group">
+              <label>备注</label>
+              <input type="text" id="flightRemark" placeholder="备注">
+            </div>
+          </div>
+          <button class="btn btn-success" onclick="saveFlightConfig()">保存配置</button>
+          
+          <h3 class="text-md font-bold mt-6 mb-3">已保存配置</h3>
+          <div class="table-container border rounded-lg">
+            <table>
+              <thead>
+                <tr>
+                  <th>仓库</th><th>星期</th><th>关东普货</th><th>关西普货</th>
+                  <th>关东特货</th><th>关西特货</th><th>备注</th><th>操作</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${data.map(item => `
+                  <tr>
+                    <td>${item.warehouse}</td>
+                    <td>${item.weekday}</td>
+                    <td>${item.kanto_normal || '-'}</td>
+                    <td>${item.kansai_normal || '-'}</td>
+                    <td>${item.kanto_special || '-'}</td>
+                    <td>${item.kansai_special || '-'}</td>
+                    <td>${item.remark || '-'}</td>
+                    <td>
+                      <button class="btn btn-danger text-xs px-2 py-1" onclick="deleteFlight(${item.id})">删除</button>
+                    </td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      `;
+    }
+
+    function saveFlightConfig() {
+      const data = DB.get('flightConfig');
+      const newItem = {
+        id: DB.nextId('flightConfig'),
+        warehouse: document.getElementById('flightWarehouse').value,
+        weekday: document.getElementById('flightWeekday').value,
+        kanto_normal: document.getElementById('flightKantoNormal').value || null,
+        kansai_normal: document.getElementById('flightKansaiNormal').value || null,
+        kanto_special: document.getElementById('flightKantoSpecial').value || null,
+        kansai_special: document.getElementById('flightKansaiSpecial').value || null,
+        remark: document.getElementById('flightRemark').value || null
+      };
+      data.push(newItem);
+      DB.set('flightConfig', data);
+      showToast('保存成功');
+      renderFlightConfig();
+    }
+
+    function deleteFlight(id) {
+      if (confirm('确定删除？')) {
+        const data = DB.get('flightConfig').filter(i => i.id !== id);
+        DB.set('flightConfig', data);
+        showToast('删除成功');
+        renderFlightConfig();
+      }
+    }
+
+    // ============ 目的港配置 ============
+    function renderPortConfig() {
+      const data = DB.get('portConfig');
+      document.getElementById('content-area').innerHTML = `
+        <div class="card p-6">
+          <h2 class="text-lg font-bold mb-4">目的港配置</h2>
+          <div class="grid grid-cols-3 gap-4 mb-6">
+            <div class="form-group">
+              <label>港口代码</label>
+              <input type="text" id="portCode" placeholder="如: NRT">
+            </div>
+            <div class="form-group">
+              <label>区域</label>
+              <select id="portRegion">
+                <option value="关东">关东</option>
+                <option value="关西">关西</option>
+              </select>
+            </div>
+            <div class="flex items-end">
+              <button class="btn btn-success" onclick="savePortConfig()">保存配置</button>
+            </div>
+          </div>
+          
+          <h3 class="text-md font-bold mb-3">已保存配置</h3>
+          <div class="table-container border rounded-lg">
+            <table>
+              <thead>
+                <tr><th>港口代码</th><th>区域</th><th>操作</th></tr>
+              </thead>
+              <tbody>
+                ${data.map(item => `
+                  <tr>
+                    <td>${item.port_code}</td>
+                    <td>${item.region}</td>
+                    <td>
+                      <button class="btn btn-danger text-xs px-2 py-1" onclick="deletePort(${item.id})">删除</button>
+                    </td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      `;
+    }
+
+    function savePortConfig() {
+      const data = DB.get('portConfig');
+      const newItem = {
+        id: DB.nextId('portConfig'),
+        port_code: document.getElementById('portCode').value,
+        region: document.getElementById('portRegion').value
+      };
+      data.push(newItem);
+      DB.set('portConfig', data);
+      showToast('保存成功');
+      renderPortConfig();
+    }
+
+    function deletePort(id) {
+      if (confirm('确定删除？')) {
+        const data = DB.get('portConfig').filter(i => i.id !== id);
+        DB.set('portConfig', data);
+        showToast('删除成功');
+        renderPortConfig();
+      }
+    }
+
+    // ============ 航空路由配置 ============
+    function renderRouteConfig() {
+      const data = DB.get('routeConfig');
+      document.getElementById('content-area').innerHTML = `
+        <div class="card p-6">
+          <h2 class="text-lg font-bold mb-4">航空路由配置</h2>
+          <div class="form-grid mb-6">
+            <div class="form-group">
+              <label>航班号</label>
+              <input type="text" id="routeFlightNo" placeholder="如: CZ001">
+            </div>
+            <div class="form-group">
+              <label>始发港</label>
+              <input type="text" id="routeOrigin" placeholder="如: SZX">
+            </div>
+            <div class="form-group">
+              <label>中转港</label>
+              <input type="text" id="routeTransfer" placeholder="可选">
+            </div>
+            <div class="form-group">
+              <label>目的港</label>
+              <input type="text" id="routeDest" placeholder="如: NRT">
+            </div>
+            <div class="form-group">
+              <label>起飞时间</label>
+              <input type="time" id="routeDepartTime">
+            </div>
+            <div class="form-group">
+              <label>到达时间</label>
+              <input type="time" id="routeArriveTime">
+            </div>
+            <div class="form-group">
+              <label>是否次日达</label>
+              <select id="routeIsNextDay">
+                <option value="否">否</option>
+                <option value="是">是</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>路由类型</label>
+              <select id="routeType">
+                <option value="直达">直达</option>
+                <option value="中转">中转</option>
+              </select>
+            </div>
+          </div>
+          <button class="btn btn-success" onclick="saveRouteConfig()">保存配置</button>
+          
+          <h3 class="text-md font-bold mt-6 mb-3">已保存配置</h3>
+          <div class="table-container border rounded-lg">
+            <table>
+              <thead>
+                <tr>
+                  <th>航班号</th><th>始发港</th><th>中转港</th><th>目的港</th>
+                  <th>起飞时间</th><th>到达时间</th><th>次日达</th><th>类型</th><th>操作</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${data.map(item => `
+                  <tr>
+                    <td>${item.flight_no}</td>
+                    <td>${item.origin}</td>
+                    <td>${item.transfer || '-'}</td>
+                    <td>${item.dest}</td>
+                    <td>${item.depart_time || '-'}</td>
+                    <td>${item.arrive_time || '-'}</td>
+                    <td>${item.is_next_day || '-'}</td>
+                    <td>${item.route_type}</td>
+                    <td>
+                      <button class="btn btn-danger text-xs px-2 py-1" onclick="deleteRoute(${item.id})">删除</button>
+                    </td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      `;
+    }
+
+    function saveRouteConfig() {
+      const data = DB.get('routeConfig');
+      const newItem = {
+        id: DB.nextId('routeConfig'),
+        flight_no: document.getElementById('routeFlightNo').value,
+        origin: document.getElementById('routeOrigin').value,
+        transfer: document.getElementById('routeTransfer').value || null,
+        dest: document.getElementById('routeDest').value,
+        depart_time: document.getElementById('routeDepartTime').value || null,
+        arrive_time: document.getElementById('routeArriveTime').value || null,
+        is_next_day: document.getElementById('routeIsNextDay').value,
+        route_type: document.getElementById('routeType').value
+      };
+      data.push(newItem);
+      DB.set('routeConfig', data);
+      showToast('保存成功');
+      renderRouteConfig();
+    }
+
+    function deleteRoute(id) {
+      if (confirm('确定删除？')) {
+        const data = DB.get('routeConfig').filter(i => i.id !== id);
+        DB.set('routeConfig', data);
+        showToast('删除成功');
+        renderRouteConfig();
+      }
+    }
+
+    // ============ 方数预估 ============
+    function renderVolumeEstimate() {
+      const data = DB.get('volumeEstimate');
+      const areaConfig = DB.get('areaConfig');
+      
+      document.getElementById('content-area').innerHTML = `
+        <div class="card p-6">
+          <h2 class="text-lg font-bold mb-4">方数预估</h2>
+          <div class="form-grid mb-6">
+            <div class="form-group">
+              <label>揽收日期</label>
+              <input type="date" id="volumeDate" onchange="calcVolume()">
+            </div>
+            <div class="form-group">
+              <label>仓库</label>
+              <select id="volumeWarehouse" onchange="calcVolume()">
+                <option value="东莞">东莞</option>
+                <option value="加工区">加工区</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>袋数</label>
+              <input type="number" id="volumePackageCount" placeholder="输入袋数" onchange="calcVolume()">
+            </div>
+            <div class="form-group">
+              <label>货物袋数是否齐全</label>
+              <select id="volumeIsComplete">
+                <option value="是">是</option>
+                <option value="否">否</option>
+              </select>
+            </div>
+          </div>
+          
+          <h3 class="text-md font-bold mb-3">预估结果</h3>
+          <div class="grid grid-cols-4 gap-4 mb-6">
+            <div class="bg-blue-50 p-4 rounded-lg text-center">
+              <div class="text-gray-500 text-sm">预估总方数</div>
+              <div class="text-2xl font-bold text-blue-600" id="calcTotalVolume">-</div>
+            </div>
+            <div class="bg-green-50 p-4 rounded-lg text-center">
+              <div class="text-gray-500 text-sm">关东方数</div>
+              <div class="text-2xl font-bold text-green-600" id="calcKantoTotal">-</div>
+            </div>
+            <div class="bg-purple-50 p-4 rounded-lg text-center">
+              <div class="text-gray-500 text-sm">关西方数</div>
+              <div class="text-2xl font-bold text-purple-600" id="calcKansaiTotal">-</div>
+            </div>
+            <div class="bg-orange-50 p-4 rounded-lg text-center">
+              <div class="text-gray-500 text-sm">星期</div>
+              <div class="text-2xl font-bold text-orange-600" id="calcWeekday">-</div>
+            </div>
+          </div>
+          
+          <div class="grid grid-cols-4 gap-4 mb-6">
+            <div class="bg-gray-50 p-3 rounded text-center">
+              <div class="text-xs text-gray-500">关东普货</div>
+              <div class="font-bold" id="calcKantoNormal">-</div>
+            </div>
+            <div class="bg-gray-50 p-3 rounded text-center">
+              <div class="text-xs text-gray-500">关东特货</div>
+              <div class="font-bold" id="calcKantoSpecial">-</div>
+            </div>
+            <div class="bg-gray-50 p-3 rounded text-center">
+              <div class="text-xs text-gray-500">关西普货</div>
+              <div class="font-bold" id="calcKansaiNormal">-</div>
+            </div>
+            <div class="bg-gray-50 p-3 rounded text-center">
+              <div class="text-xs text-gray-500">关西特货</div>
+              <div class="font-bold" id="calcKansaiSpecial">-</div>
+            </div>
+          </div>
+          
+          <button class="btn btn-success" onclick="saveVolumeEstimate()">保存记录</button>
+          
+          <h3 class="text-md font-bold mt-6 mb-3">历史记录</h3>
+          <div class="table-container border rounded-lg">
+            <table>
+              <thead>
+                <tr>
+                  <th>揽收日期</th><th>星期</th><th>仓库</th><th>袋数</th>
+                  <th>总方数</th><th>关东</th><th>关西</th>
+                  <th>关东普货</th><th>关东特货</th><th>关西普货</th><th>关西特货</th>
+                  <th>是否齐全</th><th>操作</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${data.map(item => `
+                  <tr>
+                    <td>${item.collect_date}</td>
+                    <td>${item.weekday || '-'}</td>
+                    <td>${item.warehouse}</td>
+                    <td>${item.package_count}</td>
+                    <td>${item.total_volume?.toFixed(3) || '-'}</td>
+                    <td>${item.kanto_total?.toFixed(3) || '-'}</td>
+                    <td>${item.kansai_total?.toFixed(3) || '-'}</td>
+                    <td>${item.kanto_normal?.toFixed(3) || '-'}</td>
+                    <td>${item.kanto_special?.toFixed(3) || '-'}</td>
+                    <td>${item.kansai_normal?.toFixed(3) || '-'}</td>
+                    <td>${item.kansai_special?.toFixed(3) || '-'}</td>
+                    <td>${item.is_complete || '-'}</td>
+                    <td>
+                      <button class="btn btn-danger text-xs px-2 py-1" onclick="deleteVolume(${item.id})">删除</button>
+                    </td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      `;
+    }
+
+    function calcVolume() {
+      const date = document.getElementById('volumeDate').value;
+      const warehouse = document.getElementById('volumeWarehouse').value;
+      const packageCount = parseFloat(document.getElementById('volumePackageCount').value) || 0;
+      
+      if (!date || !packageCount) return;
+      
+      const areaConfig = DB.get('areaConfig').find(a => a.warehouse === warehouse) || {};
+      const packageVolume = parseFloat(areaConfig.package_volume) || 0.02;
+      const kantoRatio = parseFloat(areaConfig.kanto_ratio) || 0.45;
+      const kansaiRatio = parseFloat(areaConfig.kansai_ratio) || 0.55;
+      const kantoNormalRatio = parseFloat(areaConfig.kanto_normal_ratio) || 0.7;
+      const kantoSpecialRatio = parseFloat(areaConfig.kanto_special_ratio) || 0.3;
+      const kansaiNormalRatio = parseFloat(areaConfig.kansai_normal_ratio) || 0.8;
+      const kansaiSpecialRatio = parseFloat(areaConfig.kansai_special_ratio) || 0.2;
+      
+      const totalVolume = packageCount * packageVolume;
+      const kantoTotal = totalVolume * kantoRatio;
+      const kansaiTotal = totalVolume * kansaiRatio;
+      const kantoNormal = kantoTotal * kantoNormalRatio;
+      const kantoSpecial = kantoTotal * kantoSpecialRatio;
+      const kansaiNormal = kansaiTotal * kansaiNormalRatio;
+      const kansaiSpecial = kansaiTotal * kansaiSpecialRatio;
+      
+      const weekdays = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'];
+      const weekday = weekdays[new Date(date).getDay()];
+      
+      document.getElementById('calcTotalVolume').textContent = totalVolume.toFixed(3);
+      document.getElementById('calcKantoTotal').textContent = kantoTotal.toFixed(3);
+      document.getElementById('calcKansaiTotal').textContent = kansaiTotal.toFixed(3);
+      document.getElementById('calcWeekday').textContent = weekday;
+      document.getElementById('calcKantoNormal').textContent = kantoNormal.toFixed(3);
+      document.getElementById('calcKantoSpecial').textContent = kantoSpecial.toFixed(3);
+      document.getElementById('calcKansaiNormal').textContent = kansaiNormal.toFixed(3);
+      document.getElementById('calcKansaiSpecial').textContent = kansaiSpecial.toFixed(3);
+    }
+
+    function saveVolumeEstimate() {
+      const date = document.getElementById('volumeDate').value;
+      if (!date) {
+        showToast('请选择日期');
+        return;
+      }
+      
+      const data = DB.get('volumeEstimate');
+      const warehouse = document.getElementById('volumeWarehouse').value;
+      const packageCount = parseFloat(document.getElementById('volumePackageCount').value) || 0;
+      const isComplete = document.getElementById('volumeIsComplete').value;
+      
+      const areaConfig = DB.get('areaConfig').find(a => a.warehouse === warehouse) || {};
+      const packageVolume = parseFloat(areaConfig.package_volume) || 0.02;
+      const kantoRatio = parseFloat(areaConfig.kanto_ratio) || 0.45;
+      const kansaiRatio = parseFloat(areaConfig.kansai_ratio) || 0.55;
+      const kantoNormalRatio = parseFloat(areaConfig.kanto_normal_ratio) || 0.7;
+      const kantoSpecialRatio = parseFloat(areaConfig.kanto_special_ratio) || 0.3;
+      const kansaiNormalRatio = parseFloat(areaConfig.kansai_normal_ratio) || 0.8;
+      const kansaiSpecialRatio = parseFloat(areaConfig.kansai_special_ratio) || 0.2;
+      
+      const totalVolume = packageCount * packageVolume;
+      const kantoTotal = totalVolume * kantoRatio;
+      const kansaiTotal = totalVolume * kansaiRatio;
+      
+      const weekdays = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'];
+      
+      const newItem = {
+        id: DB.nextId('volumeEstimate'),
+        collect_date: date,
+        weekday: weekdays[new Date(date).getDay()],
+        warehouse,
+        package_count: packageCount,
+        total_volume: totalVolume,
+        kanto_total: kantoTotal,
+        kansai_total: kansaiTotal,
+        kanto_normal: kantoTotal * kantoNormalRatio,
+        kanto_special: kantoTotal * kantoSpecialRatio,
+        kansai_normal: kansaiTotal * kansaiNormalRatio,
+        kansai_special: kansaiTotal * kansaiSpecialRatio,
+        is_complete: isComplete
+      };
+      
+      data.push(newItem);
+      DB.set('volumeEstimate', data);
+      showToast('保存成功');
+      renderVolumeEstimate();
+    }
+
+    function deleteVolume(id) {
+      if (confirm('确定删除？')) {
+        const data = DB.get('volumeEstimate').filter(i => i.id !== id);
+        DB.set('volumeEstimate', data);
+        showToast('删除成功');
+        renderVolumeEstimate();
+      }
+    }
+
+    // ============ 主单发放 ============
+    let currentOrderId = null;
+    
+    function renderMainOrder() {
+      document.getElementById('content-area').innerHTML = `
+        <div class="card p-6">
+          <h2 class="text-lg font-bold mb-4">主单发放</h2>
+          <div class="form-grid mb-4">
+            <div class="form-group">
+              <label>揽收日期 *</label>
+              <input type="date" id="orderCollectDate">
+            </div>
+            <div class="form-group">
+              <label>仓库 *</label>
+              <select id="orderWarehouse">
+                <option value="东莞">东莞</option>
+                <option value="加工区">加工区</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>口岸 *</label>
+              <select id="orderPort">
+                <option value="关东">关东</option>
+                <option value="关西">关西</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>货物属性 *</label>
+              <select id="orderCargoType">
+                <option value="普货">普货</option>
+                <option value="特货">特货</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>类别</label>
+              <input type="text" id="orderCategory" placeholder="自动生成" readonly>
+            </div>
+            <div class="form-group">
+              <label>打货上限</label>
+              <input type="text" id="orderMaxVolume" placeholder="如: 10">
+            </div>
+            <div class="form-group">
+              <label>货物袋数是否齐全 *</label>
+              <select id="orderPackReq">
+                <option value="是">是</option>
+                <option value="否">否</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>主单号</label>
+              <input type="text" id="orderMainNo" placeholder="主单号">
+            </div>
+            <div class="form-group">
+              <label>航班号</label>
+              <select id="orderFlightNo">
+                <option value="">请选择</option>
+                ${DB.get('flightConfig').map(f => `<option value="${f.kanto_normal || ''}">${f.kanto_normal || '-'}</option>`).join('')}
+              </select>
+            </div>
+            <div class="form-group">
+              <label>目的港</label>
+              <select id="orderDest">
+                <option value="">请选择</option>
+                ${DB.get('portConfig').map(p => `<option value="${p.port_code}">${p.port_code} (${p.region})</option>`).join('')}
+              </select>
+            </div>
+            <div class="form-group">
+              <label>起飞时间</label>
+              <input type="time" id="orderDepartTime">
+            </div>
+            <div class="form-group">
+              <label>到港时间</label>
+              <input type="time" id="orderArriveTime">
+            </div>
+            <div class="form-group">
+              <label>实际件数</label>
+              <input type="number" id="orderActualPieces" placeholder="件数">
+            </div>
+            <div class="form-group">
+              <label>实际重量</label>
+              <input type="text" id="orderActualWeight" placeholder="重量">
+            </div>
+            <div class="form-group">
+              <label>实际体积</label>
+              <input type="text" id="orderActualVolume" placeholder="体积">
+            </div>
+            <div class="form-group">
+              <label>实际票数</label>
+              <input type="number" id="orderActualBills" placeholder="票数">
+            </div>
+            <div class="form-group">
+              <label>备注</label>
+              <input type="text" id="orderRemark" placeholder="备注">
+            </div>
+          </div>
+          <div class="flex gap-3">
+            <button class="btn btn-success" onclick="saveMainOrder()">保存主单</button>
+            <button class="btn btn-primary" onclick="openOrderList()">查看主单列表</button>
+            <button class="btn btn-secondary" onclick="clearOrderForm()">清空表单</button>
+          </div>
+        </div>
+      `;
+      
+      // 自动生成类别
+      document.getElementById('orderPort').addEventListener('change', updateCategory);
+      document.getElementById('orderCargoType').addEventListener('change', updateCategory);
+    }
+
+    function updateCategory() {
+      const port = document.getElementById('orderPort').value;
+      const cargoType = document.getElementById('orderCargoType').value;
+      document.getElementById('orderCategory').value = `${port}${cargoType}`;
+    }
+
+    function saveMainOrder() {
+      const collectDate = document.getElementById('orderCollectDate').value;
+      const warehouse = document.getElementById('orderWarehouse').value;
+      const port = document.getElementById('orderPort').value;
+      const cargoType = document.getElementById('orderCargoType').value;
+      
+      if (!collectDate || !warehouse || !port || !cargoType) {
+        showToast('请填写必填项');
+        return;
+      }
+      
+      const data = DB.get('mainOrders');
+      const orderData = {
+        id: currentOrderId || DB.nextId('mainOrders'),
+        collect_date: collectDate,
+        warehouse,
+        port,
+        cargo_type: cargoType,
+        category: document.getElementById('orderCategory').value,
+        max_volume: document.getElementById('orderMaxVolume').value || null,
+        pack_req: document.getElementById('orderPackReq').value,
+        main_no: document.getElementById('orderMainNo').value || null,
+        flight_no: document.getElementById('orderFlightNo').value || null,
+        dest: document.getElementById('orderDest').value || null,
+        depart_time: document.getElementById('orderDepartTime').value || null,
+        arrive_time: document.getElementById('orderArriveTime').value || null,
+        actual_pieces: document.getElementById('orderActualPieces').value || null,
+        actual_weight: document.getElementById('orderActualWeight').value || null,
+        actual_volume: document.getElementById('orderActualVolume').value || null,
+        actual_bills: document.getElementById('orderActualBills').value || null,
+        remark: document.getElementById('orderRemark').value || null
+      };
+      
+      if (currentOrderId) {
+        const index = data.findIndex(i => i.id === currentOrderId);
+        if (index > -1) data[index] = orderData;
+        currentOrderId = null;
+      } else {
+        data.push(orderData);
+      }
+      
+      DB.set('mainOrders', data);
+      showToast('保存成功');
+      clearOrderForm();
+    }
+
+    function clearOrderForm() {
+      document.getElementById('orderCollectDate').value = '';
+      document.getElementById('orderWarehouse').value = '东莞';
+      document.getElementById('orderPort').value = '关东';
+      document.getElementById('orderCargoType').value = '普货';
+      document.getElementById('orderCategory').value = '';
+      document.getElementById('orderMaxVolume').value = '';
+      document.getElementById('orderPackReq').value = '是';
+      document.getElementById('orderMainNo').value = '';
+      document.getElementById('orderFlightNo').value = '';
+      document.getElementById('orderDest').value = '';
+      document.getElementById('orderDepartTime').value = '';
+      document.getElementById('orderArriveTime').value = '';
+      document.getElementById('orderActualPieces').value = '';
+      document.getElementById('orderActualWeight').value = '';
+      document.getElementById('orderActualVolume').value = '';
+      document.getElementById('orderActualBills').value = '';
+      document.getElementById('orderRemark').value = '';
+      currentOrderId = null;
+    }
+
+    function openOrderList() {
+      document.getElementById('orderListModal').classList.add('show');
+      renderOrderList(DB.get('mainOrders'));
+    }
+
+    function closeOrderList() {
+      document.getElementById('orderListModal').classList.remove('show');
+    }
+
+    function renderOrderList(data) {
+      document.getElementById('orderListBody').innerHTML = data.map(item => `
+        <tr>
+          <td>${item.collect_date}</td>
+          <td>${item.warehouse}</td>
+          <td>${item.port}</td>
+          <td>${item.cargo_type}</td>
+          <td>${item.category || '-'}</td>
+          <td>${item.main_no || '-'}</td>
+          <td>${item.flight_no || '-'}</td>
+          <td>${item.dest || '-'}</td>
+          <td>${item.max_volume || '-'}</td>
+          <td>${item.depart_time || '-'}</td>
+          <td>${item.arrive_time || '-'}</td>
+          <td>${item.actual_pieces || '-'}</td>
+          <td>${item.actual_weight || '-'}</td>
+          <td>${item.actual_volume || '-'}</td>
+          <td>${item.actual_bills || '-'}</td>
+          <td>${item.remark || '-'}</td>
+          <td>
+            <button class="btn btn-primary text-xs px-2 py-1" onclick="editOrder(${item.id})">编辑</button>
+            <button class="btn btn-danger text-xs px-2 py-1" onclick="deleteOrder(${item.id})">删除</button>
+          </td>
+        </tr>
+      `).join('');
+      document.getElementById('orderListCount').textContent = `共 ${data.length} 条记录`;
+    }
+
+    function filterOrders() {
+      const date = document.getElementById('filterOrderDate').value;
+      const warehouse = document.getElementById('filterWarehouse').value;
+      const port = document.getElementById('filterPort').value;
+      
+      let data = DB.get('mainOrders');
+      if (date) data = data.filter(i => i.collect_date === date);
+      if (warehouse) data = data.filter(i => i.warehouse === warehouse);
+      if (port) data = data.filter(i => i.port === port);
+      
+      renderOrderList(data);
+    }
+
+    function editOrder(id) {
+      const item = DB.get('mainOrders').find(i => i.id === id);
+      if (item) {
+        closeOrderList();
+        currentOrderId = id;
+        document.getElementById('orderCollectDate').value = item.collect_date;
+        document.getElementById('orderWarehouse').value = item.warehouse;
+        document.getElementById('orderPort').value = item.port;
+        document.getElementById('orderCargoType').value = item.cargo_type;
+        document.getElementById('orderCategory').value = item.category || '';
+        document.getElementById('orderMaxVolume').value = item.max_volume || '';
+        document.getElementById('orderPackReq').value = item.pack_req || '是';
+        document.getElementById('orderMainNo').value = item.main_no || '';
+        document.getElementById('orderFlightNo').value = item.flight_no || '';
+        document.getElementById('orderDest').value = item.dest || '';
+        document.getElementById('orderDepartTime').value = item.depart_time || '';
+        document.getElementById('orderArriveTime').value = item.arrive_time || '';
+        document.getElementById('orderActualPieces').value = item.actual_pieces || '';
+        document.getElementById('orderActualWeight').value = item.actual_weight || '';
+        document.getElementById('orderActualVolume').value = item.actual_volume || '';
+        document.getElementById('orderActualBills').value = item.actual_bills || '';
+        document.getElementById('orderRemark').value = item.remark || '';
+      }
+    }
+
+    function deleteOrder(id) {
+      if (confirm('确定删除？')) {
+        const data = DB.get('mainOrders').filter(i => i.id !== id);
+        DB.set('mainOrders', data);
+        showToast('删除成功');
+        renderOrderList(data);
+      }
+    }
+
+    // ============ 欠方余方查询 ============
+    function renderBalance() {
+      const volumeData = DB.get('volumeEstimate');
+      const orderData = DB.get('mainOrders');
+      
+      // 按仓库+口岸+货物属性汇总
+      const summary = {};
+      volumeData.forEach(v => {
+        const key = `${v.warehouse}`;
+        if (!summary[key]) {
+          summary[key] = { warehouse: v.warehouse, est_volume: 0, actual_volume: 0 };
+        }
+        summary[key].est_volume += v.total_volume || 0;
+      });
+      
+      orderData.forEach(o => {
+        const key = `${o.warehouse}`;
+        if (!summary[key]) {
+          summary[key] = { warehouse: o.warehouse, est_volume: 0, actual_volume: 0 };
+        }
+        summary[key].actual_volume += parseFloat(o.actual_volume) || 0;
+      });
+      
+      const summaryList = Object.values(summary);
+      
+      document.getElementById('content-area').innerHTML = `
+        <div class="card p-6">
+          <h2 class="text-lg font-bold mb-4">欠方余方查询</h2>
+          
+          <div class="grid grid-cols-3 gap-4 mb-6">
+            <div class="form-group">
+              <label>仓库</label>
+              <select id="balanceWarehouse" onchange="filterBalance()">
+                <option value="">全部</option>
+                <option value="东莞">东莞</option>
+                <option value="加工区">加工区</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>揽收日期起</label>
+              <input type="date" id="balanceDateStart" onchange="filterBalance()">
+            </div>
+            <div class="form-group">
+              <label>揽收日期止</label>
+              <input type="date" id="balanceDateEnd" onchange="filterBalance()">
+            </div>
+          </div>
+          
+          <h3 class="text-md font-bold mb-3">汇总统计</h3>
+          <div class="table-container border rounded-lg mb-6">
+            <table>
+              <thead>
+                <tr>
+                  <th>仓库</th>
+                  <th>预估总方数</th>
+                  <th>实际总方数</th>
+                  <th>差额(欠/余)</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${summaryList.map(item => {
+                  const diff = item.actual_volume - item.est_volume;
+                  const diffClass = diff < 0 ? 'text-red-600' : diff > 0 ? 'text-green-600' : '';
+                  const diffText = diff < 0 ? `欠 ${Math.abs(diff).toFixed(3)}` : diff > 0 ? `余 ${diff.toFixed(3)}` : '0';
+                  return `
+                    <tr>
+                      <td>${item.warehouse}</td>
+                      <td>${item.est_volume.toFixed(3)}</td>
+                      <td>${item.actual_volume.toFixed(3)}</td>
+                      <td class="${diffClass} font-bold">${diffText}</td>
+                    </tr>
+                  `;
+                }).join('')}
+              </tbody>
+            </table>
+          </div>
+          
+          <h3 class="text-md font-bold mb-3">方数预估明细</h3>
+          <div class="table-container border rounded-lg mb-6">
+            <table>
+              <thead>
+                <tr>
+                  <th>揽收日期</th><th>仓库</th><th>袋数</th>
+                  <th>预估方数</th><th>关东</th><th>关西</th>
+                </tr>
+              </thead>
+              <tbody id="balanceVolumeBody">
+                ${volumeData.slice(-20).map(item => `
+                  <tr>
+                    <td>${item.collect_date}</td>
+                    <td>${item.warehouse}</td>
+                    <td>${item.package_count}</td>
+                    <td>${item.total_volume?.toFixed(3) || '-'}</td>
+                    <td>${item.kanto_total?.toFixed(3) || '-'}</td>
+                    <td>${item.kansai_total?.toFixed(3) || '-'}</td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      `;
+    }
+
+    function filterBalance() {
+      // 简化版筛选，实际可扩展
+      renderBalance();
+    }
+
+    // 初始化显示第一个标签页
+    renderTab('area');
+  </script>
+</body>
+</html>
