@@ -193,17 +193,19 @@ export default function LogisticsManagement() {
   // 欠方余方查询
   const [balanceQuery, setBalanceQuery] = useState({
     collect_date: '',
-    warehouse: '',
-    port: '',
-    cargo_type: '',
+    warehouse: '全部',
+    port: '全部',
+    cargo_type: '全部',
   });
-  const [balanceResult, setBalanceResult] = useState<{
+  const [balanceResults, setBalanceResults] = useState<Array<{
+    warehouse: string;
+    port: string;
+    cargo_type: string;
     estVolume: number;
     maxVolume: number;
-    balance: number;
-    isDeficit: boolean;
-    isSurplus: boolean;
-  } | null>(null);
+    deficit: number;
+    surplus: number;
+  }>>([]);
   
   // 加载数据
   const loadAreaConfigs = async () => {
@@ -670,13 +672,94 @@ export default function LogisticsManagement() {
   };
   
   // 欠方余方查询
-  const queryBalance = async () => {
-    const params = new URLSearchParams(balanceQuery as Record<string, string>);
-    const res = await fetch(`/api/balance?${params}`);
-    const data = await res.json();
-    if (data.success) {
-      setBalanceResult(data.data);
+  const queryBalance = () => {
+    if (!balanceQuery.collect_date) {
+      alert('请选择揽收日期');
+      return;
     }
+    
+    const results: Array<{
+      warehouse: string;
+      port: string;
+      cargo_type: string;
+      estVolume: number;
+      maxVolume: number;
+      deficit: number;
+      surplus: number;
+    }> = [];
+    
+    const warehouses = balanceQuery.warehouse === '全部' ? ['东莞', '加工区'] : [balanceQuery.warehouse];
+    const ports = balanceQuery.port === '全部' ? ['关东', '关西'] : [balanceQuery.port];
+    const cargoTypes = balanceQuery.cargo_type === '全部' ? ['普货', '特货'] : [balanceQuery.cargo_type];
+    
+    for (const wh of warehouses) {
+      for (const pt of ports) {
+        for (const ct of cargoTypes) {
+          // 查找当天的方数预估（如果当天数据不齐全，使用前一天）
+          let estimate = volumeEstimates.find(
+            e => e.collect_date === balanceQuery.collect_date && e.warehouse === wh
+          );
+          
+          // 如果当天数据不齐全或不存在，尝试查找前一天
+          if (!estimate || estimate.is_complete === '否') {
+            const prevDate = getPrevDate(balanceQuery.collect_date);
+            const prevEstimate = volumeEstimates.find(
+              e => e.collect_date === prevDate && e.warehouse === wh
+            );
+            if (prevEstimate) {
+              estimate = prevEstimate;
+            }
+          }
+          
+          // 计算预估方数
+          let estVolume = 0;
+          if (estimate) {
+            if (pt === '关东' && ct === '普货') {
+              estVolume = parseFloat(estimate.kanto_normal || '0');
+            } else if (pt === '关东' && ct === '特货') {
+              estVolume = parseFloat(estimate.kanto_special || '0');
+            } else if (pt === '关西' && ct === '普货') {
+              estVolume = parseFloat(estimate.kansai_normal || '0');
+            } else if (pt === '关西' && ct === '特货') {
+              estVolume = parseFloat(estimate.kansai_special || '0');
+            }
+          }
+          
+          // 计算打货上限汇总（对应组合的主单的max_volume之和）
+          const orders = mainOrders.filter(
+            o => o.collect_date === balanceQuery.collect_date && 
+                 o.warehouse === wh && 
+                 o.port === pt && 
+                 o.cargo_type === ct
+          );
+          const maxVolume = orders.reduce((sum, o) => sum + parseFloat(o.max_volume || '0'), 0);
+          
+          // 计算欠方/余方
+          const diff = estVolume - maxVolume;
+          const deficit = diff > 0 ? diff : 0;
+          const surplus = diff < 0 ? Math.abs(diff) : 0;
+          
+          results.push({
+            warehouse: wh,
+            port: pt,
+            cargo_type: ct,
+            estVolume,
+            maxVolume,
+            deficit,
+            surplus,
+          });
+        }
+      }
+    }
+    
+    setBalanceResults(results);
+  };
+  
+  // 获取前一天日期
+  const getPrevDate = (dateStr: string) => {
+    const date = new Date(dateStr);
+    date.setDate(date.getDate() - 1);
+    return date.toISOString().split('T')[0];
   };
   
   // 填充航班信息
@@ -1528,7 +1611,7 @@ export default function LogisticsManagement() {
               <CardContent>
                 <div className="grid grid-cols-5 gap-4 mb-4">
                   <div>
-                    <Label>揽收日期</Label>
+                    <Label>揽收日期 <span className="text-red-500">*</span></Label>
                     <Input type="date" value={balanceQuery.collect_date}
                       onChange={e => setBalanceQuery(prev => ({ ...prev, collect_date: e.target.value }))} />
                   </div>
@@ -1538,6 +1621,7 @@ export default function LogisticsManagement() {
                       onValueChange={v => setBalanceQuery(prev => ({ ...prev, warehouse: v }))}>
                       <SelectTrigger><SelectValue placeholder="请选择" /></SelectTrigger>
                       <SelectContent>
+                        <SelectItem value="全部">全部</SelectItem>
                         <SelectItem value="东莞">东莞</SelectItem>
                         <SelectItem value="加工区">加工区</SelectItem>
                       </SelectContent>
@@ -1549,6 +1633,7 @@ export default function LogisticsManagement() {
                       onValueChange={v => setBalanceQuery(prev => ({ ...prev, port: v }))}>
                       <SelectTrigger><SelectValue placeholder="请选择" /></SelectTrigger>
                       <SelectContent>
+                        <SelectItem value="全部">全部</SelectItem>
                         <SelectItem value="关东">关东</SelectItem>
                         <SelectItem value="关西">关西</SelectItem>
                       </SelectContent>
@@ -1560,6 +1645,7 @@ export default function LogisticsManagement() {
                       onValueChange={v => setBalanceQuery(prev => ({ ...prev, cargo_type: v }))}>
                       <SelectTrigger><SelectValue placeholder="请选择" /></SelectTrigger>
                       <SelectContent>
+                        <SelectItem value="全部">全部</SelectItem>
                         <SelectItem value="普货">普货</SelectItem>
                         <SelectItem value="特货">特货</SelectItem>
                       </SelectContent>
@@ -1572,35 +1658,47 @@ export default function LogisticsManagement() {
               </CardContent>
             </Card>
             
-            {balanceResult && (
-              <Card>
-                <CardHeader>查询结果</CardHeader>
-                <CardContent>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="p-4 bg-gray-50 rounded-lg">
-                      <div className="text-sm text-gray-500 mb-1">预估方数</div>
-                      <div className="text-2xl font-bold text-blue-600">{balanceResult.estVolume.toFixed(2)}</div>
-                    </div>
-                    <div className="p-4 bg-gray-50 rounded-lg">
-                      <div className="text-sm text-gray-500 mb-1">打货上限汇总</div>
-                      <div className="text-2xl font-bold text-blue-600">{balanceResult.maxVolume.toFixed(2)}</div>
-                    </div>
-                    <div className="p-4 bg-gray-50 rounded-lg">
-                      <div className="text-sm text-gray-500 mb-1">欠方</div>
-                      <div className={`text-2xl font-bold ${balanceResult.isDeficit ? 'text-red-600' : 'text-gray-300'}`}>
-                        {balanceResult.isDeficit ? Math.abs(balanceResult.balance).toFixed(2) : '0.00'}
-                      </div>
-                    </div>
-                    <div className="p-4 bg-gray-50 rounded-lg">
-                      <div className="text-sm text-gray-500 mb-1">余方</div>
-                      <div className={`text-2xl font-bold ${balanceResult.isSurplus ? 'text-green-600' : 'text-gray-300'}`}>
-                        {balanceResult.isSurplus ? Math.abs(balanceResult.balance).toFixed(2) : '0.00'}
-                      </div>
-                    </div>
+            <Card>
+              <CardHeader>查询结果</CardHeader>
+              <CardContent>
+                {balanceResults.length > 0 ? (
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>仓库</TableHead>
+                        <TableHead>口岸</TableHead>
+                        <TableHead>货物属性</TableHead>
+                        <TableHead className="text-right">预估方数</TableHead>
+                        <TableHead className="text-right">打货上限汇总</TableHead>
+                        <TableHead className="text-right">欠方</TableHead>
+                        <TableHead className="text-right">余方</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {balanceResults.map((r, idx) => (
+                        <TableRow key={idx}>
+                          <TableCell>{r.warehouse}</TableCell>
+                          <TableCell>{r.port}</TableCell>
+                          <TableCell>{r.cargo_type}</TableCell>
+                          <TableCell className="text-right">{r.estVolume.toFixed(3)}</TableCell>
+                          <TableCell className="text-right">{r.maxVolume.toFixed(3)}</TableCell>
+                          <TableCell className="text-right font-semibold text-red-600">
+                            {r.deficit > 0 ? r.deficit.toFixed(3) : '0.000'}
+                          </TableCell>
+                          <TableCell className="text-right font-semibold text-green-600">
+                            {r.surplus > 0 ? r.surplus.toFixed(3) : '0.000'}
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                ) : (
+                  <div className="text-center text-gray-500 py-8">
+                    请选择揽收日期后点击查询
                   </div>
-                </CardContent>
-              </Card>
-            )}
+                )}
+              </CardContent>
+            </Card>
           </div>
         )}
       </main>
