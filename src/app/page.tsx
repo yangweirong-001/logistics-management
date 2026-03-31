@@ -959,6 +959,13 @@ export default function LogisticsManagement() {
         </nav>
         
         <div className="p-4 border-t border-white/10">
+          <a
+            href="/logistics.html"
+            download="物流管理系统.html"
+            className="block w-full py-3 px-4 bg-green-600 hover:bg-green-700 text-white text-center rounded-lg font-medium transition-colors mb-3"
+          >
+            📥 下载HTML版本
+          </a>
           <div className="text-sm text-white/70 mb-2">联网版本</div>
           <div className="text-xs text-green-400">在线同步</div>
         </div>
