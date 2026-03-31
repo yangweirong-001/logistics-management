@@ -1525,7 +1525,7 @@ export default function LogisticsManagement() {
                   </div>
                   <div>
                     <Label className="text-sm text-gray-600 mb-1 block">实际航班日期</Label>
-                    <Input type="date" value={orderForm.actual_flight_date}
+                    <Input type="date" value={orderForm.actual_flight_date || ''}
                       onChange={e => setOrderForm(prev => ({ ...prev, actual_flight_date: e.target.value }))} />
                   </div>
                   <div>
@@ -1538,6 +1538,18 @@ export default function LogisticsManagement() {
                 {/* 第五行 */}
                 <div className="grid grid-cols-4 gap-4 mb-4">
                   <div>
+                    <Label className="text-sm text-gray-600 mb-1 block">航班号</Label>
+                    <Select value={orderForm.flight_no || ''}
+                      onValueChange={v => { setOrderForm(prev => ({ ...prev, flight_no: v })); fillFlightInfo(v); }}>
+                      <SelectTrigger><SelectValue placeholder="请选择" /></SelectTrigger>
+                      <SelectContent>
+                        {getAvailableFlights().map(r => (
+                          <SelectItem key={r.id} value={r.flight_no}>{r.flight_no}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div>
                     <Label className="text-sm text-gray-600 mb-1 block">始发港</Label>
                     <Input className="bg-gray-100" value={orderForm.origin || ''} readOnly placeholder="自动填充" />
                   </div>
@@ -1549,6 +1561,10 @@ export default function LogisticsManagement() {
                     <Label className="text-sm text-gray-600 mb-1 block">目的港</Label>
                     <Input className="bg-gray-100" value={orderForm.dest || ''} readOnly placeholder="自动填充" />
                   </div>
+                </div>
+                
+                {/* 第六行 */}
+                <div className="grid grid-cols-4 gap-4 mb-4">
                   <div>
                     <Label className="text-sm text-gray-600 mb-1 block">起飞时间</Label>
                     <Input className="bg-gray-100" value={
@@ -1557,10 +1573,6 @@ export default function LogisticsManagement() {
                         : orderForm.depart_time || ''
                     } readOnly placeholder="自动填充" />
                   </div>
-                </div>
-                
-                {/* 第六行 */}
-                <div className="grid grid-cols-4 gap-4 mb-4">
                   <div>
                     <Label className="text-sm text-gray-600 mb-1 block">到港时间</Label>
                     <Input className="bg-gray-100" value={
@@ -1579,21 +1591,21 @@ export default function LogisticsManagement() {
                     <Input type="number" step="0.01" value={orderForm.actual_weight || ''}
                       onChange={e => setOrderForm(prev => ({ ...prev, actual_weight: e.target.value }))} />
                   </div>
-                  <div>
-                    <Label className="text-sm text-gray-600 mb-1 block">实际体积</Label>
-                    <Input type="number" step="0.001" value={orderForm.actual_volume || ''}
-                      onChange={e => setOrderForm(prev => ({ ...prev, actual_volume: e.target.value }))} />
-                  </div>
                 </div>
                 
                 {/* 第七行 */}
                 <div className="grid grid-cols-4 gap-4 mb-4">
                   <div>
+                    <Label className="text-sm text-gray-600 mb-1 block">实际体积</Label>
+                    <Input type="number" step="0.001" value={orderForm.actual_volume || ''}
+                      onChange={e => setOrderForm(prev => ({ ...prev, actual_volume: e.target.value }))} />
+                  </div>
+                  <div>
                     <Label className="text-sm text-gray-600 mb-1 block">实际票数</Label>
                     <Input type="number" value={orderForm.actual_bills || ''}
                       onChange={e => setOrderForm(prev => ({ ...prev, actual_bills: e.target.value }))} />
                   </div>
-                  <div className="col-span-3">
+                  <div className="col-span-2">
                     <Label className="text-sm text-gray-600 mb-1 block">备注</Label>
                     <Input placeholder="请输入备注信息" value={orderForm.remark || ''}
                       onChange={e => setOrderForm(prev => ({ ...prev, remark: e.target.value }))} />
