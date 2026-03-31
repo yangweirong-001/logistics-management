@@ -1296,8 +1296,20 @@ function calcEstVolume() {
   // 先查找当天数据
   let vol = getData(KEYS.VOL).find(i => i.collect_date === date && i.warehouse === wh);
   
-  // 如果当天没有，查找前一天数据
-  if (!vol) {
+  // 判断是否使用当天数据
+  let useToday = false;
+  if (vol) {
+    // 如果当天有数据且"货物袋数是否齐全"为"是"，使用当天数据
+    if (vol.is_complete === '是') {
+      useToday = true;
+    } else {
+      // 如果"货物袋数是否齐全"不是"是"（否或未填），使用前一天数据
+      useToday = false;
+    }
+  }
+  
+  // 如果不使用当天数据，查找前一天
+  if (!useToday) {
     const prevDate = addDays(date, -1);
     vol = getData(KEYS.VOL).find(i => i.collect_date === prevDate && i.warehouse === wh);
   }
