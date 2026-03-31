@@ -549,7 +549,7 @@
             <div class="form-row">
               <div class="form-col">
                 <div class="form-group">
-                  <label class="form-label">揽收日期</label>
+                  <label class="form-label">揽收日期 <span style="color:#f5222d">*</span></label>
                   <input type="date" class="form-control" id="b-date">
                 </div>
               </div>
@@ -557,7 +557,7 @@
                 <div class="form-group">
                   <label class="form-label">仓库</label>
                   <select class="form-control" id="b-wh">
-                    <option value="">请选择</option>
+                    <option value="">全部</option>
                     <option value="东莞">东莞</option>
                     <option value="加工区">加工区</option>
                   </select>
@@ -567,7 +567,7 @@
                 <div class="form-group">
                   <label class="form-label">口岸</label>
                   <select class="form-control" id="b-port">
-                    <option value="">请选择</option>
+                    <option value="">全部</option>
                     <option value="关东">关东</option>
                     <option value="关西">关西</option>
                   </select>
@@ -577,7 +577,7 @@
                 <div class="form-group">
                   <label class="form-label">货物属性</label>
                   <select class="form-control" id="b-cargo">
-                    <option value="">请选择</option>
+                    <option value="">全部</option>
                     <option value="普货">普货</option>
                     <option value="特货">特货</option>
                   </select>
@@ -592,10 +592,24 @@
         <div class="card">
           <div class="card-header">查询结果</div>
           <div class="card-body">
-            <div class="result-item"><div class="result-label">预估方数</div><div class="result-value" id="b-est">--</div></div>
-            <div class="result-item"><div class="result-label">打货上限汇总</div><div class="result-value" id="b-max">--</div></div>
-            <div class="result-item"><div class="result-label">欠方</div><div class="result-value negative" id="b-def">--</div></div>
-            <div class="result-item"><div class="result-label">余方</div><div class="result-value positive" id="b-sur">--</div></div>
+            <div class="scroll-table">
+              <table id="balance-table">
+                <thead>
+                  <tr>
+                    <th>仓库</th>
+                    <th>口岸</th>
+                    <th>货物属性</th>
+                    <th>预估方数</th>
+                    <th>打货上限汇总</th>
+                    <th>欠方</th>
+                    <th>余方</th>
+                  </tr>
+                </thead>
+                <tbody id="balance-tbody">
+                  <tr><td colspan="7" style="text-align:center;color:#999;">请选择揽收日期后点击查询</td></tr>
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
       </div>
@@ -1505,31 +1519,72 @@ function queryBalance() {
   const port = document.getElementById('b-port').value;
   const cargo = document.getElementById('b-cargo').value;
 
-  if (!date || !wh || !port || !cargo) { alert('请填写完整'); return; }
+  if (!date) { alert('请选择揽收日期'); return; }
 
-  // 获取预估方数
-  const vol = getData(KEYS.VOL).find(i => i.collect_date === date && i.warehouse === wh);
-  let est = 0;
-  if (vol) {
-    if (port === '关东' && cargo === '普货') est = parseFloat(vol.kanto_normal) || 0;
-    else if (port === '关东' && cargo === '特货') est = parseFloat(vol.kanto_special) || 0;
-    else if (port === '关西' && cargo === '普货') est = parseFloat(vol.kansai_normal) || 0;
-    else if (port === '关西' && cargo === '特货') est = parseFloat(vol.kansai_special) || 0;
-  }
+  // 定义所有可能的组合
+  const warehouses = wh ? [wh] : ['东莞', '加工区'];
+  const ports = port ? [port] : ['关东', '关西'];
+  const cargos = cargo ? [cargo] : ['普货', '特货'];
 
-  // 获取打货上限汇总
-  const orders = getData(KEYS.ORDER).filter(i => i.collect_date === date && i.warehouse === wh && i.port === port && i.cargo_type === cargo);
-  const maxSum = orders.reduce((s, i) => s + (parseFloat(i.max_volume) || 0), 0);
+  const results = [];
 
-  const balance = est - maxSum;
-  document.getElementById('b-est').textContent = est.toFixed(3);
-  document.getElementById('b-max').textContent = maxSum.toFixed(3);
-  if (balance > 0) {
-    document.getElementById('b-def').textContent = balance.toFixed(3);
-    document.getElementById('b-sur').textContent = '0.000';
+  // 遍历所有组合
+  warehouses.forEach(w => {
+    ports.forEach(p => {
+      cargos.forEach(c => {
+        // 获取预估方数
+        const vol = getData(KEYS.VOL).find(i => i.collect_date === date && i.warehouse === w);
+        let est = 0;
+        if (vol) {
+          if (p === '关东' && c === '普货') est = parseFloat(vol.kanto_normal) || 0;
+          else if (p === '关东' && c === '特货') est = parseFloat(vol.kanto_special) || 0;
+          else if (p === '关西' && c === '普货') est = parseFloat(vol.kansai_normal) || 0;
+          else if (p === '关西' && c === '特货') est = parseFloat(vol.kansai_special) || 0;
+        }
+
+        // 获取打货上限汇总
+        const orders = getData(KEYS.ORDER).filter(i => 
+          i.collect_date === date && i.warehouse === w && i.port === p && i.cargo_type === c
+        );
+        const maxSum = orders.reduce((s, i) => s + (parseFloat(i.max_volume) || 0), 0);
+
+        // 计算欠方/余方
+        const balance = est - maxSum;
+        const deficit = balance > 0 ? balance : 0;  // 欠方：预估 > 打货上限
+        const surplus = balance < 0 ? Math.abs(balance) : 0;  // 余方：预估 < 打货上限
+
+        // 只显示有数据的记录（有预估方数或有打货上限）
+        if (est > 0 || maxSum > 0) {
+          results.push({
+            warehouse: w,
+            port: p,
+            cargo: c,
+            est: est.toFixed(3),
+            maxSum: maxSum.toFixed(3),
+            deficit: deficit.toFixed(3),
+            surplus: surplus.toFixed(3)
+          });
+        }
+      });
+    });
+  });
+
+  // 渲染结果
+  const tbody = document.getElementById('balance-tbody');
+  if (results.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:#999;">暂无数据</td></tr>';
   } else {
-    document.getElementById('b-def').textContent = '0.000';
-    document.getElementById('b-sur').textContent = Math.abs(balance).toFixed(3);
+    tbody.innerHTML = results.map(r => `
+      <tr>
+        <td><strong>${r.warehouse}</strong></td>
+        <td>${r.port}</td>
+        <td>${r.cargo}</td>
+        <td>${r.est}</td>
+        <td>${r.maxSum}</td>
+        <td style="color:${parseFloat(r.deficit) > 0 ? '#f5222d' : '#999'}">${r.deficit}</td>
+        <td style="color:${parseFloat(r.surplus) > 0 ? '#52c41a' : '#999'}">${r.surplus}</td>
+      </tr>
+    `).join('');
   }
 }
 
