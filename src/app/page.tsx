@@ -1172,57 +1172,28 @@ export default function LogisticsManagement() {
     return date.toISOString().split('T')[0];
   };
   
-  // 填充航班信息（根据航班号和目的港筛选）
-  const fillFlightInfo = (flightNo: string) => {
-    // 先根据目的港获取对应的机场代码
-    const portCodesForRegion = portConfigs
-      .filter(p => p.region === orderForm.port)
-      .map(p => p.port_code);
+  // 根据航班号+始发港+中转站+目的港匹配路由，自动填充起飞时间和落地时间
+  const matchRouteAndFillTimes = () => {
+    const { flight_no, origin, transfer, dest } = orderForm;
     
-    // 找到航班号匹配且目的港在对应区域的路由
-    const route = routeConfigs.find(r => 
-      r.flight_no === flightNo && 
-      (portCodesForRegion.length === 0 || portCodesForRegion.includes(r.dest))
+    // 四个字段都有值才匹配
+    if (!flight_no || !origin || !dest) return;
+    
+    // 查找匹配的路由
+    const matchedRoute = routeConfigs.find(r => 
+      r.flight_no === flight_no &&
+      r.origin === origin &&
+      (r.transfer || '') === (transfer || '') &&
+      r.dest === dest
     );
     
-    // 如果没找到，则找第一个航班号匹配的
-    const finalRoute = route || routeConfigs.find(r => r.flight_no === flightNo);
-    
-    if (finalRoute) {
+    if (matchedRoute) {
       setOrderForm(prev => ({
         ...prev,
-        flight_no: flightNo,
-        origin: finalRoute.origin,
-        transfer: finalRoute.transfer || '',
-        dest: finalRoute.dest,
-        depart_time: finalRoute.depart_time || '',
-        arrive_time: finalRoute.arrive_time || '',
+        depart_time: matchedRoute.depart_time || '',
+        arrive_time: matchedRoute.arrive_time || '',
       }));
     }
-  };
-  
-  // 获取可用航班号列表（根据目的港筛选）
-  const getAvailableFlights = () => {
-    // 如果没有配置路由，返回空数组
-    if (!routeConfigs || routeConfigs.length === 0) return [];
-    
-    // 根据目的港筛选航班
-    if (orderForm.port) {
-      // 获取该目的港对应的目的港代码
-      const portCodesForRegion = portConfigs
-        .filter(p => p.region === orderForm.port)
-        .map(p => p.port_code);
-      
-      // 筛选目的港代码匹配的航班
-      const filteredRoutes = routeConfigs.filter(r => portCodesForRegion.includes(r.dest));
-      
-      if (filteredRoutes.length > 0) {
-        return filteredRoutes;
-      }
-    }
-    
-    // 如果没有目的港筛选，返回所有航班
-    return routeConfigs;
   };
 
   return (
@@ -1980,32 +1951,48 @@ export default function LogisticsManagement() {
                   <div>
                     <Label className="text-sm text-gray-600 mb-1 block">航班号</Label>
                     <Input 
-                      list="flight-options"
                       value={orderForm.flight_no || ''}
                       onChange={e => { 
                         const value = e.target.value.toUpperCase();
-                        setOrderForm(prev => ({ ...prev, flight_no: value })); 
-                        fillFlightInfo(value);
+                        setOrderForm(prev => ({ ...prev, flight_no: value }));
+                        // 延迟匹配，等状态更新后再匹配
+                        setTimeout(() => matchRouteAndFillTimes(), 100);
                       }}
-                      placeholder="输入或选择航班号"
+                      placeholder="请输入航班号"
                     />
-                    <datalist id="flight-options">
-                      {getAvailableFlights().map(r => (
-                        <option key={r.id} value={r.flight_no} />
-                      ))}
-                    </datalist>
                   </div>
                   <div>
                     <Label className="text-sm text-gray-600 mb-1 block">始发港</Label>
-                    <Input className="bg-gray-100" value={orderForm.origin || ''} readOnly placeholder="自动填充" />
+                    <Input 
+                      value={orderForm.origin || ''} 
+                      onChange={e => {
+                        setOrderForm(prev => ({ ...prev, origin: e.target.value.toUpperCase() }));
+                        setTimeout(() => matchRouteAndFillTimes(), 100);
+                      }}
+                      placeholder="请输入始发港" 
+                    />
                   </div>
                   <div>
                     <Label className="text-sm text-gray-600 mb-1 block">中转站</Label>
-                    <Input className="bg-gray-100" value={orderForm.transfer || ''} readOnly placeholder="自动填充" />
+                    <Input 
+                      value={orderForm.transfer || ''} 
+                      onChange={e => {
+                        setOrderForm(prev => ({ ...prev, transfer: e.target.value.toUpperCase() }));
+                        setTimeout(() => matchRouteAndFillTimes(), 100);
+                      }}
+                      placeholder="请输入中转站" 
+                    />
                   </div>
                   <div>
                     <Label className="text-sm text-gray-600 mb-1 block">目的港</Label>
-                    <Input className="bg-gray-100" value={orderForm.dest || ''} readOnly placeholder="自动填充" />
+                    <Input 
+                      value={orderForm.dest || ''} 
+                      onChange={e => {
+                        setOrderForm(prev => ({ ...prev, dest: e.target.value.toUpperCase() }));
+                        setTimeout(() => matchRouteAndFillTimes(), 100);
+                      }}
+                      placeholder="请输入目的港" 
+                    />
                   </div>
                 </div>
                 
