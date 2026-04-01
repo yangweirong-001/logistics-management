@@ -216,6 +216,9 @@ export default function LogisticsManagement() {
   // 搜索状态
   const [flightSearchQuery, setFlightSearchQuery] = useState('');
   
+  // 多选状态
+  const [selectedRouteIds, setSelectedRouteIds] = useState<Set<number>>(new Set());
+  
   // 文件上传 ref
   const routeImportRef = useRef<HTMLInputElement>(null);
   
@@ -648,6 +651,61 @@ export default function LogisticsManagement() {
         return;
       }
       loadRouteConfigs();
+    }
+  };
+  
+  // 路由配置多选操作
+  const toggleRouteSelection = (id: number) => {
+    setSelectedRouteIds(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(id)) {
+        newSet.delete(id);
+      } else {
+        newSet.add(id);
+      }
+      return newSet;
+    });
+  };
+  
+  const toggleAllRoutes = () => {
+    if (selectedRouteIds.size === routeConfigs.length) {
+      setSelectedRouteIds(new Set());
+    } else {
+      setSelectedRouteIds(new Set(routeConfigs.map(r => r.id)));
+    }
+  };
+  
+  const deleteSelectedRoutes = async () => {
+    if (selectedRouteIds.size === 0) {
+      alert('请先选择要删除的记录');
+      return;
+    }
+    if (!confirm(`确定删除选中的 ${selectedRouteIds.size} 条记录？`)) return;
+    
+    setSaving(true);
+    let successCount = 0;
+    let failCount = 0;
+    
+    for (const id of selectedRouteIds) {
+      try {
+        const response = await fetch(`/api/route-config/${id}`, { method: 'DELETE' });
+        const result = await response.json();
+        if (result.success) {
+          successCount++;
+        } else {
+          failCount++;
+        }
+      } catch {
+        failCount++;
+      }
+    }
+    
+    setSaving(false);
+    setSelectedRouteIds(new Set());
+    loadRouteConfigs();
+    
+    if (failCount > 0) {
+      alert(`删除完成：成功 ${successCount} 条，失败 ${failCount} 条`);
     }
   };
   
@@ -1421,6 +1479,11 @@ export default function LogisticsManagement() {
                   <Button variant="outline" onClick={() => routeImportRef.current?.click()}>
                     Excel导入
                   </Button>
+                  {selectedRouteIds.size > 0 && (
+                    <Button variant="destructive" onClick={deleteSelectedRoutes}>
+                      删除选中 ({selectedRouteIds.size})
+                    </Button>
+                  )}
                   <Button onClick={() => { setEditingRoute(null); setRouteModalOpen(true); }}>
                     新增配置
                   </Button>
@@ -1430,6 +1493,14 @@ export default function LogisticsManagement() {
                 <Table>
                   <TableHeader>
                     <TableRow>
+                      <TableHead className="w-12">
+                        <input
+                          type="checkbox"
+                          checked={routeConfigs.length > 0 && selectedRouteIds.size === routeConfigs.length}
+                          onChange={toggleAllRoutes}
+                          className="w-4 h-4"
+                        />
+                      </TableHead>
                       <TableHead>航班号</TableHead>
                       <TableHead>始发</TableHead>
                       <TableHead>中转</TableHead>
@@ -1444,7 +1515,15 @@ export default function LogisticsManagement() {
                   </TableHeader>
                   <TableBody>
                     {routeConfigs.map(config => (
-                      <TableRow key={config.id}>
+                      <TableRow key={config.id} className={selectedRouteIds.has(config.id) ? 'bg-blue-50' : ''}>
+                        <TableCell>
+                          <input
+                            type="checkbox"
+                            checked={selectedRouteIds.has(config.id)}
+                            onChange={() => toggleRouteSelection(config.id)}
+                            className="w-4 h-4"
+                          />
+                        </TableCell>
                         <TableCell>{config.flight_no}</TableCell>
                         <TableCell>{config.origin}</TableCell>
                         <TableCell>{config.transfer || '-'}</TableCell>
