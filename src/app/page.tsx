@@ -365,28 +365,42 @@ export default function LogisticsManagement() {
       kansai_special_ratio: formData.get('kansai_special_ratio') as string,
     };
     
-    if (editingArea) {
-      await fetch(`/api/area-config/${editingArea.id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
-      });
-    } else {
-      await fetch('/api/area-config', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
-      });
+    try {
+      let response;
+      if (editingArea) {
+        response = await fetch(`/api/area-config/${editingArea.id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data),
+        });
+      } else {
+        response = await fetch('/api/area-config', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data),
+        });
+      }
+      const result = await response.json();
+      if (!result.success) {
+        alert('保存失败: ' + (result.error || '未知错误'));
+        return;
+      }
+      setAreaModalOpen(false);
+      setEditingArea(null);
+      loadAreaConfigs();
+    } catch (err) {
+      alert('保存失败: ' + (err instanceof Error ? err.message : '网络错误'));
     }
-    
-    setAreaModalOpen(false);
-    setEditingArea(null);
-    loadAreaConfigs();
   };
   
   const deleteAreaConfig = async (id: number) => {
     if (confirm('确定删除此配置？')) {
-      await fetch(`/api/area-config/${id}`, { method: 'DELETE' });
+      const response = await fetch(`/api/area-config/${id}`, { method: 'DELETE' });
+      const result = await response.json();
+      if (!result.success) {
+        alert('删除失败: ' + (result.error || '未知错误'));
+        return;
+      }
       loadAreaConfigs();
     }
   };
@@ -403,28 +417,42 @@ export default function LogisticsManagement() {
       remark: formData.get('remark') as string,
     };
     
-    if (editingFlight) {
-      await fetch(`/api/flight-config/${editingFlight.id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
-      });
-    } else {
-      await fetch('/api/flight-config', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
-      });
+    try {
+      let response;
+      if (editingFlight) {
+        response = await fetch(`/api/flight-config/${editingFlight.id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data),
+        });
+      } else {
+        response = await fetch('/api/flight-config', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data),
+        });
+      }
+      const result = await response.json();
+      if (!result.success) {
+        alert('保存失败: ' + (result.error || '未知错误'));
+        return;
+      }
+      setFlightModalOpen(false);
+      setEditingFlight(null);
+      loadFlightConfigs();
+    } catch (err) {
+      alert('保存失败: ' + (err instanceof Error ? err.message : '网络错误'));
     }
-    
-    setFlightModalOpen(false);
-    setEditingFlight(null);
-    loadFlightConfigs();
   };
   
   const deleteFlightConfig = async (id: number) => {
     if (confirm('确定删除此配置？')) {
-      await fetch(`/api/flight-config/${id}`, { method: 'DELETE' });
+      const response = await fetch(`/api/flight-config/${id}`, { method: 'DELETE' });
+      const result = await response.json();
+      if (!result.success) {
+        alert('删除失败: ' + (result.error || '未知错误'));
+        return;
+      }
       loadFlightConfigs();
     }
   };
@@ -436,28 +464,42 @@ export default function LogisticsManagement() {
       region: formData.get('region') as string,
     };
     
-    if (editingPort) {
-      await fetch(`/api/port-config/${editingPort.id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
-      });
-    } else {
-      await fetch('/api/port-config', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
-      });
+    try {
+      let response;
+      if (editingPort) {
+        response = await fetch(`/api/port-config/${editingPort.id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data),
+        });
+      } else {
+        response = await fetch('/api/port-config', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data),
+        });
+      }
+      const result = await response.json();
+      if (!result.success) {
+        alert('保存失败: ' + (result.error || '未知错误'));
+        return;
+      }
+      setPortModalOpen(false);
+      setEditingPort(null);
+      loadPortConfigs();
+    } catch (err) {
+      alert('保存失败: ' + (err instanceof Error ? err.message : '网络错误'));
     }
-    
-    setPortModalOpen(false);
-    setEditingPort(null);
-    loadPortConfigs();
   };
   
   const deletePortConfig = async (id: number) => {
     if (confirm('确定删除此配置？')) {
-      await fetch(`/api/port-config/${id}`, { method: 'DELETE' });
+      const response = await fetch(`/api/port-config/${id}`, { method: 'DELETE' });
+      const result = await response.json();
+      if (!result.success) {
+        alert('删除失败: ' + (result.error || '未知错误'));
+        return;
+      }
       loadPortConfigs();
     }
   };
@@ -476,28 +518,42 @@ export default function LogisticsManagement() {
       route_type: formData.get('route_type') as string,
     };
     
-    if (editingRoute) {
-      await fetch(`/api/route-config/${editingRoute.id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
-      });
-    } else {
-      await fetch('/api/route-config', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
-      });
+    try {
+      let response;
+      if (editingRoute) {
+        response = await fetch(`/api/route-config/${editingRoute.id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data),
+        });
+      } else {
+        response = await fetch('/api/route-config', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data),
+        });
+      }
+      const result = await response.json();
+      if (!result.success) {
+        alert('保存失败: ' + (result.error || '未知错误'));
+        return;
+      }
+      setRouteModalOpen(false);
+      setEditingRoute(null);
+      loadRouteConfigs();
+    } catch (err) {
+      alert('保存失败: ' + (err instanceof Error ? err.message : '网络错误'));
     }
-    
-    setRouteModalOpen(false);
-    setEditingRoute(null);
-    loadRouteConfigs();
   };
   
   const deleteRouteConfig = async (id: number) => {
     if (confirm('确定删除此配置？')) {
-      await fetch(`/api/route-config/${id}`, { method: 'DELETE' });
+      const response = await fetch(`/api/route-config/${id}`, { method: 'DELETE' });
+      const result = await response.json();
+      if (!result.success) {
+        alert('删除失败: ' + (result.error || '未知错误'));
+        return;
+      }
       loadRouteConfigs();
     }
   };
@@ -630,7 +686,12 @@ export default function LogisticsManagement() {
   // 删除方数预估记录
   const deleteVolumeEstimate = async (id: number) => {
     if (confirm('确定删除此记录？')) {
-      await fetch(`/api/volume-estimate/${id}`, { method: 'DELETE' });
+      const response = await fetch(`/api/volume-estimate/${id}`, { method: 'DELETE' });
+      const result = await response.json();
+      if (!result.success) {
+        alert('删除失败: ' + (result.error || '未知错误'));
+        return;
+      }
       loadVolumeEstimates();
     }
   };
@@ -761,7 +822,12 @@ export default function LogisticsManagement() {
   
   const deleteMainOrder = async (id: number) => {
     if (confirm('确定删除此主单？')) {
-      await fetch(`/api/main-order/${id}`, { method: 'DELETE' });
+      const response = await fetch(`/api/main-order/${id}`, { method: 'DELETE' });
+      const result = await response.json();
+      if (!result.success) {
+        alert('删除失败: ' + (result.error || '未知错误'));
+        return;
+      }
       loadMainOrders();
     }
   };
