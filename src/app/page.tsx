@@ -1179,37 +1179,28 @@ export default function LogisticsManagement() {
     }
   };
   
-  // 获取可用航班号列表
+  // 获取可用航班号列表（根据目的港筛选）
   const getAvailableFlights = () => {
     // 如果没有配置路由，返回空数组
     if (!routeConfigs || routeConfigs.length === 0) return [];
     
-    // 获取类别对应的路由类型
-    const category = `${orderForm.port}${orderForm.cargo_type}`;
-    
-    // 根据航班配置确定路由类型
-    const weekday = orderForm.collect_date ? getWeekday(orderForm.collect_date) : '';
-    const flightConfig = flightConfigs.find(
-      f => f.warehouse === orderForm.warehouse && f.weekday === weekday
-    );
-    
-    // 如果没有航班配置或类别为空，显示所有航班
-    if (!flightConfig || !category) {
-      return routeConfigs;
+    // 根据目的港筛选航班
+    if (orderForm.port) {
+      // 获取该目的港对应的目的港代码
+      const portCodesForRegion = portConfigs
+        .filter(p => p.region === orderForm.port)
+        .map(p => p.port_code);
+      
+      // 筛选目的港代码匹配的航班
+      const filteredRoutes = routeConfigs.filter(r => portCodesForRegion.includes(r.dest));
+      
+      if (filteredRoutes.length > 0) {
+        return filteredRoutes;
+      }
     }
     
-    let routeType = '';
-    if (category === '关东普货') routeType = flightConfig.kanto_normal || '';
-    else if (category === '关东特货') routeType = flightConfig.kanto_special || '';
-    else if (category === '关西普货') routeType = flightConfig.kansai_normal || '';
-    else if (category === '关西特货') routeType = flightConfig.kansai_special || '';
-    
-    // 如果没有匹配的路由类型，显示所有航班
-    if (!routeType) {
-      return routeConfigs;
-    }
-    
-    return routeConfigs.filter(r => r.route_type === routeType);
+    // 如果没有目的港筛选，返回所有航班
+    return routeConfigs;
   };
 
   return (
@@ -1919,15 +1910,21 @@ export default function LogisticsManagement() {
                 <div className="grid grid-cols-4 gap-4 mb-4">
                   <div>
                     <Label className="text-sm text-gray-600 mb-1 block">航班号</Label>
-                    <Select value={orderForm.flight_no || ''}
-                      onValueChange={v => { setOrderForm(prev => ({ ...prev, flight_no: v })); fillFlightInfo(v); }}>
-                      <SelectTrigger><SelectValue placeholder="请选择" /></SelectTrigger>
-                      <SelectContent>
-                        {getAvailableFlights().map(r => (
-                          <SelectItem key={r.id} value={r.flight_no}>{r.flight_no}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    <Input 
+                      list="flight-options"
+                      value={orderForm.flight_no || ''}
+                      onChange={e => { 
+                        const value = e.target.value.toUpperCase();
+                        setOrderForm(prev => ({ ...prev, flight_no: value })); 
+                        fillFlightInfo(value);
+                      }}
+                      placeholder="输入或选择航班号"
+                    />
+                    <datalist id="flight-options">
+                      {getAvailableFlights().map(r => (
+                        <option key={r.id} value={r.flight_no} />
+                      ))}
+                    </datalist>
                   </div>
                   <div>
                     <Label className="text-sm text-gray-600 mb-1 block">始发港</Label>
