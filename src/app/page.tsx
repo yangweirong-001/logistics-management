@@ -2261,16 +2261,16 @@ export default function LogisticsManagement() {
               <CardHeader>查询结果</CardHeader>
               <CardContent>
                 {balanceResults.length > 0 ? (
-                  <Table>
+                  <Table className="w-full">
                     <TableHeader>
                       <TableRow>
-                        <TableHead>仓库</TableHead>
-                        <TableHead>口岸</TableHead>
-                        <TableHead>货物属性</TableHead>
-                        <TableHead className="text-right">预估方数</TableHead>
-                        <TableHead className="text-right">打货上限汇总</TableHead>
-                        <TableHead className="text-right">欠方</TableHead>
-                        <TableHead className="text-right">余方</TableHead>
+                        <TableHead className="w-20">仓库</TableHead>
+                        <TableHead className="w-20">口岸</TableHead>
+                        <TableHead className="w-24">货物属性</TableHead>
+                        <TableHead className="w-24 text-right">预估方数</TableHead>
+                        <TableHead className="w-28 text-right">打货上限汇总</TableHead>
+                        <TableHead className="w-24 text-right">欠方</TableHead>
+                        <TableHead className="w-24 text-right">余方</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
