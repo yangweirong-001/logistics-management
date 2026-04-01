@@ -215,6 +215,7 @@ export default function LogisticsManagement() {
   
   // 搜索状态
   const [flightSearchQuery, setFlightSearchQuery] = useState('');
+  const [routeSearchQuery, setRouteSearchQuery] = useState('');
   
   // 多选状态
   const [selectedRouteIds, setSelectedRouteIds] = useState<Set<number>>(new Set());
@@ -1460,6 +1461,12 @@ export default function LogisticsManagement() {
               <CardHeader className="flex flex-row items-center justify-between">
                 <CardTitle>航空路由配置</CardTitle>
                 <div className="flex gap-3">
+                  <Input
+                    placeholder="搜索航班号/始发/中转/目的/二程航班/路由..."
+                    value={routeSearchQuery}
+                    onChange={(e) => setRouteSearchQuery(e.target.value)}
+                    className="w-72"
+                  />
                   <input
                     type="file"
                     accept=".xlsx,.xls"
@@ -1487,8 +1494,39 @@ export default function LogisticsManagement() {
                       <TableHead className="w-12">
                         <input
                           type="checkbox"
-                          checked={routeConfigs.length > 0 && selectedRouteIds.size === routeConfigs.length}
-                          onChange={toggleAllRoutes}
+                          checked={routeConfigs.length > 0 && selectedRouteIds.size === routeConfigs.filter(config => 
+                            !routeSearchQuery || 
+                            config.flight_no.toLowerCase().includes(routeSearchQuery.toLowerCase()) ||
+                            config.origin.toLowerCase().includes(routeSearchQuery.toLowerCase()) ||
+                            (config.transfer || '').toLowerCase().includes(routeSearchQuery.toLowerCase()) ||
+                            config.dest.toLowerCase().includes(routeSearchQuery.toLowerCase()) ||
+                            (config.second_flight || '').toLowerCase().includes(routeSearchQuery.toLowerCase()) ||
+                            config.route_type.toLowerCase().includes(routeSearchQuery.toLowerCase())
+                          ).length && selectedRouteIds.size === routeConfigs.filter(config => 
+                            !routeSearchQuery || 
+                            config.flight_no.toLowerCase().includes(routeSearchQuery.toLowerCase()) ||
+                            config.origin.toLowerCase().includes(routeSearchQuery.toLowerCase()) ||
+                            (config.transfer || '').toLowerCase().includes(routeSearchQuery.toLowerCase()) ||
+                            config.dest.toLowerCase().includes(routeSearchQuery.toLowerCase()) ||
+                            (config.second_flight || '').toLowerCase().includes(routeSearchQuery.toLowerCase()) ||
+                            config.route_type.toLowerCase().includes(routeSearchQuery.toLowerCase())
+                          ).length}
+                          onChange={() => {
+                            const filtered = routeConfigs.filter(config => 
+                              !routeSearchQuery || 
+                              config.flight_no.toLowerCase().includes(routeSearchQuery.toLowerCase()) ||
+                              config.origin.toLowerCase().includes(routeSearchQuery.toLowerCase()) ||
+                              (config.transfer || '').toLowerCase().includes(routeSearchQuery.toLowerCase()) ||
+                              config.dest.toLowerCase().includes(routeSearchQuery.toLowerCase()) ||
+                              (config.second_flight || '').toLowerCase().includes(routeSearchQuery.toLowerCase()) ||
+                              config.route_type.toLowerCase().includes(routeSearchQuery.toLowerCase())
+                            );
+                            if (selectedRouteIds.size === filtered.length) {
+                              setSelectedRouteIds(new Set());
+                            } else {
+                              setSelectedRouteIds(new Set(filtered.map(r => r.id)));
+                            }
+                          }}
                           className="w-4 h-4"
                         />
                       </TableHead>
@@ -1505,7 +1543,17 @@ export default function LogisticsManagement() {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {routeConfigs.map(config => (
+                    {routeConfigs
+                      .filter(config => 
+                        !routeSearchQuery || 
+                        config.flight_no.toLowerCase().includes(routeSearchQuery.toLowerCase()) ||
+                        config.origin.toLowerCase().includes(routeSearchQuery.toLowerCase()) ||
+                        (config.transfer || '').toLowerCase().includes(routeSearchQuery.toLowerCase()) ||
+                        config.dest.toLowerCase().includes(routeSearchQuery.toLowerCase()) ||
+                        (config.second_flight || '').toLowerCase().includes(routeSearchQuery.toLowerCase()) ||
+                        config.route_type.toLowerCase().includes(routeSearchQuery.toLowerCase())
+                      )
+                      .map(config => (
                       <TableRow key={config.id} className={selectedRouteIds.has(config.id) ? 'bg-blue-50' : ''}>
                         <TableCell>
                           <input
