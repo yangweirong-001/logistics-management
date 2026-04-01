@@ -2048,11 +2048,17 @@ function deleteVolRecent(id) {
 }
 
 // ==================== 初始化 ====================
-renderArea();
-renderFlight();
-renderPort();
-renderRoute();
-renderVolRecent();
+async function initApp() {
+  // 先从 API 加载所有数据
+  await Promise.all([
+    loadAreaData(),
+    loadFlightData(),
+    loadPortData(),
+    loadRouteData(),
+    loadVolData()
+  ]);
+}
+initApp();
 </script>
 </body>
 </html>
