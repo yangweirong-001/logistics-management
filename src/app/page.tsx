@@ -2267,30 +2267,30 @@ export default function LogisticsManagement() {
               <CardHeader>查询结果</CardHeader>
               <CardContent>
                 {balanceResults.length > 0 ? (
-                  <Table className="w-full table-fixed">
+                  <Table className="w-full">
                     <TableHeader>
                       <TableRow>
-                        <TableHead className="w-[14%]">仓库</TableHead>
-                        <TableHead className="w-[14%]">口岸</TableHead>
-                        <TableHead className="w-[14%]">货物属性</TableHead>
-                        <TableHead className="w-[14%] text-right">预估方数</TableHead>
-                        <TableHead className="w-[16%] text-right">打货上限汇总</TableHead>
-                        <TableHead className="w-[14%] text-right">欠方</TableHead>
-                        <TableHead className="w-[14%] text-right">余方</TableHead>
+                        <TableHead className="text-center px-2">仓库</TableHead>
+                        <TableHead className="text-center px-2">口岸</TableHead>
+                        <TableHead className="text-center px-2">货物属性</TableHead>
+                        <TableHead className="text-center px-2">预估方数</TableHead>
+                        <TableHead className="text-center px-2">打货上限汇总</TableHead>
+                        <TableHead className="text-center px-2">欠方</TableHead>
+                        <TableHead className="text-center px-2">余方</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
                       {balanceResults.map((r, idx) => (
                         <TableRow key={idx}>
-                          <TableCell>{r.warehouse}</TableCell>
-                          <TableCell>{r.port}</TableCell>
-                          <TableCell>{r.cargo_type}</TableCell>
-                          <TableCell className="text-right">{r.estVolume.toFixed(3)}</TableCell>
-                          <TableCell className="text-right">{r.maxVolume.toFixed(3)}</TableCell>
-                          <TableCell className="text-right font-semibold text-red-600">
+                          <TableCell className="text-center px-2">{r.warehouse}</TableCell>
+                          <TableCell className="text-center px-2">{r.port}</TableCell>
+                          <TableCell className="text-center px-2">{r.cargo_type}</TableCell>
+                          <TableCell className="text-center px-2">{r.estVolume.toFixed(3)}</TableCell>
+                          <TableCell className="text-center px-2">{r.maxVolume.toFixed(3)}</TableCell>
+                          <TableCell className="text-center px-2 font-semibold text-red-600">
                             {r.deficit > 0 ? r.deficit.toFixed(3) : '0.000'}
                           </TableCell>
-                          <TableCell className="text-right font-semibold text-green-600">
+                          <TableCell className="text-center px-2 font-semibold text-green-600">
                             {r.surplus > 0 ? r.surplus.toFixed(3) : '0.000'}
                           </TableCell>
                         </TableRow>
