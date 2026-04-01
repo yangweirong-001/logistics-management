@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import * as XLSX from 'xlsx';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -214,6 +215,9 @@ export default function LogisticsManagement() {
   
   // 搜索状态
   const [flightSearchQuery, setFlightSearchQuery] = useState('');
+  
+  // 文件上传 ref
+  const routeImportRef = useRef<HTMLInputElement>(null);
   
   // 编辑状态
   const [editingArea, setEditingArea] = useState<AreaConfig | null>(null);
@@ -644,6 +648,66 @@ export default function LogisticsManagement() {
         return;
       }
       loadRouteConfigs();
+    }
+  };
+  
+  // Excel 批量导入路由配置
+  const handleRouteImport = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    
+    try {
+      setSaving(true);
+      const data = await file.arrayBuffer();
+      const workbook = XLSX.read(data);
+      const sheetName = workbook.SheetNames[0];
+      const worksheet = workbook.Sheets[sheetName];
+      const jsonData = XLSX.utils.sheet_to_json(worksheet) as Record<string, unknown>[];
+      
+      if (jsonData.length === 0) {
+        alert('Excel 文件为空或格式不正确');
+        return;
+      }
+      
+      // 转换数据格式
+      const routes = jsonData.map((row) => ({
+        flight_no: String(row['航班号'] || row['flight_no'] || ''),
+        origin: String(row['始发'] || row['origin'] || ''),
+        transfer: String(row['中转'] || row['transfer'] || ''),
+        dest: String(row['目的'] || row['dest'] || ''),
+        depart_time: String(row['起飞时间'] || row['depart_time'] || ''),
+        arrive_time: String(row['落地时间'] || row['arrive_time'] || ''),
+        is_next_day: String(row['是否隔天'] || row['is_next_day'] || ''),
+        second_flight: String(row['第二程航班'] || row['second_flight'] || ''),
+        route_type: String(row['路由'] || row['route_type'] || '空运'),
+      })).filter(r => r.flight_no && r.origin && r.dest && r.route_type);
+      
+      if (routes.length === 0) {
+        alert('未找到有效数据，请检查 Excel 格式');
+        return;
+      }
+      
+      const response = await fetch('/api/route-config/batch', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ routes }),
+      });
+      
+      const result = await response.json();
+      if (result.success) {
+        alert(`导入完成！成功 ${result.data.successCount} 条，失败 ${result.data.failCount} 条`);
+        loadRouteConfigs();
+      } else {
+        alert('导入失败: ' + (result.error || '未知错误'));
+      }
+    } catch (err) {
+      alert('导入失败: ' + (err instanceof Error ? err.message : '文件解析错误'));
+    } finally {
+      setSaving(false);
+      // 重置文件输入
+      if (routeImportRef.current) {
+        routeImportRef.current.value = '';
+      }
     }
   };
   
@@ -1328,9 +1392,21 @@ export default function LogisticsManagement() {
             <Card className="mb-5">
               <CardHeader className="flex flex-row items-center justify-between">
                 <CardTitle>航空路由配置</CardTitle>
-                <Button onClick={() => { setEditingRoute(null); setRouteModalOpen(true); }}>
-                  新增配置
-                </Button>
+                <div className="flex gap-3">
+                  <input
+                    type="file"
+                    accept=".xlsx,.xls"
+                    ref={routeImportRef}
+                    onChange={handleRouteImport}
+                    className="hidden"
+                  />
+                  <Button variant="outline" onClick={() => routeImportRef.current?.click()}>
+                    Excel导入
+                  </Button>
+                  <Button onClick={() => { setEditingRoute(null); setRouteModalOpen(true); }}>
+                    新增配置
+                  </Button>
+                </div>
               </CardHeader>
               <CardContent>
                 <Table>
