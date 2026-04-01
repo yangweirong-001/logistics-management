@@ -2143,7 +2143,11 @@ export default function LogisticsManagement() {
                   <div>
                     <Label>仓库</Label>
                     <Select value={orderQueryWarehouse} onValueChange={v => setOrderQueryWarehouse(v)}>
-                      <SelectTrigger><SelectValue placeholder="全部" /></SelectTrigger>
+                      <SelectTrigger>
+                        <SelectValue placeholder="全部">
+                          {orderQueryWarehouse === '全部' ? '全部' : orderQueryWarehouse}
+                        </SelectValue>
+                      </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="全部">全部</SelectItem>
                         <SelectItem value="东莞">东莞</SelectItem>
@@ -2167,29 +2171,49 @@ export default function LogisticsManagement() {
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>揽收日期</TableHead>
-                      <TableHead>仓库</TableHead>
-                      <TableHead>口岸</TableHead>
-                      <TableHead>货物属性</TableHead>
-                      <TableHead>类别</TableHead>
-                      <TableHead>主单号</TableHead>
-                      <TableHead>航班号</TableHead>
-                      <TableHead>目的港</TableHead>
-                      <TableHead>操作</TableHead>
+                      <TableHead className="text-center px-2">揽收日期</TableHead>
+                      <TableHead className="text-center px-2">仓库</TableHead>
+                      <TableHead className="text-center px-2">口岸</TableHead>
+                      <TableHead className="text-center px-2">货物属性</TableHead>
+                      <TableHead className="text-center px-2">类别</TableHead>
+                      <TableHead className="text-center px-2">主单号</TableHead>
+                      <TableHead className="text-center px-2">航班号</TableHead>
+                      <TableHead className="text-center px-2">始发</TableHead>
+                      <TableHead className="text-center px-2">中转</TableHead>
+                      <TableHead className="text-center px-2">目的</TableHead>
+                      <TableHead className="text-center px-2">预计起飞</TableHead>
+                      <TableHead className="text-center px-2">预计落地</TableHead>
+                      <TableHead className="text-center px-2">打货上限(方)</TableHead>
+                      <TableHead className="text-center px-2">打货上限(件)</TableHead>
+                      <TableHead className="text-center px-2">操作</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {mainOrders.slice(0, 20).map(order => (
+                    {mainOrders.slice(0, 50).map(order => (
                       <TableRow key={order.id}>
-                        <TableCell>{order.collect_date}</TableCell>
-                        <TableCell>{order.warehouse}</TableCell>
-                        <TableCell>{order.port}</TableCell>
-                        <TableCell>{order.cargo_type}</TableCell>
-                        <TableCell>{order.category}</TableCell>
-                        <TableCell>{order.main_no || '-'}</TableCell>
-                        <TableCell>{order.flight_no || '-'}</TableCell>
-                        <TableCell>{order.dest || '-'}</TableCell>
-                        <TableCell>
+                        <TableCell className="text-center px-2">{order.collect_date}</TableCell>
+                        <TableCell className="text-center px-2">{order.warehouse}</TableCell>
+                        <TableCell className="text-center px-2">{order.port}</TableCell>
+                        <TableCell className="text-center px-2">{order.cargo_type}</TableCell>
+                        <TableCell className="text-center px-2">{order.category || '-'}</TableCell>
+                        <TableCell className="text-center px-2">{order.main_no || '-'}</TableCell>
+                        <TableCell className="text-center px-2">{order.flight_no || '-'}</TableCell>
+                        <TableCell className="text-center px-2">{order.origin || '-'}</TableCell>
+                        <TableCell className="text-center px-2">{order.transfer || '-'}</TableCell>
+                        <TableCell className="text-center px-2">{order.dest || '-'}</TableCell>
+                        <TableCell className="text-center px-2">
+                          {order.actual_flight_date && order.depart_time 
+                            ? `${order.actual_flight_date} ${order.depart_time}` 
+                            : order.depart_time || '-'}
+                        </TableCell>
+                        <TableCell className="text-center px-2">
+                          {order.actual_flight_date && order.arrive_time 
+                            ? `${order.actual_flight_date} ${order.arrive_time}` 
+                            : order.arrive_time || '-'}
+                        </TableCell>
+                        <TableCell className="text-center px-2">{order.max_volume || '-'}</TableCell>
+                        <TableCell className="text-center px-2">{order.max_pieces || '-'}</TableCell>
+                        <TableCell className="text-center px-2">
                           <Button size="sm" variant="outline" className="mr-2"
                             onClick={() => {
                               setEditingOrder(order);
