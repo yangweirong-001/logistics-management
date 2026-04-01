@@ -422,15 +422,21 @@ export default function LogisticsManagement() {
     // 大包预估体积保留12位小数
     const packageVolumeValue = parseFloat(formData.get('package_volume') as string) || 0;
     
+    // 占比字段处理：空字符串转为 0，保留2位小数
+    const parseRatio = (value: string) => {
+      const num = parseFloat(value);
+      return isNaN(num) ? 0 : parseFloat(num.toFixed(2));
+    };
+    
     const data = {
       warehouse: formData.get('warehouse') as string,
       package_volume: packageVolumeValue.toFixed(12),
-      kanto_ratio: formData.get('kanto_ratio') as string,
-      kansai_ratio: formData.get('kansai_ratio') as string,
-      kanto_normal_ratio: formData.get('kanto_normal_ratio') as string,
-      kanto_special_ratio: formData.get('kanto_special_ratio') as string,
-      kansai_normal_ratio: formData.get('kansai_normal_ratio') as string,
-      kansai_special_ratio: formData.get('kansai_special_ratio') as string,
+      kanto_ratio: parseRatio(formData.get('kanto_ratio') as string),
+      kansai_ratio: parseRatio(formData.get('kansai_ratio') as string),
+      kanto_normal_ratio: parseRatio(formData.get('kanto_normal_ratio') as string),
+      kanto_special_ratio: parseRatio(formData.get('kanto_special_ratio') as string),
+      kansai_normal_ratio: parseRatio(formData.get('kansai_normal_ratio') as string),
+      kansai_special_ratio: parseRatio(formData.get('kansai_special_ratio') as string),
     };
     
     try {
