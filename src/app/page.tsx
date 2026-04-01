@@ -97,6 +97,7 @@ interface MainOrder {
   origin: string | null;
   transfer: string | null;
   dest: string | null;
+  second_flight: string | null;
   depart_time: string | null;
   arrive_time: string | null;
   actual_pieces: number | null;
@@ -256,6 +257,7 @@ export default function LogisticsManagement() {
     origin: '',
     transfer: '',
     dest: '',
+    second_flight: '',
     depart_time: '',
     arrive_time: '',
     actual_pieces: '',
@@ -1027,6 +1029,7 @@ export default function LogisticsManagement() {
       origin: toNull(orderForm.origin),
       transfer: toNull(orderForm.transfer),
       dest: toNull(orderForm.dest),
+      second_flight: toNull(orderForm.second_flight),
       depart_time: toNull(orderForm.depart_time),
       arrive_time: toNull(orderForm.arrive_time),
       actual_pieces: toIntOrNull(orderForm.actual_pieces),
@@ -1172,27 +1175,37 @@ export default function LogisticsManagement() {
     return date.toISOString().split('T')[0];
   };
   
-  // 根据航班号+始发港+中转站+目的港匹配路由，自动填充起飞时间和落地时间
+  // 根据航班号+始发港+中转站+目的港匹配路由，自动填充起飞时间、落地时间、二程航班
   const matchRouteAndFillTimes = () => {
     const { flight_no, origin, transfer, dest } = orderForm;
     
-    // 四个字段都有值才匹配
+    // 必填字段校验
     if (!flight_no || !origin || !dest) return;
     
+    // 规范化中转站（空字符串和null视为相同）
+    const normalizedTransfer = (transfer || '').trim();
+    
     // 查找匹配的路由
-    const matchedRoute = routeConfigs.find(r => 
-      r.flight_no === flight_no &&
-      r.origin === origin &&
-      (r.transfer || '') === (transfer || '') &&
-      r.dest === dest
-    );
+    const matchedRoute = routeConfigs.find(r => {
+      const routeTransfer = (r.transfer || '').trim();
+      return (
+        r.flight_no === flight_no &&
+        r.origin === origin &&
+        routeTransfer === normalizedTransfer &&
+        r.dest === dest
+      );
+    });
     
     if (matchedRoute) {
+      console.log('匹配到路由:', matchedRoute);
       setOrderForm(prev => ({
         ...prev,
+        second_flight: matchedRoute.second_flight || '',
         depart_time: matchedRoute.depart_time || '',
         arrive_time: matchedRoute.arrive_time || '',
       }));
+    } else {
+      console.log('未匹配到路由', { flight_no, origin, transfer, dest });
     }
   };
 
@@ -1997,7 +2010,7 @@ export default function LogisticsManagement() {
                 </div>
                 
                 {/* 第六行 */}
-                <div className="grid grid-cols-4 gap-4 mb-4">
+                <div className="grid grid-cols-5 gap-4 mb-4">
                   <div>
                     <Label className="text-sm text-gray-600 mb-1 block">起飞时间</Label>
                     <Input className="bg-gray-100" value={
@@ -2005,6 +2018,11 @@ export default function LogisticsManagement() {
                         ? `${orderForm.actual_flight_date} ${orderForm.depart_time}`
                         : orderForm.depart_time || ''
                     } readOnly placeholder="自动填充" />
+                  </div>
+                  <div>
+                    <Label className="text-sm text-gray-600 mb-1 block">二程航班</Label>
+                    <Input className="bg-gray-100" value={orderForm.second_flight || ''} 
+                      readOnly placeholder="自动填充" />
                   </div>
                   <div>
                     <Label className="text-sm text-gray-600 mb-1 block">到港时间</Label>
@@ -2057,7 +2075,7 @@ export default function LogisticsManagement() {
                     setOrderForm({
                       collect_date: '', depart_date: '', warehouse: '', cargo_type: '', port: '',
                       status: '', pack_req: '', max_volume: '', route_type: '', actual_flight_date: '', main_no: '',
-                      flight_no: '', origin: '', transfer: '', dest: '', depart_time: '', arrive_time: '',
+                      flight_no: '', origin: '', transfer: '', dest: '', second_flight: '', depart_time: '', arrive_time: '',
                       actual_pieces: '', actual_weight: '', actual_volume: '', actual_bills: '', remark: '',
                     });
                     setEditingOrder(null);
@@ -2161,6 +2179,7 @@ export default function LogisticsManagement() {
                                 origin: order.origin || '',
                                 transfer: order.transfer || '',
                                 dest: order.dest || '',
+                                second_flight: order.second_flight || '',
                                 depart_time: order.depart_time || '',
                                 arrive_time: order.arrive_time || '',
                                 actual_pieces: order.actual_pieces?.toString() || '',
@@ -2635,6 +2654,7 @@ export default function LogisticsManagement() {
                   <TableHead className="bg-gray-50 text-center px-2">目的港</TableHead>
                   <TableHead className="bg-gray-50 text-center px-2">打货上限</TableHead>
                   <TableHead className="bg-gray-50 text-center px-2">起飞时间</TableHead>
+                  <TableHead className="bg-gray-50 text-center px-2">二程航班</TableHead>
                   <TableHead className="bg-gray-50 text-center px-2">到港时间</TableHead>
                   <TableHead className="bg-gray-50 text-center px-2">实际件数</TableHead>
                   <TableHead className="bg-gray-50 text-center px-2">实际重量</TableHead>
@@ -2661,6 +2681,7 @@ export default function LogisticsManagement() {
                         ? `${order.actual_flight_date} ${order.depart_time}` 
                         : '-'}
                     </TableCell>
+                    <TableCell className="text-center">{order.second_flight || '-'}</TableCell>
                     <TableCell className="text-center">
                       {order.actual_flight_date && order.arrive_time 
                         ? `${order.actual_flight_date} ${order.arrive_time}` 
@@ -2691,6 +2712,7 @@ export default function LogisticsManagement() {
                             origin: order.origin || '',
                             transfer: order.transfer || '',
                             dest: order.dest || '',
+                            second_flight: order.second_flight || '',
                             depart_time: order.depart_time || '',
                             arrive_time: order.arrive_time || '',
                             actual_pieces: order.actual_pieces?.toString() || '',
