@@ -919,22 +919,54 @@ function getData(k) {
   return localData;
 }
 
-// 保存数据到 API
+// 保存数据到 API（逐条保存）
 async function saveDataToAPI(key, data) {
   try {
     const endpoint = API_ENDPOINTS[key];
-    const res = await fetch(`${API_BASE}${endpoint}`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data)
-    });
+    // 先获取服务器上的数据
+    const res = await fetch(`${API_BASE}${endpoint}`);
     const json = await res.json();
-    if (json.success) {
-      saveDataLocal(key, data); // 同步更新本地缓存
-      return true;
+    const serverData = json.success ? (json.data || []) : [];
+    const serverIds = serverData.map(item => item.id);
+    
+    // 逐条处理
+    for (const item of data) {
+      if (item.id && typeof item.id === 'number') {
+        // 更新已有数据
+        await fetch(`${API_BASE}${endpoint}/${item.id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(item)
+        });
+      } else {
+        // 新增数据（移除临时 id）
+        const newItem = { ...item };
+        delete newItem.id;
+        await fetch(`${API_BASE}${endpoint}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(newItem)
+        });
+      }
     }
-    console.error('保存失败:', json);
-    return false;
+    
+    // 删除服务器上有但本地没有的数据
+    const localIds = data.filter(item => typeof item.id === 'number').map(item => item.id);
+    for (const serverItem of serverData) {
+      if (!localIds.includes(serverItem.id)) {
+        await fetch(`${API_BASE}${endpoint}/${serverItem.id}`, {
+          method: 'DELETE'
+        });
+      }
+    }
+    
+    // 重新获取最新数据
+    const refreshRes = await fetch(`${API_BASE}${endpoint}`);
+    const refreshJson = await refreshRes.json();
+    if (refreshJson.success && refreshJson.data) {
+      saveDataLocal(key, refreshJson.data);
+    }
+    return true;
   } catch (e) {
     console.error('API 保存失败:', e);
     saveDataLocal(key, data); // 降级保存到本地
