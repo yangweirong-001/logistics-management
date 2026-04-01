@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>数据同步测试</title>
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 800px; margin: 50px auto; padding: 20px; }
+    .success { color: green; }
+    .error { color: red; }
+    pre { background: #f5f5f5; padding: 15px; border-radius: 5px; overflow-x: auto; }
+    button { padding: 10px 20px; margin: 10px 5px; cursor: pointer; }
+    input { padding: 8px; margin: 5px; }
+    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+    th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+    th { background: #f5f5f5; }
+  </style>
+</head>
+<body>
+  <h1>数据同步测试页面</h1>
+  <p>当前时间: <span id="time"></span></p>
+  
+  <h2>1. 测试 API 连接</h2>
+  <button onclick="testAPI()">测试 API</button>
+  <div id="api-result"></div>
+  
+  <h2>2. 添加测试数据</h2>
+  <input type="text" id="warehouse" placeholder="仓库名称" value="测试仓库">
+  <button onclick="addData()">添加数据</button>
+  <div id="add-result"></div>
+  
+  <h2>3. 当前数据列表</h2>
+  <button onclick="loadData()">刷新数据</button>
+  <div id="data-list"></div>
+  
+  <script>
+    const API_BASE = window.location.origin;
+    
+    // 显示当前时间
+    document.getElementById('time').textContent = new Date().toLocaleString();
+    
+    async function testAPI() {
+      const resultDiv = document.getElementById('api-result');
+      resultDiv.innerHTML = '<p>测试中...</p>';
+      
+      try {
+        const res = await fetch(`${API_BASE}/api/area-config`);
+        const json = await res.json();
+        
+        if (json.success) {
+          resultDiv.innerHTML = `<p class="success">✅ API 连接成功！</p>
+            <p>数据条数: ${json.data.length}</p>
+            <pre>${JSON.stringify(json.data, null, 2)}</pre>`;
+        } else {
+          resultDiv.innerHTML = `<p class="error">❌ API 返回错误: ${json.error}</p>`;
+        }
+      } catch (e) {
+        resultDiv.innerHTML = `<p class="error">❌ API 连接失败: ${e.message}</p>`;
+      }
+    }
+    
+    async function addData() {
+      const warehouse = document.getElementById('warehouse').value;
+      const resultDiv = document.getElementById('add-result');
+      resultDiv.innerHTML = '<p>保存中...</p>';
+      
+      try {
+        const res = await fetch(`${API_BASE}/api/area-config`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            warehouse: warehouse,
+            package_volume: 0.5,
+            kanto_ratio: 50,
+            kansai_ratio: 50,
+            kanto_normal_ratio: 50,
+            kanto_special_ratio: 50,
+            kansai_normal_ratio: 50,
+            kansai_special_ratio: 50
+          })
+        });
+        const json = await res.json();
+        
+        if (json.success) {
+          resultDiv.innerHTML = `<p class="success">✅ 保存成功！</p>
+            <pre>${JSON.stringify(json.data, null, 2)}</pre>`;
+          loadData(); // 刷新列表
+        } else {
+          resultDiv.innerHTML = `<p class="error">❌ 保存失败: ${json.error}</p>`;
+        }
+      } catch (e) {
+        resultDiv.innerHTML = `<p class="error">❌ 保存失败: ${e.message}</p>`;
+      }
+    }
+    
+    async function loadData() {
+      const listDiv = document.getElementById('data-list');
+      listDiv.innerHTML = '<p>加载中...</p>';
+      
+      try {
+        const res = await fetch(`${API_BASE}/api/area-config`);
+        const json = await res.json();
+        
+        if (json.success && json.data.length > 0) {
+          let html = '<table><thead><tr><th>ID</th><th>仓库</th><th>体积</th><th>创建时间</th></tr></thead><tbody>';
+          json.data.forEach(item => {
+            html += `<tr>
+              <td>${item.id}</td>
+              <td>${item.warehouse}</td>
+              <td>${item.package_volume}</td>
+              <td>${item.created_at}</td>
+            </tr>`;
+          });
+          html += '</tbody></table>';
+          listDiv.innerHTML = html;
+        } else {
+          listDiv.innerHTML = '<p>暂无数据</p>';
+        }
+      } catch (e) {
+        listDiv.innerHTML = `<p class="error">❌ 加载失败: ${e.message}</p>`;
+      }
+    }
+    
+    // 页面加载时自动测试
+    testAPI();
+    loadData();
+  </script>
+</body>
+</html>
