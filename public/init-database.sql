@@ -1,6 +1,6 @@
 -- ============================================
--- 物流管理系统 - 安全数据库初始化脚本
--- 特点：不删除现有数据，仅创建不存在的表
+-- 物流管理系统 - 完整数据库初始化脚本
+-- 在 Supabase SQL Editor 中执行此脚本
 -- ============================================
 
 -- 1. 区域参数配置表
@@ -123,15 +123,7 @@ ALTER TABLE volume_estimates DISABLE ROW LEVEL SECURITY;
 ALTER TABLE main_orders DISABLE ROW LEVEL SECURITY;
 
 -- ============================================
--- 如果需要将现有数据的占比字段改为小数类型
--- 取消下面这段注释后执行（仅执行一次）
+-- 完成！
 -- ============================================
-/*
-ALTER TABLE area_configs 
-  ALTER COLUMN kanto_ratio TYPE DECIMAL(5,2),
-  ALTER COLUMN kansai_ratio TYPE DECIMAL(5,2),
-  ALTER COLUMN kanto_normal_ratio TYPE DECIMAL(5,2),
-  ALTER COLUMN kanto_special_ratio TYPE DECIMAL(5,2),
-  ALTER COLUMN kansai_normal_ratio TYPE DECIMAL(5,2),
-  ALTER COLUMN kansai_special_ratio TYPE DECIMAL(5,2);
-*/
+-- 执行此脚本后，所有数据表已创建完成
+-- 访问 https://projects-roan-beta.vercel.app/ 开始使用
