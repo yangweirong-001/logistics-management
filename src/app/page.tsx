@@ -556,7 +556,7 @@ export default function LogisticsManagement() {
     }
     
     if (editingVolume) {
-      await fetch(`/api/volume-estimate/${editingVolume.id}`, {
+      const response = await fetch(`/api/volume-estimate/${editingVolume.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -576,8 +576,13 @@ export default function LogisticsManagement() {
           is_complete: volumeForm.is_complete,
         }),
       });
+      const result = await response.json();
+      if (!result.success) {
+        alert('保存失败: ' + (result.error || '未知错误'));
+        return;
+      }
     } else {
-      await fetch('/api/volume-estimate', {
+      const response = await fetch('/api/volume-estimate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -597,6 +602,11 @@ export default function LogisticsManagement() {
           is_complete: volumeForm.is_complete,
         }),
       });
+      const result = await response.json();
+      if (!result.success) {
+        alert('保存失败: ' + (result.error || '未知错误'));
+        return;
+      }
     }
     
     loadVolumeEstimates();
