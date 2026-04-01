@@ -656,13 +656,31 @@ export default function LogisticsManagement() {
     const file = e.target.files?.[0];
     if (!file) return;
     
+    // 解析Excel时间格式（数字转时间字符串）
+    const parseExcelTime = (value: unknown): string => {
+      if (value === null || value === undefined || value === '') return '';
+      
+      // 如果已经是字符串，直接返回
+      if (typeof value === 'string') return value.trim();
+      
+      // 如果是数字，转换为时间格式
+      if (typeof value === 'number') {
+        const totalMinutes = Math.round(value * 24 * 60);
+        const hours = Math.floor(totalMinutes / 60) % 24;
+        const minutes = totalMinutes % 60;
+        return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
+      }
+      
+      return String(value);
+    };
+    
     try {
       setSaving(true);
       const data = await file.arrayBuffer();
       const workbook = XLSX.read(data);
       const sheetName = workbook.SheetNames[0];
       const worksheet = workbook.Sheets[sheetName];
-      const jsonData = XLSX.utils.sheet_to_json(worksheet) as Record<string, unknown>[];
+      const jsonData = XLSX.utils.sheet_to_json(worksheet, { raw: false }) as Record<string, unknown>[];
       
       if (jsonData.length === 0) {
         alert('Excel 文件为空或格式不正确');
@@ -675,10 +693,10 @@ export default function LogisticsManagement() {
         origin: String(row['始发'] || row['origin'] || ''),
         transfer: String(row['中转'] || row['transfer'] || ''),
         dest: String(row['目的'] || row['dest'] || ''),
-        depart_time: String(row['起飞时间'] || row['depart_time'] || ''),
-        arrive_time: String(row['落地时间'] || row['arrive_time'] || ''),
+        depart_time: parseExcelTime(row['起飞时间'] || row['depart_time']),
+        arrive_time: parseExcelTime(row['落地时间'] || row['arrive_time']),
         is_next_day: String(row['是否隔天'] || row['is_next_day'] || ''),
-        second_flight: String(row['第二程航班'] || row['second_flight'] || ''),
+        second_flight: String(row['二程航班'] || row['第二程航班'] || row['second_flight'] || ''),
         route_type: String(row['路由'] || row['route_type'] || '空运'),
       })).filter(r => r.flight_no && r.origin && r.dest && r.route_type);
       
@@ -1419,6 +1437,7 @@ export default function LogisticsManagement() {
                       <TableHead>起飞时间</TableHead>
                       <TableHead>落地时间</TableHead>
                       <TableHead>是否隔天</TableHead>
+                      <TableHead>二程航班</TableHead>
                       <TableHead>路由</TableHead>
                       <TableHead>操作</TableHead>
                     </TableRow>
@@ -1433,6 +1452,7 @@ export default function LogisticsManagement() {
                         <TableCell>{config.depart_time || '-'}</TableCell>
                         <TableCell>{config.arrive_time || '-'}</TableCell>
                         <TableCell>{config.is_next_day || '-'}</TableCell>
+                        <TableCell>{config.second_flight || '-'}</TableCell>
                         <TableCell>
                           <Badge variant={config.route_type === '空运' ? 'default' : 'secondary'}>
                             {config.route_type}
