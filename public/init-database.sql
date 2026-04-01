@@ -1,20 +1,10 @@
 -- ============================================
--- 物流管理系统 - 完整数据库初始化脚本
--- 在 Supabase SQL Editor 中执行此脚本
+-- 物流管理系统 - 安全数据库初始化脚本
+-- 特点：不删除现有数据，仅创建不存在的表
 -- ============================================
 
--- 删除所有旧表（如果存在）
-DROP TABLE IF EXISTS main_orders CASCADE;
-DROP TABLE IF EXISTS volume_estimates CASCADE;
-DROP TABLE IF EXISTS route_configs CASCADE;
-DROP TABLE IF EXISTS port_configs CASCADE;
-DROP TABLE IF EXISTS flight_configs CASCADE;
-DROP TABLE IF EXISTS area_configs CASCADE;
-
--- ============================================
 -- 1. 区域参数配置表
--- ============================================
-CREATE TABLE area_configs (
+CREATE TABLE IF NOT EXISTS area_configs (
   id SERIAL PRIMARY KEY,
   warehouse TEXT NOT NULL,
   package_volume DECIMAL(12,6) NOT NULL DEFAULT 0,
@@ -28,10 +18,8 @@ CREATE TABLE area_configs (
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- ============================================
 -- 2. 航班配置表
--- ============================================
-CREATE TABLE flight_configs (
+CREATE TABLE IF NOT EXISTS flight_configs (
   id SERIAL PRIMARY KEY,
   warehouse TEXT NOT NULL,
   weekday TEXT NOT NULL,
@@ -44,10 +32,8 @@ CREATE TABLE flight_configs (
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- ============================================
 -- 3. 目的港配置表
--- ============================================
-CREATE TABLE port_configs (
+CREATE TABLE IF NOT EXISTS port_configs (
   id SERIAL PRIMARY KEY,
   port_code TEXT NOT NULL,
   region TEXT NOT NULL,
@@ -55,10 +41,8 @@ CREATE TABLE port_configs (
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- ============================================
 -- 4. 航空路由配置表
--- ============================================
-CREATE TABLE route_configs (
+CREATE TABLE IF NOT EXISTS route_configs (
   id SERIAL PRIMARY KEY,
   flight_no TEXT NOT NULL,
   origin TEXT NOT NULL,
@@ -73,10 +57,8 @@ CREATE TABLE route_configs (
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- ============================================
 -- 5. 方数预估表
--- ============================================
-CREATE TABLE volume_estimates (
+CREATE TABLE IF NOT EXISTS volume_estimates (
   id SERIAL PRIMARY KEY,
   collect_date DATE NOT NULL,
   weekday TEXT,
@@ -96,10 +78,8 @@ CREATE TABLE volume_estimates (
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- ============================================
 -- 6. 主单发放表
--- ============================================
-CREATE TABLE main_orders (
+CREATE TABLE IF NOT EXISTS main_orders (
   id SERIAL PRIMARY KEY,
   collect_date DATE NOT NULL,
   collect_weekday TEXT,
@@ -134,9 +114,7 @@ CREATE TABLE main_orders (
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- ============================================
 -- 禁用 RLS（简化权限控制）
--- ============================================
 ALTER TABLE area_configs DISABLE ROW LEVEL SECURITY;
 ALTER TABLE flight_configs DISABLE ROW LEVEL SECURITY;
 ALTER TABLE port_configs DISABLE ROW LEVEL SECURITY;
@@ -145,7 +123,15 @@ ALTER TABLE volume_estimates DISABLE ROW LEVEL SECURITY;
 ALTER TABLE main_orders DISABLE ROW LEVEL SECURITY;
 
 -- ============================================
--- 完成！
+-- 如果需要将现有数据的占比字段改为小数类型
+-- 取消下面这段注释后执行（仅执行一次）
 -- ============================================
--- 执行此脚本后，所有数据表已创建完成
--- 访问 https://projects-roan-beta.vercel.app/ 开始使用
+/*
+ALTER TABLE area_configs 
+  ALTER COLUMN kanto_ratio TYPE DECIMAL(5,2),
+  ALTER COLUMN kansai_ratio TYPE DECIMAL(5,2),
+  ALTER COLUMN kanto_normal_ratio TYPE DECIMAL(5,2),
+  ALTER COLUMN kanto_special_ratio TYPE DECIMAL(5,2),
+  ALTER COLUMN kansai_normal_ratio TYPE DECIMAL(5,2),
+  ALTER COLUMN kansai_special_ratio TYPE DECIMAL(5,2);
+*/
