@@ -872,13 +872,115 @@
   </div>
 
 <script>
+// ==================== API 配置 ====================
+// 自动检测当前域名，用于 API 调用
+const API_BASE = window.location.origin;
+const USE_API = true; // 使用云端 API，数据会同步到 Supabase
+
 // ==================== 数据存储 ====================
 const KEYS = { AREA: 'lg_area', FLIGHT: 'lg_flight', PORT: 'lg_port', ROUTE: 'lg_route', VOL: 'lg_vol', ORDER: 'lg_order' };
-const getData = k => JSON.parse(localStorage.getItem(k) || '[]');
-const saveData = (k, d) => localStorage.setItem(k, JSON.stringify(d));
+
+// API 端点映射
+const API_ENDPOINTS = {
+  [KEYS.AREA]: '/api/area-config',
+  [KEYS.FLIGHT]: '/api/flight-config',
+  [KEYS.PORT]: '/api/port-config',
+  [KEYS.ROUTE]: '/api/route-config',
+  [KEYS.VOL]: '/api/volume-estimate',
+  [KEYS.ORDER]: '/api/main-order'
+};
+
+// 本地存储（作为缓存）
+const getDataLocal = k => JSON.parse(localStorage.getItem(k) || '[]');
+const saveDataLocal = (k, d) => localStorage.setItem(k, JSON.stringify(d));
+
+// 从 API 获取数据
+async function getDataFromAPI(key) {
+  try {
+    const res = await fetch(`${API_BASE}${API_ENDPOINTS[key]}`);
+    const json = await res.json();
+    if (json.success && json.data) {
+      saveDataLocal(key, json.data); // 缓存到本地
+      return json.data;
+    }
+    return [];
+  } catch (e) {
+    console.error('API 获取失败，使用本地缓存:', e);
+    return getDataLocal(key);
+  }
+}
+
+// 同步获取数据（优先从本地缓存获取，后台更新）
+function getData(k) {
+  // 立即返回本地缓存
+  const localData = getDataLocal(k);
+  // 后台从 API 更新
+  getDataFromAPI(k);
+  return localData;
+}
+
+// 保存数据到 API
+async function saveDataToAPI(key, data) {
+  try {
+    const endpoint = API_ENDPOINTS[key];
+    const res = await fetch(`${API_BASE}${endpoint}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    });
+    const json = await res.json();
+    if (json.success) {
+      saveDataLocal(key, data); // 同步更新本地缓存
+      return true;
+    }
+    console.error('保存失败:', json);
+    return false;
+  } catch (e) {
+    console.error('API 保存失败:', e);
+    saveDataLocal(key, data); // 降级保存到本地
+    return false;
+  }
+}
+
+// 删除 API 数据
+async function deleteFromAPI(key, id) {
+  try {
+    const endpoint = API_ENDPOINTS[key];
+    const res = await fetch(`${API_BASE}${endpoint}/${id}`, {
+      method: 'DELETE'
+    });
+    const json = await res.json();
+    if (json.success) {
+      // 更新本地缓存
+      const localData = getDataLocal(key).filter(item => item.id !== id);
+      saveDataLocal(key, localData);
+      return true;
+    }
+    return false;
+  } catch (e) {
+    console.error('API 删除失败:', e);
+    return false;
+  }
+}
+
+// 同步保存（兼容旧代码）
+function saveData(k, d) {
+  saveDataLocal(k, d); // 立即保存到本地
+  saveDataToAPI(k, d); // 异步同步到 API
+}
+
 const genId = () => Date.now().toString(36) + Math.random().toString(36).substr(2);
 const getWeekday = d => ['周日','周一','周二','周三','周四','周五','周六'][new Date(d).getDay()];
 const addDays = (d, n) => { const dt = new Date(d); dt.setDate(dt.getDate()+n); return dt.toISOString().split('T')[0]; };
+
+// 页面加载时从 API 刷新数据
+async function refreshAllData() {
+  for (const key of Object.values(KEYS)) {
+    await getDataFromAPI(key);
+  }
+}
+// 启动时刷新所有数据
+refreshAllData();
 
 // ==================== 下载功能 ====================
 function downloadHTML() {
