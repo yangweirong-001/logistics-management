@@ -8,11 +8,27 @@ interface SupabaseCredentials {
   anonKey: string;
 }
 
+// 检测是否在 Vercel 环境
+function isVercelEnvironment(): boolean {
+  return !!(process.env.VERCEL || process.env.NEXT_PUBLIC_VERCEL_URL);
+}
+
 function loadEnv(): void {
   if (envLoaded || (process.env.COZE_SUPABASE_URL && process.env.COZE_SUPABASE_ANON_KEY)) {
     return;
   }
 
+  // Vercel 环境：直接使用 process.env（Vercel 会自动注入环境变量）
+  if (isVercelEnvironment()) {
+    if (process.env.COZE_SUPABASE_URL && process.env.COZE_SUPABASE_ANON_KEY) {
+      envLoaded = true;
+      return;
+    }
+    // 环境变量未设置，稍后在 getSupabaseCredentials 中抛出错误
+    return;
+  }
+
+  // 沙箱环境：使用 Python 获取环境变量
   try {
     try {
       require('dotenv').config();
