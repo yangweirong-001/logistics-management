@@ -18,12 +18,12 @@ CREATE TABLE area_configs (
   id SERIAL PRIMARY KEY,
   warehouse TEXT NOT NULL,
   package_volume DECIMAL(12,6) NOT NULL DEFAULT 0,
-  kanto_ratio INTEGER NOT NULL DEFAULT 0,
-  kansai_ratio INTEGER NOT NULL DEFAULT 0,
-  kanto_normal_ratio INTEGER NOT NULL DEFAULT 0,
-  kanto_special_ratio INTEGER NOT NULL DEFAULT 0,
-  kansai_normal_ratio INTEGER NOT NULL DEFAULT 0,
-  kansai_special_ratio INTEGER NOT NULL DEFAULT 0,
+  kanto_ratio DECIMAL(5,2) NOT NULL DEFAULT 0,
+  kansai_ratio DECIMAL(5,2) NOT NULL DEFAULT 0,
+  kanto_normal_ratio DECIMAL(5,2) NOT NULL DEFAULT 0,
+  kanto_special_ratio DECIMAL(5,2) NOT NULL DEFAULT 0,
+  kansai_normal_ratio DECIMAL(5,2) NOT NULL DEFAULT 0,
+  kansai_special_ratio DECIMAL(5,2) NOT NULL DEFAULT 0,
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
