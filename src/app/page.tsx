@@ -2024,7 +2024,7 @@ export default function LogisticsManagement() {
               </div>
               <div>
                 <Label>大包预估体积（方数）</Label>
-                <Input name="package_volume" type="number" step="0.01" defaultValue={editingArea?.package_volume} />
+                <Input name="package_volume" type="number" step="any" placeholder="支持12位小数" defaultValue={editingArea?.package_volume} />
               </div>
               <div>
                 <Label>关东目的港占比（%）</Label>
