@@ -212,6 +212,9 @@ export default function LogisticsManagement() {
   const [volumeHistoryOpen, setVolumeHistoryOpen] = useState(false);
   const [orderListOpen, setOrderListOpen] = useState(false);
   
+  // 搜索状态
+  const [flightSearchQuery, setFlightSearchQuery] = useState('');
+  
   // 编辑状态
   const [editingArea, setEditingArea] = useState<AreaConfig | null>(null);
   const [editingFlight, setEditingFlight] = useState<FlightConfig | null>(null);
@@ -1215,9 +1218,17 @@ export default function LogisticsManagement() {
             <Card className="mb-5">
               <CardHeader className="flex flex-row items-center justify-between">
                 <CardTitle>航班配置</CardTitle>
-                <Button onClick={() => { setEditingFlight(null); setFlightModalOpen(true); }}>
-                  新增配置
-                </Button>
+                <div className="flex gap-3">
+                  <Input
+                    placeholder="搜索仓库/周几..."
+                    value={flightSearchQuery}
+                    onChange={(e) => setFlightSearchQuery(e.target.value)}
+                    className="w-48"
+                  />
+                  <Button onClick={() => { setEditingFlight(null); setFlightModalOpen(true); }}>
+                    新增配置
+                  </Button>
+                </div>
               </CardHeader>
               <CardContent>
                 <Table>
@@ -1234,7 +1245,13 @@ export default function LogisticsManagement() {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {flightConfigs.map(config => (
+                    {flightConfigs
+                      .filter(config => 
+                        !flightSearchQuery || 
+                        config.warehouse.includes(flightSearchQuery) || 
+                        config.weekday.includes(flightSearchQuery)
+                      )
+                      .map(config => (
                       <TableRow key={config.id}>
                         <TableCell>{config.warehouse}</TableCell>
                         <TableCell>{config.weekday}</TableCell>
