@@ -416,9 +416,12 @@ export default function LogisticsManagement() {
   
   // 区域参数配置操作
   const saveAreaConfig = async (formData: FormData) => {
+    // 大包预估体积保留12位小数
+    const packageVolumeValue = parseFloat(formData.get('package_volume') as string) || 0;
+    
     const data = {
       warehouse: formData.get('warehouse') as string,
-      package_volume: formData.get('package_volume') as string,
+      package_volume: packageVolumeValue.toFixed(12),
       kanto_ratio: formData.get('kanto_ratio') as string,
       kansai_ratio: formData.get('kansai_ratio') as string,
       kanto_normal_ratio: formData.get('kanto_normal_ratio') as string,
