@@ -949,13 +949,13 @@ async function apiDelete(endpoint, id) {
 
 // ==================== 兼容旧接口 ====================
 function getData(key) {
-  const endpoint = KEYS[key];
-  return localCache[endpoint] || [];
+  // key 已经是 endpoint，直接返回缓存
+  return localCache[key] || [];
 }
 
 function saveData(key, data) {
   // 这个函数现在只用于本地缓存，实际保存通过单独的 API 调用
-  localCache[KEYS[key]] = data;
+  localCache[key] = data;
 }
 
 // ==================== 区域配置操作 ====================
