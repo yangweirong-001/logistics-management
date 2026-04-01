@@ -271,6 +271,9 @@ export default function LogisticsManagement() {
     surplus: number;
   }>>([]);
   
+  // 全局保存加载状态
+  const [saving, setSaving] = useState(false);
+  
   // 加载数据
   const loadAreaConfigs = async () => {
     const res = await fetch('/api/area-config');
@@ -431,6 +434,7 @@ export default function LogisticsManagement() {
     };
     
     try {
+      setSaving(true);
       let response;
       if (editingArea) {
         response = await fetch(`/api/area-config/${editingArea.id}`, {
@@ -455,6 +459,8 @@ export default function LogisticsManagement() {
       loadAreaConfigs();
     } catch (err) {
       alert('保存失败: ' + (err instanceof Error ? err.message : '网络错误'));
+    } finally {
+      setSaving(false);
     }
   };
   
@@ -483,6 +489,7 @@ export default function LogisticsManagement() {
     };
     
     try {
+      setSaving(true);
       let response;
       if (editingFlight) {
         response = await fetch(`/api/flight-config/${editingFlight.id}`, {
@@ -507,6 +514,8 @@ export default function LogisticsManagement() {
       loadFlightConfigs();
     } catch (err) {
       alert('保存失败: ' + (err instanceof Error ? err.message : '网络错误'));
+    } finally {
+      setSaving(false);
     }
   };
   
@@ -530,6 +539,7 @@ export default function LogisticsManagement() {
     };
     
     try {
+      setSaving(true);
       let response;
       if (editingPort) {
         response = await fetch(`/api/port-config/${editingPort.id}`, {
@@ -554,6 +564,8 @@ export default function LogisticsManagement() {
       loadPortConfigs();
     } catch (err) {
       alert('保存失败: ' + (err instanceof Error ? err.message : '网络错误'));
+    } finally {
+      setSaving(false);
     }
   };
   
@@ -584,6 +596,7 @@ export default function LogisticsManagement() {
     };
     
     try {
+      setSaving(true);
       let response;
       if (editingRoute) {
         response = await fetch(`/api/route-config/${editingRoute.id}`, {
@@ -608,6 +621,8 @@ export default function LogisticsManagement() {
       loadRouteConfigs();
     } catch (err) {
       alert('保存失败: ' + (err instanceof Error ? err.message : '网络错误'));
+    } finally {
+      setSaving(false);
     }
   };
   
@@ -640,6 +655,8 @@ export default function LogisticsManagement() {
       alert('请先配置该仓库的区域参数');
       return;
     }
+    
+    setSaving(true);
     
     const packageVolume = parseFloat(areaConfig.package_volume);
     const packageCount = volumeForm.package_count;
@@ -676,65 +693,71 @@ export default function LogisticsManagement() {
       else if (flightConfig.kansai_special === '海空') seaAirVolume += kansaiSpecial;
     }
     
-    if (editingVolume) {
-      const response = await fetch(`/api/volume-estimate/${editingVolume.id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          collect_date: volumeForm.collect_date,
-          weekday,
-          warehouse: volumeForm.warehouse,
-          package_count: volumeForm.package_count,
-          total_volume: totalVolume.toFixed(3),
-          kanto_total: kantoTotal.toFixed(3),
-          kansai_total: kansaiTotal.toFixed(3),
-          kanto_normal: kantoNormal.toFixed(3),
-          kanto_special: kantoSpecial.toFixed(3),
-          kansai_normal: kansaiNormal.toFixed(3),
-          kansai_special: kansaiSpecial.toFixed(3),
-          air_volume: airVolume.toFixed(3),
-          sea_air_volume: seaAirVolume.toFixed(3),
-          is_complete: volumeForm.is_complete,
-        }),
-      });
-      const result = await response.json();
-      if (!result.success) {
-        alert('保存失败: ' + (result.error || '未知错误'));
-        return;
+    try {
+      if (editingVolume) {
+        const response = await fetch(`/api/volume-estimate/${editingVolume.id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            collect_date: volumeForm.collect_date,
+            weekday,
+            warehouse: volumeForm.warehouse,
+            package_count: volumeForm.package_count,
+            total_volume: totalVolume.toFixed(3),
+            kanto_total: kantoTotal.toFixed(3),
+            kansai_total: kansaiTotal.toFixed(3),
+            kanto_normal: kantoNormal.toFixed(3),
+            kanto_special: kantoSpecial.toFixed(3),
+            kansai_normal: kansaiNormal.toFixed(3),
+            kansai_special: kansaiSpecial.toFixed(3),
+            air_volume: airVolume.toFixed(3),
+            sea_air_volume: seaAirVolume.toFixed(3),
+            is_complete: volumeForm.is_complete,
+          }),
+        });
+        const result = await response.json();
+        if (!result.success) {
+          alert('保存失败: ' + (result.error || '未知错误'));
+          return;
+        }
+      } else {
+        const response = await fetch('/api/volume-estimate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            collect_date: volumeForm.collect_date,
+            weekday,
+            warehouse: volumeForm.warehouse,
+            package_count: volumeForm.package_count,
+            total_volume: totalVolume.toFixed(3),
+            kanto_total: kantoTotal.toFixed(3),
+            kansai_total: kansaiTotal.toFixed(3),
+            kanto_normal: kantoNormal.toFixed(3),
+            kanto_special: kantoSpecial.toFixed(3),
+            kansai_normal: kansaiNormal.toFixed(3),
+            kansai_special: kansaiSpecial.toFixed(3),
+            air_volume: airVolume.toFixed(3),
+            sea_air_volume: seaAirVolume.toFixed(3),
+            is_complete: volumeForm.is_complete,
+          }),
+        });
+        const result = await response.json();
+        if (!result.success) {
+          alert('保存失败: ' + (result.error || '未知错误'));
+          return;
+        }
       }
-    } else {
-      const response = await fetch('/api/volume-estimate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          collect_date: volumeForm.collect_date,
-          weekday,
-          warehouse: volumeForm.warehouse,
-          package_count: volumeForm.package_count,
-          total_volume: totalVolume.toFixed(3),
-          kanto_total: kantoTotal.toFixed(3),
-          kansai_total: kansaiTotal.toFixed(3),
-          kanto_normal: kantoNormal.toFixed(3),
-          kanto_special: kantoSpecial.toFixed(3),
-          kansai_normal: kansaiNormal.toFixed(3),
-          kansai_special: kansaiSpecial.toFixed(3),
-          air_volume: airVolume.toFixed(3),
-          sea_air_volume: seaAirVolume.toFixed(3),
-          is_complete: volumeForm.is_complete,
-        }),
-      });
-      const result = await response.json();
-      if (!result.success) {
-        alert('保存失败: ' + (result.error || '未知错误'));
-        return;
-      }
+      
+      loadVolumeEstimates();
+      setEditingVolume(null);
+      setVolumeForm({ collect_date: '', warehouse: '', package_count: 0, is_complete: '是' });
+      setVolumeResult(null);
+      alert('保存成功！');
+    } catch (err) {
+      alert('保存失败: ' + (err instanceof Error ? err.message : '网络错误'));
+    } finally {
+      setSaving(false);
     }
-    
-    loadVolumeEstimates();
-    setEditingVolume(null);
-    setVolumeForm({ collect_date: '', warehouse: '', package_count: 0, is_complete: '是' });
-    setVolumeResult(null);
-    alert('保存成功！');
   };
   
   // 编辑方数预估记录
@@ -856,6 +879,7 @@ export default function LogisticsManagement() {
     };
     
     try {
+      setSaving(true);
       let response;
       if (editingOrder) {
         response = await fetch(`/api/main-order/${editingOrder.id}`, {
@@ -881,6 +905,8 @@ export default function LogisticsManagement() {
       }
     } catch (err) {
       alert('保存失败: ' + (err instanceof Error ? err.message : '网络错误'));
+    } finally {
+      setSaving(false);
     }
     setEditingOrder(null);
   };
@@ -1038,7 +1064,15 @@ export default function LogisticsManagement() {
   };
 
   return (
-    <div className="flex min-h-screen bg-gray-100">
+    <>
+      {/* 全局保存加载提示 */}
+      {saving && (
+        <div className="fixed top-0 left-0 right-0 z-50 bg-blue-500 text-white py-2 text-center font-medium shadow-lg">
+          <span className="inline-block animate-pulse mr-2">●</span>
+          保存中，请稍候...
+        </div>
+      )}
+      <div className="flex min-h-screen bg-gray-100">
       {/* 侧边栏 */}
       <aside className="w-60 bg-slate-900 text-white flex flex-col">
         <div className="p-5 text-lg font-bold border-b border-white/10 text-center">
@@ -2441,5 +2475,6 @@ export default function LogisticsManagement() {
         </DialogContent>
       </Dialog>
     </div>
+    </>
   );
 }

@@ -2,6 +2,7 @@ import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import { execSync } from 'child_process';
 
 let envLoaded = false;
+let supabaseClient: SupabaseClient | null = null;
 
 interface SupabaseCredentials {
   url: string;
@@ -24,7 +25,6 @@ function loadEnv(): void {
       envLoaded = true;
       return;
     }
-    // 环境变量未设置，稍后在 getSupabaseCredentials 中抛出错误
     return;
   }
 
@@ -100,6 +100,11 @@ function getSupabaseCredentials(): SupabaseCredentials {
 }
 
 function getSupabaseClient(token?: string): SupabaseClient {
+  // 使用单例模式，避免重复创建客户端
+  if (supabaseClient && !token) {
+    return supabaseClient;
+  }
+
   const { url, anonKey } = getSupabaseCredentials();
 
   if (token) {
@@ -108,7 +113,7 @@ function getSupabaseClient(token?: string): SupabaseClient {
         headers: { Authorization: `Bearer ${token}` },
       },
       db: {
-        timeout: 60000,
+        timeout: 10000, // 减少到10秒
       },
       auth: {
         autoRefreshToken: false,
@@ -117,15 +122,17 @@ function getSupabaseClient(token?: string): SupabaseClient {
     });
   }
 
-  return createClient(url, anonKey, {
+  supabaseClient = createClient(url, anonKey, {
     db: {
-      timeout: 60000,
+      timeout: 10000, // 减少到10秒
     },
     auth: {
       autoRefreshToken: false,
       persistSession: false,
     },
   });
+
+  return supabaseClient;
 }
 
 export { loadEnv, getSupabaseCredentials, getSupabaseClient };
