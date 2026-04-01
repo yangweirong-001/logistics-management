@@ -284,6 +284,10 @@ export default function LogisticsManagement() {
     surplus: number;
   }>>([]);
   
+  // 主单查询条件
+  const [orderQueryDate, setOrderQueryDate] = useState('');
+  const [orderQueryWarehouse, setOrderQueryWarehouse] = useState('全部');
+  
   // 全局保存加载状态
   const [saving, setSaving] = useState(false);
   
@@ -332,6 +336,28 @@ export default function LogisticsManagement() {
     const res = await fetch(url);
     const data = await res.json();
     if (data.success) setMainOrders(data.data);
+  };
+  
+  // 主单查询
+  const queryMainOrders = async () => {
+    let url = '/api/main-order';
+    const params = new URLSearchParams();
+    if (orderQueryDate) {
+      params.append('collectDate', orderQueryDate);
+    }
+    if (params.toString()) {
+      url += `?${params.toString()}`;
+    }
+    const res = await fetch(url);
+    const data = await res.json();
+    if (data.success) {
+      let results = data.data;
+      // 前端过滤仓库
+      if (orderQueryWarehouse && orderQueryWarehouse !== '全部') {
+        results = results.filter((o: MainOrder) => o.warehouse === orderQueryWarehouse);
+      }
+      setMainOrders(results);
+    }
   };
   
   const filterOrders = (collectDate: string, warehouse: string, port: string, cargoType: string) => {
@@ -1061,6 +1087,13 @@ export default function LogisticsManagement() {
         alert('保存成功！');
         setEditingOrder(null);
         loadMainOrders();
+        // 清空表单
+        setOrderForm({
+          collect_date: '', depart_date: '', warehouse: '', cargo_type: '', port: '',
+          status: '', pack_req: '', max_volume: '', route_type: '', actual_flight_date: '', main_no: '',
+          flight_no: '', origin: '', transfer: '', dest: '', second_flight: '', depart_time: '', arrive_time: '',
+          actual_pieces: '', actual_weight: '', actual_volume: '', actual_bills: '', remark: '',
+        });
       } else {
         alert('保存失败: ' + (result.error || '未知错误'));
       }
@@ -2104,25 +2137,22 @@ export default function LogisticsManagement() {
                 <div className="grid grid-cols-4 gap-4 mb-4">
                   <div>
                     <Label>揽收日期</Label>
-                    <Input type="date" id="query-order-date" />
+                    <Input type="date" value={orderQueryDate} 
+                      onChange={e => setOrderQueryDate(e.target.value)} />
                   </div>
                   <div>
                     <Label>仓库</Label>
-                    <Select>
+                    <Select value={orderQueryWarehouse} onValueChange={v => setOrderQueryWarehouse(v)}>
                       <SelectTrigger><SelectValue placeholder="全部" /></SelectTrigger>
                       <SelectContent>
+                        <SelectItem value="全部">全部</SelectItem>
                         <SelectItem value="东莞">东莞</SelectItem>
                         <SelectItem value="加工区">加工区</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
                   <div className="flex items-end">
-                    <Button onClick={async () => {
-                      const date = (document.getElementById('query-order-date') as HTMLInputElement).value;
-                      const res = await fetch(`/api/main-order?collectDate=${date}`);
-                      const data = await res.json();
-                      if (data.success) setMainOrders(data.data);
-                    }}>查询</Button>
+                    <Button onClick={queryMainOrders}>查询</Button>
                   </div>
                 </div>
               </CardContent>
