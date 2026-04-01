@@ -943,10 +943,18 @@ export default function LogisticsManagement() {
     
     const category = `${orderForm.port}${orderForm.cargo_type}`;
     
-    // 计算预估方数
-    const estimate = volumeEstimates.find(
+    // 计算预估方数 - 先查当天，没有则查前一天
+    let estimate = volumeEstimates.find(
       e => e.collect_date === orderForm.collect_date && e.warehouse === orderForm.warehouse
     );
+    
+    // 如果当天没有数据，查找前一天
+    if (!estimate) {
+      const prevDate = addDays(orderForm.collect_date, -1);
+      estimate = volumeEstimates.find(
+        e => e.collect_date === prevDate && e.warehouse === orderForm.warehouse
+      );
+    }
     
     let estVolume = 0;
     let estPieces: number | null = null;
@@ -1164,18 +1172,31 @@ export default function LogisticsManagement() {
     return date.toISOString().split('T')[0];
   };
   
-  // 填充航班信息
+  // 填充航班信息（根据航班号和目的港筛选）
   const fillFlightInfo = (flightNo: string) => {
-    const route = routeConfigs.find(r => r.flight_no === flightNo);
-    if (route) {
+    // 先根据目的港获取对应的机场代码
+    const portCodesForRegion = portConfigs
+      .filter(p => p.region === orderForm.port)
+      .map(p => p.port_code);
+    
+    // 找到航班号匹配且目的港在对应区域的路由
+    const route = routeConfigs.find(r => 
+      r.flight_no === flightNo && 
+      (portCodesForRegion.length === 0 || portCodesForRegion.includes(r.dest))
+    );
+    
+    // 如果没找到，则找第一个航班号匹配的
+    const finalRoute = route || routeConfigs.find(r => r.flight_no === flightNo);
+    
+    if (finalRoute) {
       setOrderForm(prev => ({
         ...prev,
         flight_no: flightNo,
-        origin: route.origin,
-        transfer: route.transfer || '',
-        dest: route.dest,
-        depart_time: route.depart_time || '',
-        arrive_time: route.arrive_time || '',
+        origin: finalRoute.origin,
+        transfer: finalRoute.transfer || '',
+        dest: finalRoute.dest,
+        depart_time: finalRoute.depart_time || '',
+        arrive_time: finalRoute.arrive_time || '',
       }));
     }
   };
