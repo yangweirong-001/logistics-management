@@ -2185,6 +2185,8 @@ export default function LogisticsManagement() {
                       <TableHead className="text-center px-2">预计落地</TableHead>
                       <TableHead className="text-center px-2">打货上限(方)</TableHead>
                       <TableHead className="text-center px-2">打货上限(件)</TableHead>
+                      <TableHead className="text-center px-2">实际件数</TableHead>
+                      <TableHead className="text-center px-2">实际方数</TableHead>
                       <TableHead className="text-center px-2">操作</TableHead>
                     </TableRow>
                   </TableHeader>
@@ -2213,6 +2215,8 @@ export default function LogisticsManagement() {
                         </TableCell>
                         <TableCell className="text-center px-2">{order.max_volume || '-'}</TableCell>
                         <TableCell className="text-center px-2">{order.max_pieces || '-'}</TableCell>
+                        <TableCell className="text-center px-2">{order.actual_pieces || '-'}</TableCell>
+                        <TableCell className="text-center px-2">{order.actual_volume || '-'}</TableCell>
                         <TableCell className="text-center px-2">
                           <Button size="sm" variant="outline" className="mr-2"
                             onClick={() => {
