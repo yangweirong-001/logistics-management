@@ -873,146 +873,269 @@
 
 <script>
 // ==================== API 配置 ====================
-// 自动检测当前域名，用于 API 调用
 const API_BASE = window.location.origin;
-const USE_API = true; // 使用云端 API，数据会同步到 Supabase
 
-// ==================== 数据存储 ====================
-const KEYS = { AREA: 'lg_area', FLIGHT: 'lg_flight', PORT: 'lg_port', ROUTE: 'lg_route', VOL: 'lg_vol', ORDER: 'lg_order' };
-
-// API 端点映射
-const API_ENDPOINTS = {
-  [KEYS.AREA]: '/api/area-config',
-  [KEYS.FLIGHT]: '/api/flight-config',
-  [KEYS.PORT]: '/api/port-config',
-  [KEYS.ROUTE]: '/api/route-config',
-  [KEYS.VOL]: '/api/volume-estimate',
-  [KEYS.ORDER]: '/api/main-order'
+// ==================== 数据存储键 ====================
+const KEYS = { 
+  AREA: 'area-config', 
+  FLIGHT: 'flight-config', 
+  PORT: 'port-config', 
+  ROUTE: 'route-config', 
+  VOL: 'volume-estimate', 
+  ORDER: 'main-order' 
 };
 
-// 本地存储（作为缓存）
-const getDataLocal = k => JSON.parse(localStorage.getItem(k) || '[]');
-const saveDataLocal = (k, d) => localStorage.setItem(k, JSON.stringify(d));
+// ==================== 本地缓存 ====================
+const localCache = {};
 
-// 从 API 获取数据
-async function getDataFromAPI(key) {
+// ==================== API 操作 ====================
+async function apiGet(endpoint) {
   try {
-    const res = await fetch(`${API_BASE}${API_ENDPOINTS[key]}`);
+    const res = await fetch(`${API_BASE}/api/${endpoint}`);
     const json = await res.json();
-    if (json.success && json.data) {
-      saveDataLocal(key, json.data); // 缓存到本地
-      return json.data;
+    if (json.success) {
+      localCache[endpoint] = json.data || [];
+      return json.data || [];
     }
     return [];
   } catch (e) {
-    console.error('API 获取失败，使用本地缓存:', e);
-    return getDataLocal(key);
+    console.error('API GET 失败:', endpoint, e);
+    return localCache[endpoint] || [];
   }
 }
 
-// 同步获取数据（优先从本地缓存获取，后台更新）
-function getData(k) {
-  // 立即返回本地缓存
-  const localData = getDataLocal(k);
-  // 后台从 API 更新
-  getDataFromAPI(k);
-  return localData;
-}
-
-// 保存数据到 API（逐条保存）
-async function saveDataToAPI(key, data) {
+async function apiPost(endpoint, data) {
   try {
-    const endpoint = API_ENDPOINTS[key];
-    // 先获取服务器上的数据
-    const res = await fetch(`${API_BASE}${endpoint}`);
+    const res = await fetch(`${API_BASE}/api/${endpoint}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    });
     const json = await res.json();
-    const serverData = json.success ? (json.data || []) : [];
-    const serverIds = serverData.map(item => item.id);
-    
-    // 逐条处理
-    for (const item of data) {
-      if (item.id && typeof item.id === 'number') {
-        // 更新已有数据
-        await fetch(`${API_BASE}${endpoint}/${item.id}`, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(item)
-        });
-      } else {
-        // 新增数据（移除临时 id）
-        const newItem = { ...item };
-        delete newItem.id;
-        await fetch(`${API_BASE}${endpoint}`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(newItem)
-        });
-      }
-    }
-    
-    // 删除服务器上有但本地没有的数据
-    const localIds = data.filter(item => typeof item.id === 'number').map(item => item.id);
-    for (const serverItem of serverData) {
-      if (!localIds.includes(serverItem.id)) {
-        await fetch(`${API_BASE}${endpoint}/${serverItem.id}`, {
-          method: 'DELETE'
-        });
-      }
-    }
-    
-    // 重新获取最新数据
-    const refreshRes = await fetch(`${API_BASE}${endpoint}`);
-    const refreshJson = await refreshRes.json();
-    if (refreshJson.success && refreshJson.data) {
-      saveDataLocal(key, refreshJson.data);
-    }
-    return true;
+    return json.success;
   } catch (e) {
-    console.error('API 保存失败:', e);
-    saveDataLocal(key, data); // 降级保存到本地
+    console.error('API POST 失败:', endpoint, e);
     return false;
   }
 }
 
-// 删除 API 数据
-async function deleteFromAPI(key, id) {
+async function apiPut(endpoint, id, data) {
   try {
-    const endpoint = API_ENDPOINTS[key];
-    const res = await fetch(`${API_BASE}${endpoint}/${id}`, {
+    const res = await fetch(`${API_BASE}/api/${endpoint}/${id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    });
+    const json = await res.json();
+    return json.success;
+  } catch (e) {
+    console.error('API PUT 失败:', endpoint, e);
+    return false;
+  }
+}
+
+async function apiDelete(endpoint, id) {
+  try {
+    const res = await fetch(`${API_BASE}/api/${endpoint}/${id}`, {
       method: 'DELETE'
     });
     const json = await res.json();
-    if (json.success) {
-      // 更新本地缓存
-      const localData = getDataLocal(key).filter(item => item.id !== id);
-      saveDataLocal(key, localData);
-      return true;
-    }
-    return false;
+    return json.success;
   } catch (e) {
-    console.error('API 删除失败:', e);
+    console.error('API DELETE 失败:', endpoint, e);
     return false;
   }
 }
 
-// 同步保存（兼容旧代码）
-function saveData(k, d) {
-  saveDataLocal(k, d); // 立即保存到本地
-  saveDataToAPI(k, d); // 异步同步到 API
+// ==================== 兼容旧接口 ====================
+function getData(key) {
+  const endpoint = KEYS[key];
+  return localCache[endpoint] || [];
 }
+
+function saveData(key, data) {
+  // 这个函数现在只用于本地缓存，实际保存通过单独的 API 调用
+  localCache[KEYS[key]] = data;
+}
+
+// ==================== 区域配置操作 ====================
+async function loadAreaData() {
+  localCache['area-config'] = await apiGet('area-config');
+  renderArea();
+}
+
+async function saveAreaData(item, isEdit) {
+  let success;
+  if (isEdit && item.id) {
+    success = await apiPut('area-config', item.id, item);
+  } else {
+    success = await apiPost('area-config', item);
+  }
+  if (success) {
+    await loadAreaData();
+  }
+  return success;
+}
+
+async function deleteAreaData(id) {
+  const success = await apiDelete('area-config', id);
+  if (success) {
+    await loadAreaData();
+  }
+  return success;
+}
+
+// ==================== 航班配置操作 ====================
+async function loadFlightData() {
+  localCache['flight-config'] = await apiGet('flight-config');
+  renderFlight();
+}
+
+async function saveFlightData(item, isEdit) {
+  let success;
+  if (isEdit && item.id) {
+    success = await apiPut('flight-config', item.id, item);
+  } else {
+    success = await apiPost('flight-config', item);
+  }
+  if (success) {
+    await loadFlightData();
+  }
+  return success;
+}
+
+async function deleteFlightData(id) {
+  const success = await apiDelete('flight-config', id);
+  if (success) {
+    await loadFlightData();
+  }
+  return success;
+}
+
+// ==================== 目的港配置操作 ====================
+async function loadPortData() {
+  localCache['port-config'] = await apiGet('port-config');
+  renderPort();
+}
+
+async function savePortData(item, isEdit) {
+  let success;
+  if (isEdit && item.id) {
+    success = await apiPut('port-config', item.id, item);
+  } else {
+    success = await apiPost('port-config', item);
+  }
+  if (success) {
+    await loadPortData();
+  }
+  return success;
+}
+
+async function deletePortData(id) {
+  const success = await apiDelete('port-config', id);
+  if (success) {
+    await loadPortData();
+  }
+  return success;
+}
+
+// ==================== 路由配置操作 ====================
+async function loadRouteData() {
+  localCache['route-config'] = await apiGet('route-config');
+  renderRoute();
+}
+
+async function saveRouteData(item, isEdit) {
+  let success;
+  if (isEdit && item.id) {
+    success = await apiPut('route-config', item.id, item);
+  } else {
+    success = await apiPost('route-config', item);
+  }
+  if (success) {
+    await loadRouteData();
+  }
+  return success;
+}
+
+async function deleteRouteData(id) {
+  const success = await apiDelete('route-config', id);
+  if (success) {
+    await loadRouteData();
+  }
+  return success;
+}
+
+// ==================== 方数预估操作 ====================
+async function loadVolData() {
+  localCache['volume-estimate'] = await apiGet('volume-estimate');
+  renderVol();
+}
+
+async function saveVolData(item, isEdit) {
+  let success;
+  if (isEdit && item.id) {
+    success = await apiPut('volume-estimate', item.id, item);
+  } else {
+    success = await apiPost('volume-estimate', item);
+  }
+  if (success) {
+    await loadVolData();
+  }
+  return success;
+}
+
+async function deleteVolData(id) {
+  const success = await apiDelete('volume-estimate', id);
+  if (success) {
+    await loadVolData();
+  }
+  return success;
+}
+
+// ==================== 主单操作 ====================
+async function loadOrderData() {
+  localCache['main-order'] = await apiGet('main-order');
+  renderOrder();
+}
+
+async function saveOrderData(item, isEdit) {
+  let success;
+  if (isEdit && item.id) {
+    success = await apiPut('main-order', item.id, item);
+  } else {
+    success = await apiPost('main-order', item);
+  }
+  if (success) {
+    await loadOrderData();
+  }
+  return success;
+}
+
+async function deleteOrderData(id) {
+  const success = await apiDelete('main-order', id);
+  if (success) {
+    await loadOrderData();
+  }
+  return success;
+}
+
+// ==================== 初始化加载所有数据 ====================
+async function initAllData() {
+  await loadAreaData();
+  await loadFlightData();
+  await loadPortData();
+  await loadRouteData();
+  await loadVolData();
+  await loadOrderData();
+}
+
+// 页面加载时初始化
+initAllData();
 
 const genId = () => Date.now().toString(36) + Math.random().toString(36).substr(2);
 const getWeekday = d => ['周日','周一','周二','周三','周四','周五','周六'][new Date(d).getDay()];
 const addDays = (d, n) => { const dt = new Date(d); dt.setDate(dt.getDate()+n); return dt.toISOString().split('T')[0]; };
-
-// 页面加载时从 API 刷新数据
-async function refreshAllData() {
-  for (const key of Object.values(KEYS)) {
-    await getDataFromAPI(key);
-  }
-}
-// 启动时刷新所有数据
-refreshAllData();
 
 // ==================== 下载功能 ====================
 function downloadHTML() {
@@ -1074,32 +1197,37 @@ function saveArea() {
   const id = document.getElementById('area-id').value;
   const pvolValue = parseFloat(document.getElementById('area-pvol').value) || 0;
   const data = {
-    id: id || genId(),
     warehouse: document.getElementById('area-wh').value,
-    package_volume: pvolValue.toFixed(12),
-    kanto_ratio: document.getElementById('area-kr').value,
-    kansai_ratio: document.getElementById('area-wr').value,
-    kanto_normal_ratio: document.getElementById('area-kn').value,
-    kanto_special_ratio: document.getElementById('area-ks').value,
-    kansai_normal_ratio: document.getElementById('area-wn').value,
-    kansai_special_ratio: document.getElementById('area-ws').value,
+    package_volume: parseFloat(pvolValue.toFixed(12)),
+    kanto_ratio: parseFloat(document.getElementById('area-kr').value) || 0,
+    kansai_ratio: parseFloat(document.getElementById('area-wr').value) || 0,
+    kanto_normal_ratio: parseFloat(document.getElementById('area-kn').value) || 0,
+    kanto_special_ratio: parseFloat(document.getElementById('area-ks').value) || 0,
+    kansai_normal_ratio: parseFloat(document.getElementById('area-wn').value) || 0,
+    kansai_special_ratio: parseFloat(document.getElementById('area-ws').value) || 0,
   };
-  let list = getData(KEYS.AREA);
-  if (id) {
-    const idx = list.findIndex(i => i.id === id);
-    if (idx > -1) list[idx] = data;
-  } else {
-    list.push(data);
+  
+  const isEdit = !!id;
+  if (isEdit) {
+    data.id = parseInt(id);
   }
-  saveData(KEYS.AREA, list);
-  closeModal('modal-area');
-  renderArea();
+  
+  saveAreaData(data, isEdit).then(success => {
+    if (success) {
+      closeModal('modal-area');
+      alert('保存成功');
+    } else {
+      alert('保存失败，请重试');
+    }
+  });
 }
 
-function deleteArea(id) {
+async function deleteArea(id) {
   if (confirm('确定删除？')) {
-    saveData(KEYS.AREA, getData(KEYS.AREA).filter(i => i.id !== id));
-    renderArea();
+    const success = await deleteAreaData(id);
+    if (!success) {
+      alert('删除失败，请重试');
+    }
   }
 }
 
@@ -1143,7 +1271,6 @@ function openFlightModal(editId = null) {
 function saveFlight() {
   const id = document.getElementById('flight-id').value;
   const data = {
-    id: id || genId(),
     warehouse: document.getElementById('flight-wh').value,
     weekday: document.getElementById('flight-wd').value,
     kanto_normal: document.getElementById('flight-kn').value,
@@ -1152,22 +1279,28 @@ function saveFlight() {
     kansai_special: document.getElementById('flight-ws').value,
     remark: document.getElementById('flight-rm').value,
   };
-  let list = getData(KEYS.FLIGHT);
-  if (id) {
-    const idx = list.findIndex(i => i.id === id);
-    if (idx > -1) list[idx] = data;
-  } else {
-    list.push(data);
+  
+  const isEdit = !!id;
+  if (isEdit) {
+    data.id = parseInt(id);
   }
-  saveData(KEYS.FLIGHT, list);
-  closeModal('modal-flight');
-  renderFlight();
+  
+  saveFlightData(data, isEdit).then(success => {
+    if (success) {
+      closeModal('modal-flight');
+      alert('保存成功');
+    } else {
+      alert('保存失败，请重试');
+    }
+  });
 }
 
-function deleteFlight(id) {
+async function deleteFlight(id) {
   if (confirm('确定删除？')) {
-    saveData(KEYS.FLIGHT, getData(KEYS.FLIGHT).filter(i => i.id !== id));
-    renderFlight();
+    const success = await deleteFlightData(id);
+    if (!success) {
+      alert('删除失败，请重试');
+    }
   }
 }
 
@@ -1201,17 +1334,33 @@ function openPortModal(editId = null) {
 
 function savePort() {
   const id = document.getElementById('port-id').value;
-  const data = { id: id || genId(), port_code: document.getElementById('port-code').value, region: document.getElementById('port-region').value };
-  let list = getData(KEYS.PORT);
-  if (id) { const idx = list.findIndex(i => i.id === id); if (idx > -1) list[idx] = data; }
-  else { list.push(data); }
-  saveData(KEYS.PORT, list);
-  closeModal('modal-port');
-  renderPort();
+  const data = { 
+    port_code: document.getElementById('port-code').value, 
+    region: document.getElementById('port-region').value 
+  };
+  
+  const isEdit = !!id;
+  if (isEdit) {
+    data.id = parseInt(id);
+  }
+  
+  savePortData(data, isEdit).then(success => {
+    if (success) {
+      closeModal('modal-port');
+      alert('保存成功');
+    } else {
+      alert('保存失败，请重试');
+    }
+  });
 }
 
-function deletePort(id) {
-  if (confirm('确定删除？')) { saveData(KEYS.PORT, getData(KEYS.PORT).filter(i => i.id !== id)); renderPort(); }
+async function deletePort(id) {
+  if (confirm('确定删除？')) {
+    const success = await deletePortData(id);
+    if (!success) {
+      alert('删除失败，请重试');
+    }
+  }
 }
 
 function renderPort() {
@@ -1256,7 +1405,6 @@ function openRouteModal(editId = null) {
 function saveRoute() {
   const id = document.getElementById('route-id').value;
   const data = {
-    id: id || genId(),
     flight_no: document.getElementById('route-fno').value,
     origin: document.getElementById('route-orig').value,
     transfer: document.getElementById('route-trans').value,
@@ -1267,16 +1415,29 @@ function saveRoute() {
     second_flight: document.getElementById('route-sf').value,
     route_type: document.getElementById('route-type').value,
   };
-  let list = getData(KEYS.ROUTE);
-  if (id) { const idx = list.findIndex(i => i.id === id); if (idx > -1) list[idx] = data; }
-  else { list.push(data); }
-  saveData(KEYS.ROUTE, list);
-  closeModal('modal-route');
-  renderRoute();
+  
+  const isEdit = !!id;
+  if (isEdit) {
+    data.id = parseInt(id);
+  }
+  
+  saveRouteData(data, isEdit).then(success => {
+    if (success) {
+      closeModal('modal-route');
+      alert('保存成功');
+    } else {
+      alert('保存失败，请重试');
+    }
+  });
 }
 
-function deleteRoute(id) {
-  if (confirm('确定删除？')) { saveData(KEYS.ROUTE, getData(KEYS.ROUTE).filter(i => i.id !== id)); renderRoute(); }
+async function deleteRoute(id) {
+  if (confirm('确定删除？')) {
+    const success = await deleteRouteData(id);
+    if (!success) {
+      alert('删除失败，请重试');
+    }
+  }
 }
 
 function renderRoute() {
@@ -1364,68 +1525,62 @@ function saveVolume() {
   if (!date || !wh || !cnt || !complete) { alert('请填写完整（货物袋数是否齐全为必填项）'); return; }
 
   const data = {
-    id: editId || genId(),
     collect_date: date,
     weekday: getWeekday(date),
     warehouse: wh,
-    package_count: cnt,
-    total_volume: document.getElementById('res-total').textContent,
-    kanto_total: document.getElementById('res-kanto').textContent,
-    kansai_total: document.getElementById('res-kansai').textContent,
-    kanto_normal: document.getElementById('res-kn').textContent,
-    kanto_special: document.getElementById('res-ks').textContent,
-    kansai_normal: document.getElementById('res-wn').textContent,
-    kansai_special: document.getElementById('res-ws').textContent,
-    air_volume: document.getElementById('res-air').textContent,
-    sea_air_volume: document.getElementById('res-sea').textContent,
+    package_count: parseFloat(cnt),
+    total_volume: parseFloat(document.getElementById('res-total').textContent) || 0,
+    kanto_total: parseFloat(document.getElementById('res-kanto').textContent) || 0,
+    kansai_total: parseFloat(document.getElementById('res-kansai').textContent) || 0,
+    kanto_normal: parseFloat(document.getElementById('res-kn').textContent) || 0,
+    kanto_special: parseFloat(document.getElementById('res-ks').textContent) || 0,
+    kansai_normal: parseFloat(document.getElementById('res-wn').textContent) || 0,
+    kansai_special: parseFloat(document.getElementById('res-ws').textContent) || 0,
+    air_volume: parseFloat(document.getElementById('res-air').textContent) || 0,
+    sea_air_volume: parseFloat(document.getElementById('res-sea').textContent) || 0,
     is_complete: complete,
   };
   
-  let list = getData(KEYS.VOL);
-  if (editId) {
-    const idx = list.findIndex(i => i.id === editId);
-    if (idx > -1) list[idx] = data;
-  } else {
-    list.push(data);
+  const isEdit = !!editId;
+  if (isEdit) {
+    data.id = parseInt(editId);
   }
-  saveData(KEYS.VOL, list);
-  alert('保存成功！');
-  // 清空输入，准备下一次输入
-  document.getElementById('vol-edit-id').value = '';
-  document.getElementById('vol-date').value = '';
-  document.getElementById('vol-weekday').value = '';
-  document.getElementById('vol-warehouse').value = '';
-  document.getElementById('vol-count').value = '';
-  document.getElementById('vol-complete').value = '';
-  // 重置计算结果
-  document.getElementById('res-total').textContent = '0';
-  document.getElementById('res-kanto').textContent = '0';
-  document.getElementById('res-kansai').textContent = '0';
-  document.getElementById('res-kn').textContent = '0';
-  document.getElementById('res-ks').textContent = '0';
-  document.getElementById('res-wn').textContent = '0';
-  document.getElementById('res-ws').textContent = '0';
-  document.getElementById('res-air').textContent = '0';
-  document.getElementById('res-sea').textContent = '0';
-  renderVolRecent(); // 刷新最近记录列表
+  
+  saveVolData(data, isEdit).then(success => {
+    if (success) {
+      alert('保存成功！');
+      // 清空输入，准备下一次输入
+      document.getElementById('vol-edit-id').value = '';
+      document.getElementById('vol-date').value = '';
+      document.getElementById('vol-weekday').value = '';
+      document.getElementById('vol-warehouse').value = '';
+      document.getElementById('vol-count').value = '';
+      document.getElementById('vol-complete').value = '';
+      // 重置计算结果
+      document.getElementById('res-total').textContent = '0';
+      document.getElementById('res-kanto').textContent = '0';
+      document.getElementById('res-kansai').textContent = '0';
+      document.getElementById('res-kn').textContent = '0';
+      document.getElementById('res-ks').textContent = '0';
+      document.getElementById('res-wn').textContent = '0';
+      document.getElementById('res-ws').textContent = '0';
+      document.getElementById('res-air').textContent = '0';
+      document.getElementById('res-sea').textContent = '0';
+      renderVolRecent();
+    } else {
+      alert('保存失败，请重试');
+    }
+  });
 }
 
-function showVolHistory() {
-  const list = getData(KEYS.VOL);
-  document.getElementById('volhist-tbody').innerHTML = list.map(i => `<tr>
-    <td>${i.collect_date}</td><td>${i.warehouse}</td><td>${i.package_count}</td>
-    <td>${i.total_volume}</td><td>${i.kanto_total}</td><td>${i.kansai_total}</td>
-    <td>${i.kanto_normal}</td><td>${i.kanto_special}</td><td>${i.kansai_normal}</td><td>${i.kansai_special}</td>
-    <td>${i.air_volume}</td><td>${i.sea_air_volume}</td>
-    <td><button class="btn btn-sm btn-danger" onclick="deleteVol('${i.id}')">删除</button></td>
-  </tr>`).join('');
-  openModal('modal-volhist');
-}
-
-function deleteVol(id) {
+async function deleteVol(id) {
   if (confirm('确定删除？')) {
-    saveData(KEYS.VOL, getData(KEYS.VOL).filter(i => i.id !== id));
-    showVolHistory();
+    const success = await deleteVolData(id);
+    if (success) {
+      showVolHistory();
+    } else {
+      alert('删除失败，请重试');
+    }
   }
 }
 
@@ -1564,7 +1719,6 @@ function fillFlightInfo() {
 function saveOrder() {
   const id = document.getElementById('order-edit-id').value;
   const data = {
-    id: id || genId(),
     collect_date: document.getElementById('o-cdate').value,
     collect_weekday: document.getElementById('o-cw').value,
     depart_date: document.getElementById('o-ddate').value,
@@ -1595,14 +1749,20 @@ function saveOrder() {
     remark: document.getElementById('o-remark').value,
   };
 
-  let list = getData(KEYS.ORDER);
-  if (id) { const idx = list.findIndex(i => i.id === id); if (idx > -1) list[idx] = data; }
-  else { list.push(data); }
-  saveData(KEYS.ORDER, list);
-  alert('保存成功！');
-  document.getElementById('order-edit-id').value = '';
-  // 保存后显示主单列表
-  showOrderList();
+  const isEdit = !!id;
+  if (isEdit) {
+    data.id = parseInt(id);
+  }
+
+  saveOrderData(data, isEdit).then(success => {
+    if (success) {
+      alert('保存成功！');
+      document.getElementById('order-edit-id').value = '';
+      showOrderList();
+    } else {
+      alert('保存失败，请重试');
+    }
+  });
 }
 
 function clearOrderForm() {
@@ -1686,10 +1846,14 @@ function editOrder(id) {
   }
 }
 
-function deleteOrder(id) {
+async function deleteOrder(id) {
   if (confirm('确定删除？')) {
-    saveData(KEYS.ORDER, getData(KEYS.ORDER).filter(i => i.id !== id));
-    showOrderList();
+    const success = await deleteOrderData(id);
+    if (success) {
+      showOrderList();
+    } else {
+      alert('删除失败，请重试');
+    }
   }
 }
 
