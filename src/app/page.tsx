@@ -118,6 +118,68 @@ const addDays = (dateStr: string, days: number) => {
   return date.toISOString().split('T')[0];
 };
 
+// 导出Excel功能
+const exportToExcel = (data: MainOrder[], filename: string) => {
+  // 定义列标题和对应的字段
+  const headers = [
+    '揽收日期', '揽收星期', '发货日期', '发货星期', '仓库', '货物属性', '口岸', '类别',
+    '状态', '打包要求', '打货上限方数', '打货上限件数', '预估方数', '预估件数',
+    '路由类型', '需求航班日期', '实际航班日期', '主单号', '航班号', '起飞港',
+    '中转港', '目的港', '起飞时间', '到港时间', '实际件数', '实际重量', '实际方数',
+    '实际票数', '备注'
+  ];
+  
+  // 转换数据
+  const rows = data.map(order => [
+    order.collect_date || '',
+    order.collect_weekday || '',
+    order.depart_date || '',
+    order.depart_weekday || '',
+    order.warehouse || '',
+    order.cargo_type || '',
+    order.port || '',
+    order.category || '',
+    order.status || '',
+    order.pack_req || '',
+    order.max_volume || '',
+    order.max_pieces?.toString() || '',
+    order.est_volume || '',
+    order.est_pieces?.toString() || '',
+    order.route_type || '',
+    order.req_flight_date || '',
+    order.actual_flight_date || '',
+    order.main_no || '',
+    order.flight_no || '',
+    order.origin || '',
+    order.transfer || '',
+    order.dest || '',
+    order.depart_time || '',
+    order.arrive_time || '',
+    order.actual_pieces?.toString() || '',
+    order.actual_weight || '',
+    order.actual_volume || '',
+    order.actual_bills?.toString() || '',
+    order.remark || ''
+  ]);
+  
+  // 创建CSV内容（Excel兼容）
+  const BOM = '\uFEFF'; // UTF-8 BOM，确保Excel正确识别中文
+  const csvContent = BOM + [headers, ...rows]
+    .map(row => row.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(','))
+    .join('\n');
+  
+  // 创建Blob并下载
+  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = `${filename}.csv`;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+};
+
 export default function LogisticsManagement() {
   const [activeTab, setActiveTab] = useState('config-area');
   
@@ -1722,8 +1784,15 @@ export default function LogisticsManagement() {
         {activeTab === 'order-query' && (
           <div>
             <Card className="mb-5">
-              <CardHeader>
+              <CardHeader className="flex flex-row items-center justify-between">
                 <CardTitle>主单查询</CardTitle>
+                <Button 
+                  onClick={() => exportToExcel(mainOrders, `主单查询_${new Date().toISOString().split('T')[0]}`)}
+                  disabled={mainOrders.length === 0}
+                  className="bg-green-600 hover:bg-green-700"
+                >
+                  📥 导出Excel
+                </Button>
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-4 gap-4 mb-4">
@@ -1754,7 +1823,10 @@ export default function LogisticsManagement() {
             </Card>
             
             <Card>
-              <CardHeader>查询结果</CardHeader>
+              <CardHeader className="flex flex-row items-center justify-between">
+                <span>查询结果</span>
+                <span className="text-sm text-gray-500">共 {mainOrders.length} 条记录</span>
+              </CardHeader>
               <CardContent>
                 <Table>
                   <TableHeader>
