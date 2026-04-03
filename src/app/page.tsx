@@ -2994,7 +2994,6 @@ export default function LogisticsManagement() {
                   <TableHead className="bg-gray-50 text-center px-1 py-1" style={{ width: '70px' }}>口岸</TableHead>
                   <TableHead className="bg-gray-50 text-center px-1 py-1" style={{ width: '70px' }}>货物属性</TableHead>
                   <TableHead className="bg-gray-50 text-center px-1 py-1" style={{ width: '80px' }}>路由类型</TableHead>
-                  <TableHead className="bg-gray-50 text-center px-1 py-1" style={{ width: '70px' }}>类别</TableHead>
                   <TableHead className="bg-gray-50 text-center px-1 py-1" style={{ width: '120px' }}>主单号</TableHead>
                   <TableHead className="bg-gray-50 text-center px-1 py-1" style={{ width: '90px' }}>航班号</TableHead>
                   <TableHead className="bg-gray-50 text-center px-1 py-1" style={{ width: '70px' }}>目的港</TableHead>
@@ -3024,7 +3023,6 @@ export default function LogisticsManagement() {
                         </Badge>
                       ) : '-'}
                     </TableCell>
-                    <TableCell className="text-center px-1 py-1">{order.category || '-'}</TableCell>
                     <TableCell className="text-center px-1 py-1">{order.main_no || '-'}</TableCell>
                     <TableCell className="text-center px-1 py-1">{order.flight_no || '-'}</TableCell>
                     <TableCell className="text-center px-1 py-1">{order.dest || '-'}</TableCell>
