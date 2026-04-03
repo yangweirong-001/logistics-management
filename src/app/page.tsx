@@ -1493,15 +1493,15 @@ export default function LogisticsManagement() {
                   <Table>
                     <TableHeader className="sticky top-0 bg-white z-50" style={{ position: 'sticky', top: 0, zIndex: 50, backgroundColor: 'white' }}>
                       <TableRow>
-                        <TableHead className="bg-white">仓库</TableHead>
-                        <TableHead className="bg-white">大包预估体积</TableHead>
-                        <TableHead className="bg-white">关东目的港占比</TableHead>
-                        <TableHead className="bg-white">关西目的港占比</TableHead>
-                        <TableHead className="bg-white">关东普货占比</TableHead>
-                        <TableHead className="bg-white">关东特货占比</TableHead>
-                        <TableHead className="bg-white">关西普货占比</TableHead>
-                        <TableHead className="bg-white">关西特货占比</TableHead>
-                        <TableHead className="bg-white">操作</TableHead>
+                        <TableHead className="bg-white" style={{ backgroundColor: 'white' }}>仓库</TableHead>
+                        <TableHead className="bg-white" style={{ backgroundColor: 'white' }}>大包预估体积</TableHead>
+                        <TableHead className="bg-white" style={{ backgroundColor: 'white' }}>关东目的港占比</TableHead>
+                        <TableHead className="bg-white" style={{ backgroundColor: 'white' }}>关西目的港占比</TableHead>
+                        <TableHead className="bg-white" style={{ backgroundColor: 'white' }}>关东普货占比</TableHead>
+                        <TableHead className="bg-white" style={{ backgroundColor: 'white' }}>关东特货占比</TableHead>
+                        <TableHead className="bg-white" style={{ backgroundColor: 'white' }}>关西普货占比</TableHead>
+                        <TableHead className="bg-white" style={{ backgroundColor: 'white' }}>关西特货占比</TableHead>
+                        <TableHead className="bg-white" style={{ backgroundColor: 'white' }}>操作</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -1558,14 +1558,14 @@ export default function LogisticsManagement() {
                   <Table>
                     <TableHeader className="sticky top-0 bg-white z-50" style={{ position: 'sticky', top: 0, zIndex: 50, backgroundColor: 'white' }}>
                       <TableRow>
-                        <TableHead className="bg-white">仓库</TableHead>
-                        <TableHead className="bg-white">周几</TableHead>
-                        <TableHead className="bg-white">关东普货路由</TableHead>
-                        <TableHead className="bg-white">关西普货路由</TableHead>
-                        <TableHead className="bg-white">关东特货路由</TableHead>
-                        <TableHead className="bg-white">关西特货路由</TableHead>
-                        <TableHead className="bg-white">备注</TableHead>
-                        <TableHead className="bg-white">操作</TableHead>
+                        <TableHead className="bg-white" style={{ backgroundColor: 'white' }}>仓库</TableHead>
+                        <TableHead className="bg-white" style={{ backgroundColor: 'white' }}>周几</TableHead>
+                        <TableHead className="bg-white" style={{ backgroundColor: 'white' }}>关东普货路由</TableHead>
+                        <TableHead className="bg-white" style={{ backgroundColor: 'white' }}>关西普货路由</TableHead>
+                        <TableHead className="bg-white" style={{ backgroundColor: 'white' }}>关东特货路由</TableHead>
+                        <TableHead className="bg-white" style={{ backgroundColor: 'white' }}>关西特货路由</TableHead>
+                        <TableHead className="bg-white" style={{ backgroundColor: 'white' }}>备注</TableHead>
+                        <TableHead className="bg-white" style={{ backgroundColor: 'white' }}>操作</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -1619,9 +1619,9 @@ export default function LogisticsManagement() {
                   <Table>
                     <TableHeader className="sticky top-0 bg-white z-50" style={{ position: 'sticky', top: 0, zIndex: 50, backgroundColor: 'white' }}>
                       <TableRow>
-                        <TableHead className="bg-white">目的港代码</TableHead>
-                        <TableHead className="bg-white">所属区域</TableHead>
-                        <TableHead className="bg-white">操作</TableHead>
+                        <TableHead className="bg-white" style={{ backgroundColor: 'white' }}>目的港代码</TableHead>
+                        <TableHead className="bg-white" style={{ backgroundColor: 'white' }}>所属区域</TableHead>
+                        <TableHead className="bg-white" style={{ backgroundColor: 'white' }}>操作</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -1726,16 +1726,16 @@ export default function LogisticsManagement() {
                             className="w-4 h-4"
                           />
                         </TableHead>
-                        <TableHead className="bg-white">航班号</TableHead>
-                        <TableHead className="bg-white">始发</TableHead>
-                        <TableHead className="bg-white">中转</TableHead>
-                        <TableHead className="bg-white">目的</TableHead>
-                        <TableHead className="bg-white">起飞时间</TableHead>
-                        <TableHead className="bg-white">落地时间</TableHead>
-                        <TableHead className="bg-white">是否隔天</TableHead>
-                        <TableHead className="bg-white">二程航班</TableHead>
-                        <TableHead className="bg-white">路由</TableHead>
-                        <TableHead className="bg-white">操作</TableHead>
+                        <TableHead className="bg-white" style={{ backgroundColor: 'white' }}>航班号</TableHead>
+                        <TableHead className="bg-white" style={{ backgroundColor: 'white' }}>始发</TableHead>
+                        <TableHead className="bg-white" style={{ backgroundColor: 'white' }}>中转</TableHead>
+                        <TableHead className="bg-white" style={{ backgroundColor: 'white' }}>目的</TableHead>
+                        <TableHead className="bg-white" style={{ backgroundColor: 'white' }}>起飞时间</TableHead>
+                        <TableHead className="bg-white" style={{ backgroundColor: 'white' }}>落地时间</TableHead>
+                        <TableHead className="bg-white" style={{ backgroundColor: 'white' }}>是否隔天</TableHead>
+                        <TableHead className="bg-white" style={{ backgroundColor: 'white' }}>二程航班</TableHead>
+                        <TableHead className="bg-white" style={{ backgroundColor: 'white' }}>路由</TableHead>
+                        <TableHead className="bg-white" style={{ backgroundColor: 'white' }}>操作</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -1957,21 +1957,21 @@ export default function LogisticsManagement() {
                   <Table>
                     <TableHeader className="sticky top-0 bg-white z-50" style={{ position: 'sticky', top: 0, zIndex: 50, backgroundColor: 'white' }}>
                       <TableRow>
-                        <TableHead className="bg-white">揽收日期</TableHead>
-                        <TableHead className="bg-white">仓库</TableHead>
-                        <TableHead className="bg-white">大包数</TableHead>
-                        <TableHead className="bg-white">重量</TableHead>
-                        <TableHead className="bg-white">总方数</TableHead>
-                        <TableHead className="bg-white">关东总</TableHead>
-                        <TableHead className="bg-white">关西总</TableHead>
-                        <TableHead className="bg-white">关东普货</TableHead>
-                        <TableHead className="bg-white">关东特货</TableHead>
-                        <TableHead className="bg-white">关西普货</TableHead>
-                        <TableHead className="bg-white">关西特货</TableHead>
-                        <TableHead className="bg-white">空运</TableHead>
-                        <TableHead className="bg-white">海空</TableHead>
-                        <TableHead className="bg-white">货物袋数齐全</TableHead>
-                        <TableHead className="bg-white">操作</TableHead>
+                        <TableHead className="bg-white" style={{ backgroundColor: 'white' }}>揽收日期</TableHead>
+                        <TableHead className="bg-white" style={{ backgroundColor: 'white' }}>仓库</TableHead>
+                        <TableHead className="bg-white" style={{ backgroundColor: 'white' }}>大包数</TableHead>
+                        <TableHead className="bg-white" style={{ backgroundColor: 'white' }}>重量</TableHead>
+                        <TableHead className="bg-white" style={{ backgroundColor: 'white' }}>总方数</TableHead>
+                        <TableHead className="bg-white" style={{ backgroundColor: 'white' }}>关东总</TableHead>
+                        <TableHead className="bg-white" style={{ backgroundColor: 'white' }}>关西总</TableHead>
+                        <TableHead className="bg-white" style={{ backgroundColor: 'white' }}>关东普货</TableHead>
+                        <TableHead className="bg-white" style={{ backgroundColor: 'white' }}>关东特货</TableHead>
+                        <TableHead className="bg-white" style={{ backgroundColor: 'white' }}>关西普货</TableHead>
+                        <TableHead className="bg-white" style={{ backgroundColor: 'white' }}>关西特货</TableHead>
+                        <TableHead className="bg-white" style={{ backgroundColor: 'white' }}>空运</TableHead>
+                        <TableHead className="bg-white" style={{ backgroundColor: 'white' }}>海空</TableHead>
+                        <TableHead className="bg-white" style={{ backgroundColor: 'white' }}>货物袋数齐全</TableHead>
+                        <TableHead className="bg-white" style={{ backgroundColor: 'white' }}>操作</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -2418,24 +2418,24 @@ export default function LogisticsManagement() {
                   <Table>
                     <TableHeader className="sticky top-0 bg-white z-50" style={{ position: 'sticky', top: 0, zIndex: 50, backgroundColor: 'white' }}>
                       <TableRow>
-                        <TableHead className="text-center px-2 bg-white">揽收日期</TableHead>
-                        <TableHead className="text-center px-2 bg-white">仓库</TableHead>
-                        <TableHead className="text-center px-2 bg-white">口岸</TableHead>
-                        <TableHead className="text-center px-2 bg-white">货物属性</TableHead>
-                        <TableHead className="text-center px-2 bg-white">类别</TableHead>
-                        <TableHead className="text-center px-2 bg-white">路由类型</TableHead>
-                        <TableHead className="text-center px-2 bg-white">主单号</TableHead>
-                        <TableHead className="text-center px-2 bg-white">航班号</TableHead>
-                        <TableHead className="text-center px-2 bg-white">始发</TableHead>
-                        <TableHead className="text-center px-2 bg-white">中转</TableHead>
-                        <TableHead className="text-center px-2 bg-white">目的</TableHead>
-                        <TableHead className="text-center px-2 bg-white">预计起飞</TableHead>
-                        <TableHead className="text-center px-2 bg-white">预计落地</TableHead>
-                        <TableHead className="text-center px-2 bg-white">打货上限(方)</TableHead>
-                        <TableHead className="text-center px-2 bg-white">打货上限(件)</TableHead>
-                        <TableHead className="text-center px-2 bg-white">实际件数</TableHead>
-                        <TableHead className="text-center px-2 bg-white">实际方数</TableHead>
-                        <TableHead className="text-center px-2 bg-white">操作</TableHead>
+                        <TableHead className="text-center px-2 bg-white" style={{ backgroundColor: 'white' }}>揽收日期</TableHead>
+                        <TableHead className="text-center px-2 bg-white" style={{ backgroundColor: 'white' }}>仓库</TableHead>
+                        <TableHead className="text-center px-2 bg-white" style={{ backgroundColor: 'white' }}>口岸</TableHead>
+                        <TableHead className="text-center px-2 bg-white" style={{ backgroundColor: 'white' }}>货物属性</TableHead>
+                        <TableHead className="text-center px-2 bg-white" style={{ backgroundColor: 'white' }}>类别</TableHead>
+                        <TableHead className="text-center px-2 bg-white" style={{ backgroundColor: 'white' }}>路由类型</TableHead>
+                        <TableHead className="text-center px-2 bg-white" style={{ backgroundColor: 'white' }}>主单号</TableHead>
+                        <TableHead className="text-center px-2 bg-white" style={{ backgroundColor: 'white' }}>航班号</TableHead>
+                        <TableHead className="text-center px-2 bg-white" style={{ backgroundColor: 'white' }}>始发</TableHead>
+                        <TableHead className="text-center px-2 bg-white" style={{ backgroundColor: 'white' }}>中转</TableHead>
+                        <TableHead className="text-center px-2 bg-white" style={{ backgroundColor: 'white' }}>目的</TableHead>
+                        <TableHead className="text-center px-2 bg-white" style={{ backgroundColor: 'white' }}>预计起飞</TableHead>
+                        <TableHead className="text-center px-2 bg-white" style={{ backgroundColor: 'white' }}>预计落地</TableHead>
+                        <TableHead className="text-center px-2 bg-white" style={{ backgroundColor: 'white' }}>打货上限(方)</TableHead>
+                        <TableHead className="text-center px-2 bg-white" style={{ backgroundColor: 'white' }}>打货上限(件)</TableHead>
+                        <TableHead className="text-center px-2 bg-white" style={{ backgroundColor: 'white' }}>实际件数</TableHead>
+                        <TableHead className="text-center px-2 bg-white" style={{ backgroundColor: 'white' }}>实际方数</TableHead>
+                        <TableHead className="text-center px-2 bg-white" style={{ backgroundColor: 'white' }}>操作</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -2585,13 +2585,13 @@ export default function LogisticsManagement() {
                     <Table className="w-full">
                       <TableHeader className="sticky top-0 bg-white z-50" style={{ position: 'sticky', top: 0, zIndex: 50, backgroundColor: 'white' }}>
                         <TableRow>
-                          <TableHead className="text-center px-2 bg-white">仓库</TableHead>
-                          <TableHead className="text-center px-2 bg-white">口岸</TableHead>
-                          <TableHead className="text-center px-2 bg-white">货物属性</TableHead>
-                          <TableHead className="text-center px-2 bg-white">预估方数</TableHead>
-                          <TableHead className="text-center px-2 bg-white">打货上限汇总</TableHead>
-                          <TableHead className="text-center px-2 bg-white">欠方</TableHead>
-                          <TableHead className="text-center px-2 bg-white">余方</TableHead>
+                          <TableHead className="text-center px-2 bg-white" style={{ backgroundColor: 'white' }}>仓库</TableHead>
+                          <TableHead className="text-center px-2 bg-white" style={{ backgroundColor: 'white' }}>口岸</TableHead>
+                          <TableHead className="text-center px-2 bg-white" style={{ backgroundColor: 'white' }}>货物属性</TableHead>
+                          <TableHead className="text-center px-2 bg-white" style={{ backgroundColor: 'white' }}>预估方数</TableHead>
+                          <TableHead className="text-center px-2 bg-white" style={{ backgroundColor: 'white' }}>打货上限汇总</TableHead>
+                          <TableHead className="text-center px-2 bg-white" style={{ backgroundColor: 'white' }}>欠方</TableHead>
+                          <TableHead className="text-center px-2 bg-white" style={{ backgroundColor: 'white' }}>余方</TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>
