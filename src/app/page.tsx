@@ -1729,7 +1729,7 @@ export default function LogisticsManagement() {
                   <Table style={{ tableLayout: 'auto', whiteSpace: 'nowrap', minWidth: '1800px' }}>
                     <TableHeader className="sticky top-0 bg-white z-10" style={{ position: 'sticky', top: 0, zIndex: 10, backgroundColor: '#ffffff' }}>
                       <TableRow>
-                        <TableHead className="bg-white text-center px-2 py-2" style={{ backgroundColor: '#ffffff', zIndex: 10, minWidth: '50px' }}>
+                        <TableHead className="bg-white text-center px-1 py-1" style={{ backgroundColor: '#ffffff', zIndex: 10, minWidth: '50px' }}>
                           <input
                             type="checkbox"
                             checked={routeConfigs.length > 0 && selectedRouteIds.size === routeConfigs.filter(config =>
@@ -1768,16 +1768,16 @@ export default function LogisticsManagement() {
                             className="w-4 h-4"
                           />
                         </TableHead>
-                        <TableHead className="bg-white text-center px-2 py-2" style={{ backgroundColor: '#ffffff', zIndex: 10, minWidth: '120px' }}>航班号</TableHead>
-                        <TableHead className="bg-white text-center px-2 py-2" style={{ backgroundColor: '#ffffff', zIndex: 10, minWidth: '60px' }}>始发</TableHead>
-                        <TableHead className="bg-white text-center px-2 py-2" style={{ backgroundColor: '#ffffff', zIndex: 10, minWidth: '60px' }}>中转</TableHead>
-                        <TableHead className="bg-white text-center px-2 py-2" style={{ backgroundColor: '#ffffff', zIndex: 10, minWidth: '60px' }}>目的</TableHead>
-                        <TableHead className="bg-white text-center px-2 py-2" style={{ backgroundColor: '#ffffff', zIndex: 10, minWidth: '100px' }}>起飞时间</TableHead>
-                        <TableHead className="bg-white text-center px-2 py-2" style={{ backgroundColor: '#ffffff', zIndex: 10, minWidth: '100px' }}>落地时间</TableHead>
-                        <TableHead className="bg-white text-center px-2 py-2" style={{ backgroundColor: '#ffffff', zIndex: 10, minWidth: '80px' }}>是否隔天</TableHead>
-                        <TableHead className="bg-white text-center px-2 py-2" style={{ backgroundColor: '#ffffff', zIndex: 10, minWidth: '120px' }}>二程航班</TableHead>
-                        <TableHead className="bg-white text-center px-2 py-2" style={{ backgroundColor: '#ffffff', zIndex: 10, minWidth: '80px' }}>路由</TableHead>
-                        <TableHead className="bg-white text-center px-2 py-2" style={{ backgroundColor: '#ffffff', zIndex: 10, minWidth: '120px' }}>操作</TableHead>
+                        <TableHead className="bg-white text-center px-1 py-1" style={{ backgroundColor: '#ffffff', zIndex: 10, minWidth: '120px' }}>航班号</TableHead>
+                        <TableHead className="bg-white text-center px-1 py-1" style={{ backgroundColor: '#ffffff', zIndex: 10, minWidth: '60px' }}>始发</TableHead>
+                        <TableHead className="bg-white text-center px-1 py-1" style={{ backgroundColor: '#ffffff', zIndex: 10, minWidth: '60px' }}>中转</TableHead>
+                        <TableHead className="bg-white text-center px-1 py-1" style={{ backgroundColor: '#ffffff', zIndex: 10, minWidth: '60px' }}>目的</TableHead>
+                        <TableHead className="bg-white text-center px-1 py-1" style={{ backgroundColor: '#ffffff', zIndex: 10, minWidth: '100px' }}>起飞时间</TableHead>
+                        <TableHead className="bg-white text-center px-1 py-1" style={{ backgroundColor: '#ffffff', zIndex: 10, minWidth: '100px' }}>落地时间</TableHead>
+                        <TableHead className="bg-white text-center px-1 py-1" style={{ backgroundColor: '#ffffff', zIndex: 10, minWidth: '80px' }}>是否隔天</TableHead>
+                        <TableHead className="bg-white text-center px-1 py-1" style={{ backgroundColor: '#ffffff', zIndex: 10, minWidth: '120px' }}>二程航班</TableHead>
+                        <TableHead className="bg-white text-center px-1 py-1" style={{ backgroundColor: '#ffffff', zIndex: 10, minWidth: '80px' }}>路由</TableHead>
+                        <TableHead className="bg-white text-center px-1 py-1" style={{ backgroundColor: '#ffffff', zIndex: 10, minWidth: '120px' }}>操作</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -1793,7 +1793,7 @@ export default function LogisticsManagement() {
                         )
                         .map(config => (
                         <TableRow key={config.id} className={selectedRouteIds.has(config.id) ? 'bg-blue-50' : ''}>
-                          <TableCell className="text-center px-2 py-2" style={{ minWidth: '60px' }}>
+                          <TableCell className="text-center px-1 py-1" style={{ minWidth: '50px' }}>
                             <input
                               type="checkbox"
                               checked={selectedRouteIds.has(config.id)}
@@ -1801,20 +1801,20 @@ export default function LogisticsManagement() {
                               className="w-4 h-4"
                             />
                           </TableCell>
-                          <TableCell className="text-center px-2 py-2" style={{ minWidth: '150px' }}>{config.flight_no}</TableCell>
-                          <TableCell className="text-center px-2 py-2" style={{ minWidth: '80px' }}>{config.origin}</TableCell>
-                          <TableCell className="text-center px-2 py-2" style={{ minWidth: '80px' }}>{config.transfer || '-'}</TableCell>
-                          <TableCell className="text-center px-2 py-2" style={{ minWidth: '80px' }}>{config.dest}</TableCell>
-                          <TableCell className="text-center px-2 py-2" style={{ minWidth: '120px' }}>{config.depart_time || '-'}</TableCell>
-                          <TableCell className="text-center px-2 py-2" style={{ minWidth: '120px' }}>{config.arrive_time || '-'}</TableCell>
-                          <TableCell className="text-center px-2 py-2" style={{ minWidth: '100px' }}>{config.is_next_day || '-'}</TableCell>
-                          <TableCell className="text-center px-2 py-2" style={{ minWidth: '150px' }}>{config.second_flight || '-'}</TableCell>
-                          <TableCell className="text-center px-2 py-2" style={{ minWidth: '100px' }}>
+                          <TableCell className="text-center px-1 py-1" style={{ minWidth: '120px' }}>{config.flight_no}</TableCell>
+                          <TableCell className="text-center px-1 py-1" style={{ minWidth: '60px' }}>{config.origin}</TableCell>
+                          <TableCell className="text-center px-1 py-1" style={{ minWidth: '60px' }}>{config.transfer || '-'}</TableCell>
+                          <TableCell className="text-center px-1 py-1" style={{ minWidth: '60px' }}>{config.dest}</TableCell>
+                          <TableCell className="text-center px-1 py-1" style={{ minWidth: '100px' }}>{config.depart_time || '-'}</TableCell>
+                          <TableCell className="text-center px-1 py-1" style={{ minWidth: '100px' }}>{config.arrive_time || '-'}</TableCell>
+                          <TableCell className="text-center px-1 py-1" style={{ minWidth: '80px' }}>{config.is_next_day || '-'}</TableCell>
+                          <TableCell className="text-center px-1 py-1" style={{ minWidth: '120px' }}>{config.second_flight || '-'}</TableCell>
+                          <TableCell className="text-center px-1 py-1" style={{ minWidth: '80px' }}>
                             <Badge variant={config.route_type === '空运' ? 'default' : 'secondary'}>
                               {config.route_type}
                             </Badge>
                           </TableCell>
-                          <TableCell className="text-center px-2 py-2" style={{ minWidth: '150px' }}>
+                          <TableCell className="text-center px-1 py-1" style={{ minWidth: '120px' }}>
                             <Button size="sm" variant="outline" className="mr-2"
                               onClick={() => { setEditingRoute(config); setRouteModalOpen(true); }}>
                               编辑
