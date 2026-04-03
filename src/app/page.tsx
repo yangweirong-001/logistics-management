@@ -289,7 +289,12 @@ export default function LogisticsManagement() {
   // 主单查询条件
   const [orderQueryDate, setOrderQueryDate] = useState('');
   const [orderQueryWarehouse, setOrderQueryWarehouse] = useState('全部');
-  
+
+  // 方数预估筛选条件
+  const [volumeFilterStartDate, setVolumeFilterStartDate] = useState('');
+  const [volumeFilterEndDate, setVolumeFilterEndDate] = useState('');
+  const [volumeFilterWarehouse, setVolumeFilterWarehouse] = useState('全部');
+
   // 全局保存加载状态
   const [saving, setSaving] = useState(false);
   
@@ -1263,6 +1268,59 @@ export default function LogisticsManagement() {
     return truncated.toFixed(decimals);
   };
 
+  // 获取筛选后的方数预估数据
+  const getFilteredVolumeEstimates = () => {
+    return volumeEstimates.filter(record => {
+      // 日期筛选
+      if (volumeFilterStartDate && record.collect_date < volumeFilterStartDate) return false;
+      if (volumeFilterEndDate && record.collect_date > volumeFilterEndDate) return false;
+
+      // 仓库筛选
+      if (volumeFilterWarehouse !== '全部' && record.warehouse !== volumeFilterWarehouse) return false;
+
+      return true;
+    });
+  };
+
+  // 导出方数预估到Excel
+  const exportVolumeEstimates = () => {
+    const filteredData = getFilteredVolumeEstimates();
+
+    if (filteredData.length === 0) {
+      alert('没有可导出的数据');
+      return;
+    }
+
+    // 准备Excel数据
+    const excelData = filteredData.map(record => ({
+      '揽收日期': record.collect_date,
+      '仓库': record.warehouse,
+      '大包数': record.package_count,
+      '重量': record.weight ? truncateToDecimals(record.weight, 2) : '0.00',
+      '总方数': (record.total_volume || 0).toFixed(3),
+      '关东总方数': (record.kanto_total || 0).toFixed(3),
+      '关西总方数': (record.kansai_total || 0).toFixed(3),
+      '关东普货': (record.kanto_normal || 0).toFixed(3),
+      '关东特货': (record.kanto_special || 0).toFixed(3),
+      '关西普货': (record.kansai_normal || 0).toFixed(3),
+      '关西特货': (record.kansai_special || 0).toFixed(3),
+      '空运方数': (record.air_volume || 0).toFixed(3),
+      '海空方数': (record.sea_air_volume || 0).toFixed(3),
+      '货物袋数齐全': record.is_complete || '-',
+    }));
+
+    // 创建工作簿
+    const worksheet = XLSX.utils.json_to_sheet(excelData);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, '方数预估');
+
+    // 生成文件名
+    const fileName = `方数预估_${volumeFilterStartDate || '全部'}至${volumeFilterEndDate || '全部'}_${new Date().toLocaleDateString('zh-CN')}.xlsx`;
+
+    // 导出下载
+    XLSX.writeFile(workbook, fileName);
+  };
+
   // 根据航班号+始发港+中转站+目的港匹配路由，自动填充起飞时间、落地时间、二程航班
   const matchRouteAndFillTimes = () => {
     const { flight_no, origin, transfer, dest } = orderForm;
@@ -1811,10 +1869,50 @@ export default function LogisticsManagement() {
             
             {/* 最近保存的记录 */}
             <Card>
-              <CardHeader>
+              <CardHeader className="flex flex-row items-center justify-between">
                 <CardTitle>最近保存的记录</CardTitle>
+                <Button onClick={exportVolumeEstimates} variant="outline" className="gap-2">
+                  📊 导出Excel
+                </Button>
               </CardHeader>
               <CardContent>
+                {/* 筛选器 */}
+                <div className="grid grid-cols-4 gap-4 mb-5">
+                  <div>
+                    <Label>开始日期</Label>
+                    <Input type="date" value={volumeFilterStartDate}
+                      onChange={e => setVolumeFilterStartDate(e.target.value)} />
+                  </div>
+                  <div>
+                    <Label>结束日期</Label>
+                    <Input type="date" value={volumeFilterEndDate}
+                      onChange={e => setVolumeFilterEndDate(e.target.value)} />
+                  </div>
+                  <div>
+                    <Label>仓库</Label>
+                    <Select value={volumeFilterWarehouse}
+                      onValueChange={setVolumeFilterWarehouse}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="请选择" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="全部">全部</SelectItem>
+                        <SelectItem value="东莞">东莞</SelectItem>
+                        <SelectItem value="加工区">加工区</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="flex items-end">
+                    <Button onClick={() => {
+                      setVolumeFilterStartDate('');
+                      setVolumeFilterEndDate('');
+                      setVolumeFilterWarehouse('全部');
+                    }} variant="outline">
+                      重置筛选
+                    </Button>
+                  </div>
+                </div>
+
                 <Table>
                   <TableHeader>
                     <TableRow>
@@ -1836,7 +1934,7 @@ export default function LogisticsManagement() {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {volumeEstimates.slice(0, 10).map(record => (
+                    {getFilteredVolumeEstimates().slice(0, 10).map(record => (
                       <TableRow key={record.id}>
                         <TableCell>{record.collect_date}</TableCell>
                         <TableCell>{record.warehouse}</TableCell>
@@ -1864,7 +1962,7 @@ export default function LogisticsManagement() {
                         </TableCell>
                       </TableRow>
                     ))}
-                    {volumeEstimates.length === 0 && (
+                    {getFilteredVolumeEstimates().length === 0 && (
                       <TableRow>
                         <TableCell colSpan={15} className="text-center text-gray-500">暂无记录</TableCell>
                       </TableRow>
