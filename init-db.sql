@@ -81,6 +81,7 @@ CREATE TABLE IF NOT EXISTS volume_estimates (
   kansai_special NUMERIC(15, 3),
   air_volume NUMERIC(15, 3),
   sea_air_volume NUMERIC(15, 3),
+  weight NUMERIC(15, 2),
   is_complete VARCHAR(10),
   created_at TIMESTAMPTZ DEFAULT NOW() NOT NULL,
   updated_at TIMESTAMPTZ DEFAULT NOW()

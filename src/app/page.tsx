@@ -70,6 +70,7 @@ interface VolumeEstimate {
   kansai_special: number | null;
   air_volume: number | null;
   sea_air_volume: number | null;
+  weight: number | null;
   is_complete: string | null;
 }
 
@@ -237,6 +238,7 @@ export default function LogisticsManagement() {
     collect_date: '',
     warehouse: '',
     package_count: 0,
+    weight: 0,
     is_complete: '是',
   });
   
@@ -931,6 +933,7 @@ export default function LogisticsManagement() {
             kansai_special: kansaiSpecial.toFixed(3),
             air_volume: airVolume.toFixed(3),
             sea_air_volume: seaAirVolume.toFixed(3),
+            weight: volumeForm.weight ? volumeForm.weight.toFixed(2) : null,
             is_complete: volumeForm.is_complete,
           }),
         });
@@ -957,6 +960,7 @@ export default function LogisticsManagement() {
             kansai_special: kansaiSpecial.toFixed(3),
             air_volume: airVolume.toFixed(3),
             sea_air_volume: seaAirVolume.toFixed(3),
+            weight: volumeForm.weight ? volumeForm.weight.toFixed(2) : null,
             is_complete: volumeForm.is_complete,
           }),
         });
@@ -969,7 +973,7 @@ export default function LogisticsManagement() {
       
       loadVolumeEstimates();
       setEditingVolume(null);
-      setVolumeForm({ collect_date: '', warehouse: '', package_count: 0, is_complete: '是' });
+      setVolumeForm({ collect_date: '', warehouse: '', package_count: 0, weight: 0, is_complete: '是' });
       setVolumeResult(null);
       alert('保存成功！');
     } catch (err) {
@@ -986,6 +990,7 @@ export default function LogisticsManagement() {
       collect_date: record.collect_date,
       warehouse: record.warehouse,
       package_count: record.package_count,
+      weight: record.weight || 0,
       is_complete: record.is_complete || '是',
     });
   };
@@ -1689,7 +1694,7 @@ export default function LogisticsManagement() {
               </CardHeader>
               <CardContent>
                 {/* 顶部筛选 */}
-                <div className="grid grid-cols-4 gap-4 mb-5">
+                <div className="grid grid-cols-5 gap-4 mb-5">
                   <div>
                     <Label>揽收日期</Label>
                     <Input type="date" value={volumeForm.collect_date}
@@ -1715,6 +1720,11 @@ export default function LogisticsManagement() {
                     <Label>揽收大包数</Label>
                     <Input type="number" placeholder="请输入" value={volumeForm.package_count || ''}
                       onChange={e => setVolumeForm(prev => ({ ...prev, package_count: parseInt(e.target.value) || 0 }))} />
+                  </div>
+                  <div>
+                    <Label>重量 (kg)</Label>
+                    <Input type="number" step="0.01" placeholder="请输入" value={volumeForm.weight || ''}
+                      onChange={e => setVolumeForm(prev => ({ ...prev, weight: parseFloat(e.target.value) || 0 }))} />
                   </div>
                 </div>
                 
@@ -1782,7 +1792,7 @@ export default function LogisticsManagement() {
                     <Button onClick={saveVolumeEstimate} className="bg-green-600 hover:bg-green-700">
                       保存数据
                     </Button>
-                    <Button variant="outline" onClick={() => { setEditingVolume(null); setVolumeForm({ collect_date: '', warehouse: '', package_count: 0, is_complete: '是' }); setVolumeResult(null); }}>
+                    <Button variant="outline" onClick={() => { setEditingVolume(null); setVolumeForm({ collect_date: '', warehouse: '', package_count: 0, weight: 0, is_complete: '是' }); setVolumeResult(null); }}>
                       清空
                     </Button>
                   </div>
@@ -1802,6 +1812,7 @@ export default function LogisticsManagement() {
                       <TableHead>揽收日期</TableHead>
                       <TableHead>仓库</TableHead>
                       <TableHead>大包数</TableHead>
+                      <TableHead>重量</TableHead>
                       <TableHead>总方数</TableHead>
                       <TableHead>关东总</TableHead>
                       <TableHead>关西总</TableHead>
@@ -1821,6 +1832,7 @@ export default function LogisticsManagement() {
                         <TableCell>{record.collect_date}</TableCell>
                         <TableCell>{record.warehouse}</TableCell>
                         <TableCell>{record.package_count}</TableCell>
+                        <TableCell>{(record.weight || 0).toFixed(2)}</TableCell>
                         <TableCell>{(record.total_volume || 0).toFixed(3)}</TableCell>
                         <TableCell>{(record.kanto_total || 0).toFixed(3)}</TableCell>
                         <TableCell>{(record.kansai_total || 0).toFixed(3)}</TableCell>
@@ -1845,7 +1857,7 @@ export default function LogisticsManagement() {
                     ))}
                     {volumeEstimates.length === 0 && (
                       <TableRow>
-                        <TableCell colSpan={14} className="text-center text-gray-500">暂无记录</TableCell>
+                        <TableCell colSpan={15} className="text-center text-gray-500">暂无记录</TableCell>
                       </TableRow>
                     )}
                   </TableBody>

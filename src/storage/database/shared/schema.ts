@@ -99,6 +99,7 @@ export const volumeEstimates = pgTable("volume_estimates", {
 	kansaiSpecial: numeric("kansai_special", { precision: 15, scale: 3 }),
 	airVolume: numeric("air_volume", { precision: 15, scale: 3 }),
 	seaAirVolume: numeric("sea_air_volume", { precision: 15, scale: 3 }),
+	weight: numeric("weight", { precision: 15, scale: 2 }),
 	isComplete: varchar("is_complete", { length: 10 }),
 	createdAt: timestamp("created_at", { withTimezone: true, mode: 'string' }).defaultNow().notNull(),
 	updatedAt: timestamp("updated_at", { withTimezone: true, mode: 'string' }).defaultNow(),
