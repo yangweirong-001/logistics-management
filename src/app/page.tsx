@@ -2439,58 +2439,58 @@ export default function LogisticsManagement() {
                 <span className="text-sm text-gray-500">共 {mainOrders.length} 条记录</span>
               </CardHeader>
               <CardContent>
-                <Table style={{ tableLayout: 'auto', minWidth: '2800px', whiteSpace: 'nowrap' }} className="max-h-[800px]">
+                <Table style={{ tableLayout: 'auto', minWidth: '2200px', whiteSpace: 'nowrap' }} className="max-h-[800px]">
                     <TableHeader className="sticky top-0 bg-white z-10" style={{ position: 'sticky', top: 0, zIndex: 10, backgroundColor: '#ffffff' }}>
                       <TableRow>
-                        <TableHead className="text-center px-3 bg-white" style={{ backgroundColor: '#ffffff', minWidth: '120px' }}>揽收日期</TableHead>
-                        <TableHead className="text-center px-3 bg-white" style={{ backgroundColor: '#ffffff', minWidth: '80px' }}>仓库</TableHead>
-                        <TableHead className="text-center px-3 bg-white" style={{ backgroundColor: '#ffffff', minWidth: '80px' }}>口岸</TableHead>
-                        <TableHead className="text-center px-3 bg-white" style={{ backgroundColor: '#ffffff', minWidth: '80px' }}>货物属性</TableHead>
-                        <TableHead className="text-center px-3 bg-white" style={{ backgroundColor: '#ffffff', minWidth: '100px' }}>路由类型</TableHead>
-                        <TableHead className="text-center px-3 bg-white" style={{ backgroundColor: '#ffffff', minWidth: '150px' }}>主单号</TableHead>
-                        <TableHead className="text-center px-3 bg-white" style={{ backgroundColor: '#ffffff', minWidth: '100px' }}>航班号</TableHead>
-                        <TableHead className="text-center px-3 bg-white" style={{ backgroundColor: '#ffffff', minWidth: '80px' }}>始发</TableHead>
-                        <TableHead className="text-center px-3 bg-white" style={{ backgroundColor: '#ffffff', minWidth: '80px' }}>中转</TableHead>
-                        <TableHead className="text-center px-3 bg-white" style={{ backgroundColor: '#ffffff', minWidth: '80px' }}>目的</TableHead>
-                        <TableHead className="text-center px-3 bg-white" style={{ backgroundColor: '#ffffff', minWidth: '200px' }}>预计起飞</TableHead>
-                        <TableHead className="text-center px-3 bg-white" style={{ backgroundColor: '#ffffff', minWidth: '200px' }}>预计落地</TableHead>
-                        <TableHead className="text-center px-3 bg-white" style={{ backgroundColor: '#ffffff', minWidth: '120px' }}>打货上限(方)</TableHead>
-                        <TableHead className="text-center px-3 bg-white" style={{ backgroundColor: '#ffffff', minWidth: '120px' }}>打货上限(件)</TableHead>
-                        <TableHead className="text-center px-3 bg-white" style={{ backgroundColor: '#ffffff', minWidth: '120px' }}>实际件数</TableHead>
-                        <TableHead className="text-center px-3 bg-white" style={{ backgroundColor: '#ffffff', minWidth: '120px' }}>实际方数</TableHead>
-                        <TableHead className="text-center px-3 bg-white" style={{ backgroundColor: '#ffffff', minWidth: '100px' }}>操作</TableHead>
+                        <TableHead className="text-center px-2 py-2 bg-white" style={{ backgroundColor: '#ffffff', minWidth: '100px' }}>揽收日期</TableHead>
+                        <TableHead className="text-center px-2 py-2 bg-white" style={{ backgroundColor: '#ffffff', minWidth: '60px' }}>仓库</TableHead>
+                        <TableHead className="text-center px-2 py-2 bg-white" style={{ backgroundColor: '#ffffff', minWidth: '60px' }}>口岸</TableHead>
+                        <TableHead className="text-center px-2 py-2 bg-white" style={{ backgroundColor: '#ffffff', minWidth: '60px' }}>货物属性</TableHead>
+                        <TableHead className="text-center px-2 py-2 bg-white" style={{ backgroundColor: '#ffffff', minWidth: '80px' }}>路由类型</TableHead>
+                        <TableHead className="text-center px-2 py-2 bg-white" style={{ backgroundColor: '#ffffff', minWidth: '120px' }}>主单号</TableHead>
+                        <TableHead className="text-center px-2 py-2 bg-white" style={{ backgroundColor: '#ffffff', minWidth: '90px' }}>航班号</TableHead>
+                        <TableHead className="text-center px-2 py-2 bg-white" style={{ backgroundColor: '#ffffff', minWidth: '60px' }}>始发</TableHead>
+                        <TableHead className="text-center px-2 py-2 bg-white" style={{ backgroundColor: '#ffffff', minWidth: '60px' }}>中转</TableHead>
+                        <TableHead className="text-center px-2 py-2 bg-white" style={{ backgroundColor: '#ffffff', minWidth: '60px' }}>目的</TableHead>
+                        <TableHead className="text-center px-2 py-2 bg-white" style={{ backgroundColor: '#ffffff', minWidth: '160px' }}>预计起飞</TableHead>
+                        <TableHead className="text-center px-2 py-2 bg-white" style={{ backgroundColor: '#ffffff', minWidth: '160px' }}>预计落地</TableHead>
+                        <TableHead className="text-center px-2 py-2 bg-white" style={{ backgroundColor: '#ffffff', minWidth: '90px' }}>打货上限(方)</TableHead>
+                        <TableHead className="text-center px-2 py-2 bg-white" style={{ backgroundColor: '#ffffff', minWidth: '90px' }}>打货上限(件)</TableHead>
+                        <TableHead className="text-center px-2 py-2 bg-white" style={{ backgroundColor: '#ffffff', minWidth: '90px' }}>实际件数</TableHead>
+                        <TableHead className="text-center px-2 py-2 bg-white" style={{ backgroundColor: '#ffffff', minWidth: '90px' }}>实际方数</TableHead>
+                        <TableHead className="text-center px-2 py-2 bg-white" style={{ backgroundColor: '#ffffff', minWidth: '80px' }}>操作</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
                       {mainOrders.slice(0, 50).map(order => (
                         <TableRow key={order.id}>
-                          <TableCell className="text-center px-3" style={{ minWidth: '120px' }}>{order.collect_date}</TableCell>
-                          <TableCell className="text-center px-3" style={{ minWidth: '80px' }}>{order.warehouse}</TableCell>
-                          <TableCell className="text-center px-3" style={{ minWidth: '80px' }}>{order.port}</TableCell>
-                          <TableCell className="text-center px-3" style={{ minWidth: '80px' }}>{order.cargo_type}</TableCell>
-                          <TableCell className="text-center px-3" style={{ minWidth: '100px' }}>
+                          <TableCell className="text-center px-2 py-2" style={{ minWidth: '100px' }}>{order.collect_date}</TableCell>
+                          <TableCell className="text-center px-2 py-2" style={{ minWidth: '60px' }}>{order.warehouse}</TableCell>
+                          <TableCell className="text-center px-2 py-2" style={{ minWidth: '60px' }}>{order.port}</TableCell>
+                          <TableCell className="text-center px-2 py-2" style={{ minWidth: '60px' }}>{order.cargo_type}</TableCell>
+                          <TableCell className="text-center px-2 py-2" style={{ minWidth: '80px' }}>
                             {order.route_type ? (
                               <Badge variant={order.route_type === '空运' ? 'default' : 'secondary'}>
                                 {order.route_type}
                               </Badge>
                             ) : '-'}
                           </TableCell>
-                          <TableCell className="text-center px-3" style={{ minWidth: '150px' }}>{order.main_no || '-'}</TableCell>
-                          <TableCell className="text-center px-3" style={{ minWidth: '100px' }}>{order.flight_no || '-'}</TableCell>
-                          <TableCell className="text-center px-3" style={{ minWidth: '80px' }}>{order.origin || '-'}</TableCell>
-                          <TableCell className="text-center px-3" style={{ minWidth: '80px' }}>{order.transfer || '-'}</TableCell>
-                          <TableCell className="text-center px-3" style={{ minWidth: '80px' }}>{order.dest || '-'}</TableCell>
-                          <TableCell className="text-center px-3" style={{ minWidth: '200px' }}>
+                          <TableCell className="text-center px-2 py-2" style={{ minWidth: '120px' }}>{order.main_no || '-'}</TableCell>
+                          <TableCell className="text-center px-2 py-2" style={{ minWidth: '90px' }}>{order.flight_no || '-'}</TableCell>
+                          <TableCell className="text-center px-2 py-2" style={{ minWidth: '60px' }}>{order.origin || '-'}</TableCell>
+                          <TableCell className="text-center px-2 py-2" style={{ minWidth: '60px' }}>{order.transfer || '-'}</TableCell>
+                          <TableCell className="text-center px-2 py-2" style={{ minWidth: '60px' }}>{order.dest || '-'}</TableCell>
+                          <TableCell className="text-center px-2 py-2" style={{ minWidth: '160px' }}>
                             {formatDateTime(order.actual_flight_date, order.depart_time) || '-'}
                           </TableCell>
-                          <TableCell className="text-center px-3" style={{ minWidth: '200px' }}>
+                          <TableCell className="text-center px-2 py-2" style={{ minWidth: '160px' }}>
                             {formatDateTime(order.actual_flight_date, order.arrive_time) || '-'}
                           </TableCell>
-                          <TableCell className="text-center px-3" style={{ minWidth: '120px' }}>{order.max_volume || '-'}</TableCell>
-                          <TableCell className="text-center px-3" style={{ minWidth: '120px' }}>{order.max_pieces || '-'}</TableCell>
-                          <TableCell className="text-center px-3" style={{ minWidth: '120px' }}>{order.actual_pieces || '-'}</TableCell>
-                          <TableCell className="text-center px-3" style={{ minWidth: '120px' }}>{order.actual_volume || '-'}</TableCell>
-                          <TableCell className="text-center px-3" style={{ minWidth: '100px' }}>
+                          <TableCell className="text-center px-2 py-2" style={{ minWidth: '90px' }}>{order.max_volume || '-'}</TableCell>
+                          <TableCell className="text-center px-2 py-2" style={{ minWidth: '90px' }}>{order.max_pieces || '-'}</TableCell>
+                          <TableCell className="text-center px-2 py-2" style={{ minWidth: '90px' }}>{order.actual_pieces || '-'}</TableCell>
+                          <TableCell className="text-center px-2 py-2" style={{ minWidth: '90px' }}>{order.actual_volume || '-'}</TableCell>
+                          <TableCell className="text-center px-2 py-2" style={{ minWidth: '80px' }}>
                             <Button size="sm" variant="outline" className="mr-2"
                               onClick={() => {
                                 setEditingOrder(order);
