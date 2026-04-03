@@ -1482,7 +1482,7 @@ export default function LogisticsManagement() {
               <CardContent>
                 <div className="max-h-[500px] overflow-y-auto relative">
                   <Table>
-                    <TableHeader className="sticky top-0 bg-white z-50">
+                    <TableHeader className="sticky top-0 bg-white z-50" style={{ position: 'sticky', top: 0, zIndex: 50, backgroundColor: 'white' }}>
                       <TableRow>
                         <TableHead className="bg-white">仓库</TableHead>
                         <TableHead className="bg-white">大包预估体积</TableHead>
@@ -1547,7 +1547,7 @@ export default function LogisticsManagement() {
               <CardContent>
                 <div className="max-h-[500px] overflow-y-auto relative">
                   <Table>
-                    <TableHeader className="sticky top-0 bg-white z-50">
+                    <TableHeader className="sticky top-0 bg-white z-50" style={{ position: 'sticky', top: 0, zIndex: 50, backgroundColor: 'white' }}>
                       <TableRow>
                         <TableHead className="bg-white">仓库</TableHead>
                         <TableHead className="bg-white">周几</TableHead>
@@ -1608,7 +1608,7 @@ export default function LogisticsManagement() {
               <CardContent>
                 <div className="max-h-[500px] overflow-y-auto relative">
                   <Table>
-                    <TableHeader className="sticky top-0 bg-white z-50">
+                    <TableHeader className="sticky top-0 bg-white z-50" style={{ position: 'sticky', top: 0, zIndex: 50, backgroundColor: 'white' }}>
                       <TableRow>
                         <TableHead className="bg-white">目的港代码</TableHead>
                         <TableHead className="bg-white">所属区域</TableHead>
@@ -1676,9 +1676,9 @@ export default function LogisticsManagement() {
               <CardContent>
                 <div className="max-h-[500px] overflow-y-auto relative">
                   <Table>
-                    <TableHeader className="sticky top-0 bg-white z-50">
+                    <TableHeader className="sticky top-0 bg-white z-50" style={{ position: 'sticky', top: 0, zIndex: 50, backgroundColor: 'white' }}>
                       <TableRow>
-                        <TableHead className="w-12 bg-white">
+                        <TableHead className="w-12 bg-white" style={{ backgroundColor: 'white' }}>
                           <input
                             type="checkbox"
                             checked={routeConfigs.length > 0 && selectedRouteIds.size === routeConfigs.filter(config =>
@@ -1946,7 +1946,7 @@ export default function LogisticsManagement() {
 
                 <div className="max-h-[500px] overflow-y-auto relative">
                   <Table>
-                    <TableHeader className="sticky top-0 bg-white z-50">
+                    <TableHeader className="sticky top-0 bg-white z-50" style={{ position: 'sticky', top: 0, zIndex: 50, backgroundColor: 'white' }}>
                       <TableRow>
                         <TableHead className="bg-white">揽收日期</TableHead>
                         <TableHead className="bg-white">仓库</TableHead>
@@ -2411,7 +2411,7 @@ export default function LogisticsManagement() {
               <CardContent>
                 <div className="max-h-[500px] overflow-y-auto relative">
                   <Table>
-                    <TableHeader className="sticky top-0 bg-white z-50">
+                    <TableHeader className="sticky top-0 bg-white z-50" style={{ position: 'sticky', top: 0, zIndex: 50, backgroundColor: 'white' }}>
                       <TableRow>
                         <TableHead className="text-center px-2 bg-white">揽收日期</TableHead>
                         <TableHead className="text-center px-2 bg-white">仓库</TableHead>
@@ -2578,7 +2578,7 @@ export default function LogisticsManagement() {
                 {balanceResults.length > 0 ? (
                   <div className="max-h-[500px] overflow-y-auto relative">
                     <Table className="w-full">
-                      <TableHeader className="sticky top-0 bg-white z-50">
+                      <TableHeader className="sticky top-0 bg-white z-50" style={{ position: 'sticky', top: 0, zIndex: 50, backgroundColor: 'white' }}>
                         <TableRow>
                           <TableHead className="text-center px-2 bg-white">仓库</TableHead>
                           <TableHead className="text-center px-2 bg-white">口岸</TableHead>
