@@ -1480,9 +1480,9 @@ export default function LogisticsManagement() {
                 </Button>
               </CardHeader>
               <CardContent>
-                <div className="max-h-[500px] overflow-y-auto">
+                <div className="max-h-[500px] overflow-y-auto relative">
                   <Table>
-                    <TableHeader className="sticky top-0 bg-white z-10">
+                    <TableHeader className="sticky top-0 bg-white z-50">
                       <TableRow>
                         <TableHead className="bg-white">仓库</TableHead>
                         <TableHead className="bg-white">大包预估体积</TableHead>
@@ -1545,9 +1545,9 @@ export default function LogisticsManagement() {
                 </div>
               </CardHeader>
               <CardContent>
-                <div className="max-h-[500px] overflow-y-auto">
+                <div className="max-h-[500px] overflow-y-auto relative">
                   <Table>
-                    <TableHeader className="sticky top-0 bg-white z-10">
+                    <TableHeader className="sticky top-0 bg-white z-50">
                       <TableRow>
                         <TableHead className="bg-white">仓库</TableHead>
                         <TableHead className="bg-white">周几</TableHead>
@@ -1606,9 +1606,9 @@ export default function LogisticsManagement() {
                 </Button>
               </CardHeader>
               <CardContent>
-                <div className="max-h-[500px] overflow-y-auto">
+                <div className="max-h-[500px] overflow-y-auto relative">
                   <Table>
-                    <TableHeader className="sticky top-0 bg-white z-10">
+                    <TableHeader className="sticky top-0 bg-white z-50">
                       <TableRow>
                         <TableHead className="bg-white">目的港代码</TableHead>
                         <TableHead className="bg-white">所属区域</TableHead>
@@ -1674,9 +1674,9 @@ export default function LogisticsManagement() {
                 </div>
               </CardHeader>
               <CardContent>
-                <div className="max-h-[500px] overflow-y-auto">
+                <div className="max-h-[500px] overflow-y-auto relative">
                   <Table>
-                    <TableHeader className="sticky top-0 bg-white z-10">
+                    <TableHeader className="sticky top-0 bg-white z-50">
                       <TableRow>
                         <TableHead className="w-12 bg-white">
                           <input
@@ -1944,9 +1944,9 @@ export default function LogisticsManagement() {
                   </div>
                 </div>
 
-                <div className="max-h-[500px] overflow-y-auto">
+                <div className="max-h-[500px] overflow-y-auto relative">
                   <Table>
-                    <TableHeader className="sticky top-0 bg-white z-10">
+                    <TableHeader className="sticky top-0 bg-white z-50">
                       <TableRow>
                         <TableHead className="bg-white">揽收日期</TableHead>
                         <TableHead className="bg-white">仓库</TableHead>
@@ -2409,9 +2409,9 @@ export default function LogisticsManagement() {
                 <span className="text-sm text-gray-500">共 {mainOrders.length} 条记录</span>
               </CardHeader>
               <CardContent>
-                <div className="max-h-[500px] overflow-y-auto">
+                <div className="max-h-[500px] overflow-y-auto relative">
                   <Table>
-                    <TableHeader className="sticky top-0 bg-white z-10">
+                    <TableHeader className="sticky top-0 bg-white z-50">
                       <TableRow>
                         <TableHead className="text-center px-2 bg-white">揽收日期</TableHead>
                         <TableHead className="text-center px-2 bg-white">仓库</TableHead>
@@ -2576,9 +2576,9 @@ export default function LogisticsManagement() {
               <CardHeader>查询结果</CardHeader>
               <CardContent>
                 {balanceResults.length > 0 ? (
-                  <div className="max-h-[500px] overflow-y-auto">
+                  <div className="max-h-[500px] overflow-y-auto relative">
                     <Table className="w-full">
-                      <TableHeader className="sticky top-0 bg-white z-10">
+                      <TableHeader className="sticky top-0 bg-white z-50">
                         <TableRow>
                           <TableHead className="text-center px-2 bg-white">仓库</TableHead>
                           <TableHead className="text-center px-2 bg-white">口岸</TableHead>
