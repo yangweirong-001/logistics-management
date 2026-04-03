@@ -286,6 +286,27 @@ export default function LogisticsManagement() {
     surplus: number;
   }>>([]);
   
+  // 格式化时间为 HH:mm
+  const formatTime = (timeStr: string | null | undefined): string => {
+    if (!timeStr) return '';
+    const cleanTime = timeStr.trim();
+    // 尝试解析 HH:mm:ss 格式，只取 HH:mm
+    const timeMatch = cleanTime.match(/^(\d{1,2}):(\d{1,2})(?::(\d{1,2}))?$/);
+    if (timeMatch) {
+      const hours = String(parseInt(timeMatch[1])).padStart(2, '0');
+      const minutes = String(parseInt(timeMatch[2])).padStart(2, '0');
+      return `${hours}:${minutes}`;
+    }
+    return cleanTime;
+  };
+
+  // 格式化日期时间
+  const formatDateTime = (dateStr: string | null | undefined, timeStr: string | null | undefined): string => {
+    if (!dateStr) return formatTime(timeStr);
+    if (!timeStr) return dateStr;
+    return `${dateStr} ${formatTime(timeStr)}`;
+  };
+
   // 主单查询条件
   const [orderQueryStartDate, setOrderQueryStartDate] = useState('');
   const [orderQueryEndDate, setOrderQueryEndDate] = useState('');
@@ -2249,24 +2270,18 @@ export default function LogisticsManagement() {
                 <div className="grid grid-cols-5 gap-4 mb-4">
                   <div>
                     <Label className="text-sm text-gray-600 mb-1 block">起飞时间</Label>
-                    <Input className="bg-gray-100" value={
-                      orderForm.actual_flight_date && orderForm.depart_time 
-                        ? `${orderForm.actual_flight_date} ${orderForm.depart_time}`
-                        : orderForm.depart_time || ''
-                    } readOnly placeholder="自动填充" />
+                    <Input className="bg-gray-100" value={formatDateTime(orderForm.actual_flight_date, orderForm.depart_time)}
+                      readOnly placeholder="自动填充" />
                   </div>
                   <div>
                     <Label className="text-sm text-gray-600 mb-1 block">二程航班</Label>
-                    <Input className="bg-gray-100" value={orderForm.second_flight || ''} 
+                    <Input className="bg-gray-100" value={orderForm.second_flight || ''}
                       readOnly placeholder="自动填充" />
                   </div>
                   <div>
                     <Label className="text-sm text-gray-600 mb-1 block">到港时间</Label>
-                    <Input className="bg-gray-100" value={
-                      orderForm.actual_flight_date && orderForm.arrive_time 
-                        ? `${orderForm.actual_flight_date} ${orderForm.arrive_time}`
-                        : orderForm.arrive_time || ''
-                    } readOnly placeholder="自动填充" />
+                    <Input className="bg-gray-100" value={formatDateTime(orderForm.actual_flight_date, orderForm.arrive_time)}
+                      readOnly placeholder="自动填充" />
                   </div>
                   <div>
                     <Label className="text-sm text-gray-600 mb-1 block">实际件数</Label>
@@ -2459,14 +2474,10 @@ export default function LogisticsManagement() {
                           <TableCell className="text-center px-2">{order.transfer || '-'}</TableCell>
                           <TableCell className="text-center px-2">{order.dest || '-'}</TableCell>
                           <TableCell className="text-center px-2">
-                            {order.actual_flight_date && order.depart_time
-                              ? `${order.actual_flight_date} ${order.depart_time}`
-                              : order.depart_time || '-'}
+                            {formatDateTime(order.actual_flight_date, order.depart_time) || '-'}
                           </TableCell>
                           <TableCell className="text-center px-2">
-                            {order.actual_flight_date && order.arrive_time
-                              ? `${order.actual_flight_date} ${order.arrive_time}`
-                              : order.arrive_time || '-'}
+                            {formatDateTime(order.actual_flight_date, order.arrive_time) || '-'}
                           </TableCell>
                           <TableCell className="text-center px-2">{order.max_volume || '-'}</TableCell>
                           <TableCell className="text-center px-2">{order.max_pieces || '-'}</TableCell>
@@ -2993,15 +3004,11 @@ export default function LogisticsManagement() {
                     <TableCell className="text-center">{order.dest || '-'}</TableCell>
                     <TableCell className="text-center">{order.max_volume || '-'}</TableCell>
                     <TableCell className="text-center">
-                      {order.actual_flight_date && order.depart_time 
-                        ? `${order.actual_flight_date} ${order.depart_time}` 
-                        : '-'}
+                      {formatDateTime(order.actual_flight_date, order.depart_time) || '-'}
                     </TableCell>
                     <TableCell className="text-center">{order.second_flight || '-'}</TableCell>
                     <TableCell className="text-center">
-                      {order.actual_flight_date && order.arrive_time 
-                        ? `${order.actual_flight_date} ${order.arrive_time}` 
-                        : '-'}
+                      {formatDateTime(order.actual_flight_date, order.arrive_time) || '-'}
                     </TableCell>
                     <TableCell className="text-center">{order.actual_pieces || '-'}</TableCell>
                     <TableCell className="text-center">{order.actual_weight || '-'}</TableCell>
