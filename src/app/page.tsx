@@ -2986,28 +2986,28 @@ export default function LogisticsManagement() {
             }}>查询</Button>
           </div>
           <div className="flex-1 overflow-auto border rounded-lg" style={{ maxHeight: 'calc(90vh - 200px)' }}>
-            <Table style={{ tableLayout: 'fixed' }} className="w-full text-base">
+            <Table style={{ tableLayout: 'fixed', minWidth: '1800px' }} className="w-full text-base">
               <TableHeader className="sticky top-0 bg-white z-10">
                 <TableRow>
-                  <TableHead className="bg-gray-50 text-center px-1 py-1" style={{ width: '90px' }}>揽收日期</TableHead>
-                  <TableHead className="bg-gray-50 text-center px-1 py-1" style={{ width: '60px' }}>仓库</TableHead>
-                  <TableHead className="bg-gray-50 text-center px-1 py-1" style={{ width: '60px' }}>口岸</TableHead>
-                  <TableHead className="bg-gray-50 text-center px-1 py-1" style={{ width: '60px' }}>货物属性</TableHead>
-                  <TableHead className="bg-gray-50 text-center px-1 py-1" style={{ width: '70px' }}>路由类型</TableHead>
-                  <TableHead className="bg-gray-50 text-center px-1 py-1" style={{ width: '60px' }}>类别</TableHead>
-                  <TableHead className="bg-gray-50 text-center px-1 py-1" style={{ width: '100px' }}>主单号</TableHead>
-                  <TableHead className="bg-gray-50 text-center px-1 py-1" style={{ width: '70px' }}>航班号</TableHead>
-                  <TableHead className="bg-gray-50 text-center px-1 py-1" style={{ width: '60px' }}>目的港</TableHead>
-                  <TableHead className="bg-gray-50 text-center px-1 py-1" style={{ width: '80px' }}>打货上限</TableHead>
-                  <TableHead className="bg-gray-50 text-center px-1 py-1" style={{ width: '120px' }}>起飞时间</TableHead>
-                  <TableHead className="bg-gray-50 text-center px-1 py-1" style={{ width: '80px' }}>二程航班</TableHead>
-                  <TableHead className="bg-gray-50 text-center px-1 py-1" style={{ width: '120px' }}>到港时间</TableHead>
-                  <TableHead className="bg-gray-50 text-center px-1 py-1" style={{ width: '70px' }}>实际件数</TableHead>
-                  <TableHead className="bg-gray-50 text-center px-1 py-1" style={{ width: '70px' }}>实际重量</TableHead>
-                  <TableHead className="bg-gray-50 text-center px-1 py-1" style={{ width: '70px' }}>实际体积</TableHead>
-                  <TableHead className="bg-gray-50 text-center px-1 py-1" style={{ width: '70px' }}>实际票数</TableHead>
-                  <TableHead className="bg-gray-50 text-center px-1 py-1" style={{ width: '80px' }}>备注</TableHead>
-                  <TableHead className="bg-gray-50 text-center px-1 py-1 sticky right-0" style={{ width: '100px' }}>操作</TableHead>
+                  <TableHead className="bg-gray-50 text-center px-1 py-1" style={{ width: '100px' }}>揽收日期</TableHead>
+                  <TableHead className="bg-gray-50 text-center px-1 py-1" style={{ width: '70px' }}>仓库</TableHead>
+                  <TableHead className="bg-gray-50 text-center px-1 py-1" style={{ width: '70px' }}>口岸</TableHead>
+                  <TableHead className="bg-gray-50 text-center px-1 py-1" style={{ width: '70px' }}>货物属性</TableHead>
+                  <TableHead className="bg-gray-50 text-center px-1 py-1" style={{ width: '80px' }}>路由类型</TableHead>
+                  <TableHead className="bg-gray-50 text-center px-1 py-1" style={{ width: '70px' }}>类别</TableHead>
+                  <TableHead className="bg-gray-50 text-center px-1 py-1" style={{ width: '120px' }}>主单号</TableHead>
+                  <TableHead className="bg-gray-50 text-center px-1 py-1" style={{ width: '90px' }}>航班号</TableHead>
+                  <TableHead className="bg-gray-50 text-center px-1 py-1" style={{ width: '70px' }}>目的港</TableHead>
+                  <TableHead className="bg-gray-50 text-center px-1 py-1" style={{ width: '100px' }}>打货上限</TableHead>
+                  <TableHead className="bg-gray-50 text-center px-1 py-1" style={{ width: '140px' }}>起飞时间</TableHead>
+                  <TableHead className="bg-gray-50 text-center px-1 py-1" style={{ width: '100px' }}>二程航班</TableHead>
+                  <TableHead className="bg-gray-50 text-center px-1 py-1" style={{ width: '140px' }}>到港时间</TableHead>
+                  <TableHead className="bg-gray-50 text-center px-1 py-1" style={{ width: '90px' }}>实际件数</TableHead>
+                  <TableHead className="bg-gray-50 text-center px-1 py-1" style={{ width: '90px' }}>实际重量</TableHead>
+                  <TableHead className="bg-gray-50 text-center px-1 py-1" style={{ width: '90px' }}>实际体积</TableHead>
+                  <TableHead className="bg-gray-50 text-center px-1 py-1" style={{ width: '90px' }}>实际票数</TableHead>
+                  <TableHead className="bg-gray-50 text-center px-1 py-1" style={{ width: '100px' }}>备注</TableHead>
+                  <TableHead className="bg-gray-50 text-center px-1 py-1 sticky right-0" style={{ width: '120px' }}>操作</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
