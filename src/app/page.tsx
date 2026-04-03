@@ -1314,7 +1314,18 @@ export default function LogisticsManagement() {
     
     setBalanceResults(results);
   };
-  
+
+  // 重置欠方余方查询
+  const resetBalanceQuery = () => {
+    setBalanceQuery({
+      collect_date: '',
+      warehouse: '全部',
+      port: '全部',
+      cargo_type: '全部',
+    });
+    setBalanceResults([]);
+  };
+
   // 获取前一天日期
   const getPrevDate = (dateStr: string) => {
     const date = new Date(dateStr);
@@ -2440,36 +2451,36 @@ export default function LogisticsManagement() {
               </CardHeader>
               <CardContent className="p-0">
                 <div className="overflow-auto max-h-[800px]">
-                  <table style={{ tableLayout: 'auto', minWidth: '2200px', whiteSpace: 'nowrap', borderCollapse: 'collapse' }}>
-                    <thead className="sticky top-0 bg-white z-10" style={{ position: 'sticky', top: 0, zIndex: 10, backgroundColor: '#ffffff' }}>
+                  <table style={{ tableLayout: 'auto', minWidth: '2200px', whiteSpace: 'nowrap', borderCollapse: 'separate', borderSpacing: 0 }}>
+                    <thead>
                       <tr>
-                        <th className="text-center px-2 py-2 sticky left-0 z-20" style={{ backgroundColor: '#ffffff', minWidth: '100px', left: 0, position: 'sticky', zIndex: 20, borderRight: '2px solid #e5e7eb' }}>揽收日期</th>
-                        <th className="text-center px-2 py-2 sticky left-0 z-20" style={{ backgroundColor: '#ffffff', minWidth: '60px', left: '100px', position: 'sticky', zIndex: 20, borderRight: '2px solid #e5e7eb' }}>仓库</th>
-                        <th className="text-center px-2 py-2 sticky left-0 z-20" style={{ backgroundColor: '#ffffff', minWidth: '60px', left: '160px', position: 'sticky', zIndex: 20, borderRight: '2px solid #e5e7eb' }}>口岸</th>
-                        <th className="text-center px-2 py-2 sticky left-0 z-20" style={{ backgroundColor: '#ffffff', minWidth: '60px', left: '220px', position: 'sticky', zIndex: 20, borderRight: '2px solid #e5e7eb' }}>货物属性</th>
-                        <th className="text-center px-2 py-2 sticky left-0 z-20" style={{ backgroundColor: '#ffffff', minWidth: '80px', left: '280px', position: 'sticky', zIndex: 20, borderRight: '2px solid #e5e7eb' }}>路由类型</th>
-                        <th className="text-center px-2 py-2" style={{ backgroundColor: '#ffffff', minWidth: '120px' }}>主单号</th>
-                        <th className="text-center px-2 py-2" style={{ backgroundColor: '#ffffff', minWidth: '90px' }}>航班号</th>
-                        <th className="text-center px-2 py-2" style={{ backgroundColor: '#ffffff', minWidth: '60px' }}>始发</th>
-                        <th className="text-center px-2 py-2" style={{ backgroundColor: '#ffffff', minWidth: '60px' }}>中转</th>
-                        <th className="text-center px-2 py-2" style={{ backgroundColor: '#ffffff', minWidth: '60px' }}>目的</th>
-                        <th className="text-center px-2 py-2" style={{ backgroundColor: '#ffffff', minWidth: '160px' }}>预计起飞</th>
-                        <th className="text-center px-2 py-2" style={{ backgroundColor: '#ffffff', minWidth: '160px' }}>预计落地</th>
-                        <th className="text-center px-2 py-2" style={{ backgroundColor: '#ffffff', minWidth: '90px' }}>打货上限(方)</th>
-                        <th className="text-center px-2 py-2" style={{ backgroundColor: '#ffffff', minWidth: '90px' }}>打货上限(件)</th>
-                        <th className="text-center px-2 py-2" style={{ backgroundColor: '#ffffff', minWidth: '90px' }}>实际件数</th>
-                        <th className="text-center px-2 py-2" style={{ backgroundColor: '#ffffff', minWidth: '90px' }}>实际方数</th>
-                        <th className="text-center px-2 py-2" style={{ backgroundColor: '#ffffff', minWidth: '80px' }}>操作</th>
+                        <th className="text-center px-2 py-2" style={{ minWidth: '100px', position: 'sticky', top: 0, left: 0, zIndex: 30, backgroundColor: '#ffffff', borderRight: '2px solid #e5e7eb' }}>揽收日期</th>
+                        <th className="text-center px-2 py-2" style={{ minWidth: '60px', position: 'sticky', top: 0, left: '100px', zIndex: 30, backgroundColor: '#ffffff', borderRight: '2px solid #e5e7eb' }}>仓库</th>
+                        <th className="text-center px-2 py-2" style={{ minWidth: '60px', position: 'sticky', top: 0, left: '160px', zIndex: 30, backgroundColor: '#ffffff', borderRight: '2px solid #e5e7eb' }}>口岸</th>
+                        <th className="text-center px-2 py-2" style={{ minWidth: '60px', position: 'sticky', top: 0, left: '220px', zIndex: 30, backgroundColor: '#ffffff', borderRight: '2px solid #e5e7eb' }}>货物属性</th>
+                        <th className="text-center px-2 py-2" style={{ minWidth: '80px', position: 'sticky', top: 0, left: '280px', zIndex: 30, backgroundColor: '#ffffff', borderRight: '2px solid #e5e7eb' }}>路由类型</th>
+                        <th className="text-center px-2 py-2" style={{ minWidth: '120px', position: 'sticky', top: 0, zIndex: 20, backgroundColor: '#ffffff' }}>主单号</th>
+                        <th className="text-center px-2 py-2" style={{ minWidth: '90px', position: 'sticky', top: 0, zIndex: 20, backgroundColor: '#ffffff' }}>航班号</th>
+                        <th className="text-center px-2 py-2" style={{ minWidth: '60px', position: 'sticky', top: 0, zIndex: 20, backgroundColor: '#ffffff' }}>始发</th>
+                        <th className="text-center px-2 py-2" style={{ minWidth: '60px', position: 'sticky', top: 0, zIndex: 20, backgroundColor: '#ffffff' }}>中转</th>
+                        <th className="text-center px-2 py-2" style={{ minWidth: '60px', position: 'sticky', top: 0, zIndex: 20, backgroundColor: '#ffffff' }}>目的</th>
+                        <th className="text-center px-2 py-2" style={{ minWidth: '160px', position: 'sticky', top: 0, zIndex: 20, backgroundColor: '#ffffff' }}>预计起飞</th>
+                        <th className="text-center px-2 py-2" style={{ minWidth: '160px', position: 'sticky', top: 0, zIndex: 20, backgroundColor: '#ffffff' }}>预计落地</th>
+                        <th className="text-center px-2 py-2" style={{ minWidth: '90px', position: 'sticky', top: 0, zIndex: 20, backgroundColor: '#ffffff' }}>打货上限(方)</th>
+                        <th className="text-center px-2 py-2" style={{ minWidth: '90px', position: 'sticky', top: 0, zIndex: 20, backgroundColor: '#ffffff' }}>打货上限(件)</th>
+                        <th className="text-center px-2 py-2" style={{ minWidth: '90px', position: 'sticky', top: 0, zIndex: 20, backgroundColor: '#ffffff' }}>实际件数</th>
+                        <th className="text-center px-2 py-2" style={{ minWidth: '90px', position: 'sticky', top: 0, zIndex: 20, backgroundColor: '#ffffff' }}>实际方数</th>
+                        <th className="text-center px-2 py-2" style={{ minWidth: '80px', position: 'sticky', top: 0, zIndex: 20, backgroundColor: '#ffffff' }}>操作</th>
                       </tr>
                     </thead>
                     <tbody>
                       {mainOrders.slice(0, 50).map(order => (
                         <tr key={order.id} className="border-b hover:bg-gray-50">
-                          <td className="text-center px-2 py-2 sticky left-0 z-20" style={{ minWidth: '100px', left: 0, position: 'sticky', zIndex: 20, borderRight: '2px solid #e5e7eb', backgroundColor: 'white' }}>{order.collect_date}</td>
-                          <td className="text-center px-2 py-2 sticky left-0 z-20" style={{ minWidth: '60px', left: '100px', position: 'sticky', zIndex: 20, borderRight: '2px solid #e5e7eb', backgroundColor: 'white' }}>{order.warehouse}</td>
-                          <td className="text-center px-2 py-2 sticky left-0 z-20" style={{ minWidth: '60px', left: '160px', position: 'sticky', zIndex: 20, borderRight: '2px solid #e5e7eb', backgroundColor: 'white' }}>{order.port}</td>
-                          <td className="text-center px-2 py-2 sticky left-0 z-20" style={{ minWidth: '60px', left: '220px', position: 'sticky', zIndex: 20, borderRight: '2px solid #e5e7eb', backgroundColor: 'white' }}>{order.cargo_type}</td>
-                          <td className="text-center px-2 py-2 sticky left-0 z-20" style={{ minWidth: '80px', left: '280px', position: 'sticky', zIndex: 20, borderRight: '2px solid #e5e7eb', backgroundColor: 'white' }}>
+                          <td className="text-center px-2 py-2" style={{ minWidth: '100px', position: 'sticky', left: 0, zIndex: 25, borderRight: '2px solid #e5e7eb', backgroundColor: 'white' }}>{order.collect_date}</td>
+                          <td className="text-center px-2 py-2" style={{ minWidth: '60px', position: 'sticky', left: '100px', zIndex: 25, borderRight: '2px solid #e5e7eb', backgroundColor: 'white' }}>{order.warehouse}</td>
+                          <td className="text-center px-2 py-2" style={{ minWidth: '60px', position: 'sticky', left: '160px', zIndex: 25, borderRight: '2px solid #e5e7eb', backgroundColor: 'white' }}>{order.port}</td>
+                          <td className="text-center px-2 py-2" style={{ minWidth: '60px', position: 'sticky', left: '220px', zIndex: 25, borderRight: '2px solid #e5e7eb', backgroundColor: 'white' }}>{order.cargo_type}</td>
+                          <td className="text-center px-2 py-2" style={{ minWidth: '80px', position: 'sticky', left: '280px', zIndex: 25, borderRight: '2px solid #e5e7eb', backgroundColor: 'white' }}>
                             {order.route_type ? (
                               <Badge variant={order.route_type === '空运' ? 'default' : 'secondary'}>
                                 {order.route_type}
@@ -2589,8 +2600,9 @@ export default function LogisticsManagement() {
                       </SelectContent>
                     </Select>
                   </div>
-                  <div className="flex items-end">
+                  <div className="flex items-end gap-2">
                     <Button onClick={queryBalance}>查询</Button>
+                    <Button variant="outline" onClick={resetBalanceQuery}>重置查询</Button>
                   </div>
                 </div>
               </CardContent>
