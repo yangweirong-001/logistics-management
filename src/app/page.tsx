@@ -1510,8 +1510,8 @@ export default function LogisticsManagement() {
                 </Button>
               </CardHeader>
               <CardContent>
-                <div className="max-h-[800px] overflow-auto relative">
-                  <Table style={{ tableLayout: 'fixed', width: '100%' }}>
+                <div className="overflow-auto relative" style={{ minWidth: '1800px' }}>
+                  <Table style={{ tableLayout: 'auto', width: '100%', minWidth: '1800px' }}>
                     <TableHeader className="sticky top-0 bg-white z-[9999]" style={{ position: 'sticky', top: 0, zIndex: 9999, backgroundColor: '#ffffff' }}>
                       <TableRow>
                         <TableHead className="bg-white" style={{ backgroundColor: '#ffffff', zIndex: 9999 }}>仓库</TableHead>
