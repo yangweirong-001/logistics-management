@@ -1996,7 +1996,7 @@ export default function LogisticsManagement() {
                 </div>
 
                 <div className="max-h-[300px] overflow-y-auto relative">
-                  <Table>
+                  <Table style={{ tableLayout: 'fixed', minWidth: '1400px' }}>
                     <TableHeader className="sticky top-0 bg-white z-50" style={{ position: 'sticky', top: 0, zIndex: 50, backgroundColor: 'white' }}>
                       <TableRow>
                         <TableHead className="bg-white text-center px-1 py-1" style={{ backgroundColor: '#ffffff', zIndex: 10, width: '90px' }}>揽收日期</TableHead>
