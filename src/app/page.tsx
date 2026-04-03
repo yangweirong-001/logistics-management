@@ -456,6 +456,38 @@ export default function LogisticsManagement() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [volumeForm.collect_date, volumeForm.warehouse, volumeForm.package_count, areaConfigs, flightConfigs]);
   
+  // 监听主单表单航班信息变化，自动匹配路由填充时间
+  useEffect(() => {
+    const { flight_no, origin, dest } = orderForm;
+    
+    // 必填字段校验
+    if (!flight_no || !origin || !dest) return;
+    
+    const transfer = orderForm.transfer || '';
+    
+    // 查找匹配的路由
+    const matchedRoute = routeConfigs.find(r => {
+      const routeTransfer = r.transfer || '';
+      return (
+        r.flight_no === flight_no &&
+        r.origin === origin &&
+        routeTransfer === transfer &&
+        r.dest === dest
+      );
+    });
+    
+    if (matchedRoute) {
+      console.log('匹配到路由:', matchedRoute);
+      setOrderForm(prev => ({
+        ...prev,
+        second_flight: matchedRoute.second_flight || '',
+        depart_time: matchedRoute.depart_time || '',
+        arrive_time: matchedRoute.arrive_time || '',
+      }));
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [orderForm.flight_no, orderForm.origin, orderForm.transfer, orderForm.dest, routeConfigs]);
+  
   // 区域参数配置操作
   const saveAreaConfig = async (formData: FormData) => {
     // 大包预估体积保留12位小数
@@ -2001,8 +2033,6 @@ export default function LogisticsManagement() {
                       onChange={e => { 
                         const value = e.target.value.toUpperCase();
                         setOrderForm(prev => ({ ...prev, flight_no: value }));
-                        // 延迟匹配，等状态更新后再匹配
-                        setTimeout(() => matchRouteAndFillTimes(), 100);
                       }}
                       placeholder="请输入航班号"
                     />
@@ -2013,7 +2043,6 @@ export default function LogisticsManagement() {
                       value={orderForm.origin || ''} 
                       onChange={e => {
                         setOrderForm(prev => ({ ...prev, origin: e.target.value.toUpperCase() }));
-                        setTimeout(() => matchRouteAndFillTimes(), 100);
                       }}
                       placeholder="请输入始发港" 
                     />
@@ -2024,7 +2053,6 @@ export default function LogisticsManagement() {
                       value={orderForm.transfer || ''} 
                       onChange={e => {
                         setOrderForm(prev => ({ ...prev, transfer: e.target.value.toUpperCase() }));
-                        setTimeout(() => matchRouteAndFillTimes(), 100);
                       }}
                       placeholder="请输入中转站" 
                     />
@@ -2035,7 +2063,6 @@ export default function LogisticsManagement() {
                       value={orderForm.dest || ''} 
                       onChange={e => {
                         setOrderForm(prev => ({ ...prev, dest: e.target.value.toUpperCase() }));
-                        setTimeout(() => matchRouteAndFillTimes(), 100);
                       }}
                       placeholder="请输入目的港" 
                     />
