@@ -2438,8 +2438,9 @@ export default function LogisticsManagement() {
                 <span>查询结果</span>
                 <span className="text-sm text-gray-500">共 {mainOrders.length} 条记录</span>
               </CardHeader>
-              <CardContent>
-                <Table style={{ tableLayout: 'auto', minWidth: '2200px', whiteSpace: 'nowrap' }} className="max-h-[800px]">
+              <CardContent className="p-0 overflow-auto max-h-[800px]">
+                <div style={{ minWidth: '2200px', display: 'inline-block' }}>
+                  <Table style={{ tableLayout: 'auto', whiteSpace: 'nowrap' }}>
                     <TableHeader className="sticky top-0 bg-white z-10" style={{ position: 'sticky', top: 0, zIndex: 10, backgroundColor: '#ffffff' }}>
                       <TableRow>
                         <TableHead className="text-center px-2 py-2 bg-white sticky left-0 z-20" style={{ backgroundColor: '#ffffff', minWidth: '100px', left: 0, position: 'sticky', zIndex: 20, borderRight: '2px solid #e5e7eb' }}>揽收日期</TableHead>
@@ -2532,6 +2533,7 @@ export default function LogisticsManagement() {
                       ))}
                     </TableBody>
                   </Table>
+                </div>
               </CardContent>
             </Card>
           </div>
