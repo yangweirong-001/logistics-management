@@ -933,7 +933,7 @@ export default function LogisticsManagement() {
             kansai_special: kansaiSpecial.toFixed(3),
             air_volume: airVolume.toFixed(3),
             sea_air_volume: seaAirVolume.toFixed(3),
-            weight: volumeForm.weight ? volumeForm.weight.toFixed(2) : null,
+            weight: volumeForm.weight ? truncateToDecimals(volumeForm.weight, 2) : null,
             is_complete: volumeForm.is_complete,
           }),
         });
@@ -960,7 +960,7 @@ export default function LogisticsManagement() {
             kansai_special: kansaiSpecial.toFixed(3),
             air_volume: airVolume.toFixed(3),
             sea_air_volume: seaAirVolume.toFixed(3),
-            weight: volumeForm.weight ? volumeForm.weight.toFixed(2) : null,
+            weight: volumeForm.weight ? truncateToDecimals(volumeForm.weight, 2) : null,
             is_complete: volumeForm.is_complete,
           }),
         });
@@ -1253,7 +1253,16 @@ export default function LogisticsManagement() {
     date.setDate(date.getDate() - 1);
     return date.toISOString().split('T')[0];
   };
-  
+
+  // 截断数值到指定小数位（不四舍五入）
+  const truncateToDecimals = (num: number | string | null, decimals: number): string => {
+    const numValue = typeof num === 'string' ? parseFloat(num) : (num || 0);
+    if (isNaN(numValue)) return '0';
+    const factor = Math.pow(10, decimals);
+    const truncated = Math.floor(numValue * factor) / factor;
+    return truncated.toFixed(decimals);
+  };
+
   // 根据航班号+始发港+中转站+目的港匹配路由，自动填充起飞时间、落地时间、二程航班
   const matchRouteAndFillTimes = () => {
     const { flight_no, origin, transfer, dest } = orderForm;
@@ -1832,7 +1841,7 @@ export default function LogisticsManagement() {
                         <TableCell>{record.collect_date}</TableCell>
                         <TableCell>{record.warehouse}</TableCell>
                         <TableCell>{record.package_count}</TableCell>
-                        <TableCell>{(record.weight || 0).toFixed(2)}</TableCell>
+                        <TableCell>{record.weight ? truncateToDecimals(record.weight, 2) : '0.00'}</TableCell>
                         <TableCell>{(record.total_volume || 0).toFixed(3)}</TableCell>
                         <TableCell>{(record.kanto_total || 0).toFixed(3)}</TableCell>
                         <TableCell>{(record.kansai_total || 0).toFixed(3)}</TableCell>
