@@ -2449,7 +2449,7 @@ export default function LogisticsManagement() {
                 <span className="font-semibold">查询结果</span>
                 <span className="text-sm text-gray-500">共 {mainOrders.length} 条记录</span>
               </div>
-              <div className="overflow-x-auto" style={{ maxHeight: '800px', overflowY: 'auto' }}>
+              <div style={{ overflow: 'auto', maxHeight: '800px' }}>
                 <table style={{ borderCollapse: 'collapse', minWidth: '2200px' }}>
                   <thead>
                     <tr>
