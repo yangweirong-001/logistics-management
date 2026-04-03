@@ -1313,13 +1313,13 @@ export default function LogisticsManagement() {
         </div>
       )}
       <div className="flex min-h-screen bg-gray-100">
-      {/* 侧边栏 */}
-      <aside className="w-60 bg-slate-900 text-white flex flex-col">
+      {/* 侧边栏 - 固定定位 */}
+      <aside className="fixed left-0 top-0 h-screen w-60 bg-slate-900 text-white flex flex-col z-40">
         <div className="p-5 text-lg font-bold border-b border-white/10 text-center">
           物流管理系统
         </div>
-        
-        <nav className="flex-1 py-2">
+
+        <nav className="flex-1 py-2 overflow-y-auto">
           <div className="px-4 py-2 text-xs text-white/50 uppercase">配置管理</div>
           <button
             onClick={() => setActiveTab('config-area')}
@@ -1386,8 +1386,8 @@ export default function LogisticsManagement() {
         </div>
       </aside>
       
-      {/* 主内容区 */}
-      <main className="flex-1 p-5">
+      {/* 主内容区 - 添加左边距避免被侧边栏遮挡 */}
+      <main className="ml-60 flex-1 p-5">
         {/* 区域参数配置 */}
         {activeTab === 'config-area' && (
           <div>
