@@ -157,8 +157,8 @@ export const volumeEstimateApi = {
 
   async getByDateOrPrevDay(collectDate: string, warehouse: string) {
     // 先查当天
-    let data = await this.getByDateAndWarehouse(collectDate, warehouse);
-    
+    const data = await this.getByDateAndWarehouse(collectDate, warehouse);
+
     if (data) {
       // 如果当天有数据
       if (data.is_complete === '是') {

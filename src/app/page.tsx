@@ -392,7 +392,7 @@ export default function LogisticsManagement() {
     loadRouteConfigs();
     loadVolumeEstimates();
     loadMainOrders();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+   
   }, []);
   
   // 监听volumeForm变化，自动计算（延迟执行避免频繁计算）
@@ -460,7 +460,7 @@ export default function LogisticsManagement() {
     }, 100);
     
     return () => clearTimeout(timer);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+   
   }, [volumeForm.collect_date, volumeForm.warehouse, volumeForm.package_count, areaConfigs, flightConfigs]);
   
   // 监听主单表单航班信息变化，自动匹配路由填充时间
@@ -1457,45 +1457,47 @@ export default function LogisticsManagement() {
                 </Button>
               </CardHeader>
               <CardContent>
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>仓库</TableHead>
-                      <TableHead>大包预估体积</TableHead>
-                      <TableHead>关东目的港占比</TableHead>
-                      <TableHead>关西目的港占比</TableHead>
-                      <TableHead>关东普货占比</TableHead>
-                      <TableHead>关东特货占比</TableHead>
-                      <TableHead>关西普货占比</TableHead>
-                      <TableHead>关西特货占比</TableHead>
-                      <TableHead>操作</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {areaConfigs.map(config => (
-                      <TableRow key={config.id}>
-                        <TableCell>{config.warehouse}</TableCell>
-                        <TableCell>{config.package_volume}</TableCell>
-                        <TableCell>{config.kanto_ratio}%</TableCell>
-                        <TableCell>{config.kansai_ratio}%</TableCell>
-                        <TableCell>{config.kanto_normal_ratio}%</TableCell>
-                        <TableCell>{config.kanto_special_ratio}%</TableCell>
-                        <TableCell>{config.kansai_normal_ratio}%</TableCell>
-                        <TableCell>{config.kansai_special_ratio}%</TableCell>
-                        <TableCell>
-                          <Button size="sm" variant="outline" className="mr-2"
-                            onClick={() => { setEditingArea(config); setAreaModalOpen(true); }}>
-                            编辑
-                          </Button>
-                          <Button size="sm" variant="destructive"
-                            onClick={() => deleteAreaConfig(config.id)}>
-                            删除
-                          </Button>
-                        </TableCell>
+                <div className="max-h-[500px] overflow-y-auto">
+                  <Table>
+                    <TableHeader className="sticky top-0 bg-white z-10">
+                      <TableRow>
+                        <TableHead className="bg-white">仓库</TableHead>
+                        <TableHead className="bg-white">大包预估体积</TableHead>
+                        <TableHead className="bg-white">关东目的港占比</TableHead>
+                        <TableHead className="bg-white">关西目的港占比</TableHead>
+                        <TableHead className="bg-white">关东普货占比</TableHead>
+                        <TableHead className="bg-white">关东特货占比</TableHead>
+                        <TableHead className="bg-white">关西普货占比</TableHead>
+                        <TableHead className="bg-white">关西特货占比</TableHead>
+                        <TableHead className="bg-white">操作</TableHead>
                       </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
+                    </TableHeader>
+                    <TableBody>
+                      {areaConfigs.map(config => (
+                        <TableRow key={config.id}>
+                          <TableCell>{config.warehouse}</TableCell>
+                          <TableCell>{config.package_volume}</TableCell>
+                          <TableCell>{config.kanto_ratio}%</TableCell>
+                          <TableCell>{config.kansai_ratio}%</TableCell>
+                          <TableCell>{config.kanto_normal_ratio}%</TableCell>
+                          <TableCell>{config.kanto_special_ratio}%</TableCell>
+                          <TableCell>{config.kansai_normal_ratio}%</TableCell>
+                          <TableCell>{config.kansai_special_ratio}%</TableCell>
+                          <TableCell>
+                            <Button size="sm" variant="outline" className="mr-2"
+                              onClick={() => { setEditingArea(config); setAreaModalOpen(true); }}>
+                              编辑
+                            </Button>
+                            <Button size="sm" variant="destructive"
+                              onClick={() => deleteAreaConfig(config.id)}>
+                              删除
+                            </Button>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
               </CardContent>
             </Card>
           </div>
@@ -1520,49 +1522,51 @@ export default function LogisticsManagement() {
                 </div>
               </CardHeader>
               <CardContent>
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>仓库</TableHead>
-                      <TableHead>周几</TableHead>
-                      <TableHead>关东普货路由</TableHead>
-                      <TableHead>关西普货路由</TableHead>
-                      <TableHead>关东特货路由</TableHead>
-                      <TableHead>关西特货路由</TableHead>
-                      <TableHead>备注</TableHead>
-                      <TableHead>操作</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {flightConfigs
-                      .filter(config => 
-                        !flightSearchQuery || 
-                        config.warehouse.includes(flightSearchQuery) || 
-                        config.weekday.includes(flightSearchQuery)
-                      )
-                      .map(config => (
-                      <TableRow key={config.id}>
-                        <TableCell>{config.warehouse}</TableCell>
-                        <TableCell>{config.weekday}</TableCell>
-                        <TableCell>{config.kanto_normal || '-'}</TableCell>
-                        <TableCell>{config.kansai_normal || '-'}</TableCell>
-                        <TableCell>{config.kanto_special || '-'}</TableCell>
-                        <TableCell>{config.kansai_special || '-'}</TableCell>
-                        <TableCell>{config.remark || '-'}</TableCell>
-                        <TableCell>
-                          <Button size="sm" variant="outline" className="mr-2"
-                            onClick={() => { setEditingFlight(config); setFlightModalOpen(true); }}>
-                            编辑
-                          </Button>
-                          <Button size="sm" variant="destructive"
-                            onClick={() => deleteFlightConfig(config.id)}>
-                            删除
-                          </Button>
-                        </TableCell>
+                <div className="max-h-[500px] overflow-y-auto">
+                  <Table>
+                    <TableHeader className="sticky top-0 bg-white z-10">
+                      <TableRow>
+                        <TableHead className="bg-white">仓库</TableHead>
+                        <TableHead className="bg-white">周几</TableHead>
+                        <TableHead className="bg-white">关东普货路由</TableHead>
+                        <TableHead className="bg-white">关西普货路由</TableHead>
+                        <TableHead className="bg-white">关东特货路由</TableHead>
+                        <TableHead className="bg-white">关西特货路由</TableHead>
+                        <TableHead className="bg-white">备注</TableHead>
+                        <TableHead className="bg-white">操作</TableHead>
                       </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
+                    </TableHeader>
+                    <TableBody>
+                      {flightConfigs
+                        .filter(config =>
+                          !flightSearchQuery ||
+                          config.warehouse.includes(flightSearchQuery) ||
+                          config.weekday.includes(flightSearchQuery)
+                        )
+                        .map(config => (
+                        <TableRow key={config.id}>
+                          <TableCell>{config.warehouse}</TableCell>
+                          <TableCell>{config.weekday}</TableCell>
+                          <TableCell>{config.kanto_normal || '-'}</TableCell>
+                          <TableCell>{config.kansai_normal || '-'}</TableCell>
+                          <TableCell>{config.kanto_special || '-'}</TableCell>
+                          <TableCell>{config.kansai_special || '-'}</TableCell>
+                          <TableCell>{config.remark || '-'}</TableCell>
+                          <TableCell>
+                            <Button size="sm" variant="outline" className="mr-2"
+                              onClick={() => { setEditingFlight(config); setFlightModalOpen(true); }}>
+                              编辑
+                            </Button>
+                            <Button size="sm" variant="destructive"
+                              onClick={() => deleteFlightConfig(config.id)}>
+                              删除
+                            </Button>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
               </CardContent>
             </Card>
           </div>
@@ -1579,33 +1583,35 @@ export default function LogisticsManagement() {
                 </Button>
               </CardHeader>
               <CardContent>
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>目的港代码</TableHead>
-                      <TableHead>所属区域</TableHead>
-                      <TableHead>操作</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {portConfigs.map(config => (
-                      <TableRow key={config.id}>
-                        <TableCell>{config.port_code}</TableCell>
-                        <TableCell>{config.region}</TableCell>
-                        <TableCell>
-                          <Button size="sm" variant="outline" className="mr-2"
-                            onClick={() => { setEditingPort(config); setPortModalOpen(true); }}>
-                            编辑
-                          </Button>
-                          <Button size="sm" variant="destructive"
-                            onClick={() => deletePortConfig(config.id)}>
-                            删除
-                          </Button>
-                        </TableCell>
+                <div className="max-h-[500px] overflow-y-auto">
+                  <Table>
+                    <TableHeader className="sticky top-0 bg-white z-10">
+                      <TableRow>
+                        <TableHead className="bg-white">目的港代码</TableHead>
+                        <TableHead className="bg-white">所属区域</TableHead>
+                        <TableHead className="bg-white">操作</TableHead>
                       </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
+                    </TableHeader>
+                    <TableBody>
+                      {portConfigs.map(config => (
+                        <TableRow key={config.id}>
+                          <TableCell>{config.port_code}</TableCell>
+                          <TableCell>{config.region}</TableCell>
+                          <TableCell>
+                            <Button size="sm" variant="outline" className="mr-2"
+                              onClick={() => { setEditingPort(config); setPortModalOpen(true); }}>
+                              编辑
+                            </Button>
+                            <Button size="sm" variant="destructive"
+                              onClick={() => deletePortConfig(config.id)}>
+                              删除
+                            </Button>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
               </CardContent>
             </Card>
           </div>
@@ -1645,108 +1651,110 @@ export default function LogisticsManagement() {
                 </div>
               </CardHeader>
               <CardContent>
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead className="w-12">
-                        <input
-                          type="checkbox"
-                          checked={routeConfigs.length > 0 && selectedRouteIds.size === routeConfigs.filter(config => 
-                            !routeSearchQuery || 
-                            config.flight_no.toLowerCase().includes(routeSearchQuery.toLowerCase()) ||
-                            config.origin.toLowerCase().includes(routeSearchQuery.toLowerCase()) ||
-                            (config.transfer || '').toLowerCase().includes(routeSearchQuery.toLowerCase()) ||
-                            config.dest.toLowerCase().includes(routeSearchQuery.toLowerCase()) ||
-                            (config.second_flight || '').toLowerCase().includes(routeSearchQuery.toLowerCase()) ||
-                            config.route_type.toLowerCase().includes(routeSearchQuery.toLowerCase())
-                          ).length && selectedRouteIds.size === routeConfigs.filter(config => 
-                            !routeSearchQuery || 
-                            config.flight_no.toLowerCase().includes(routeSearchQuery.toLowerCase()) ||
-                            config.origin.toLowerCase().includes(routeSearchQuery.toLowerCase()) ||
-                            (config.transfer || '').toLowerCase().includes(routeSearchQuery.toLowerCase()) ||
-                            config.dest.toLowerCase().includes(routeSearchQuery.toLowerCase()) ||
-                            (config.second_flight || '').toLowerCase().includes(routeSearchQuery.toLowerCase()) ||
-                            config.route_type.toLowerCase().includes(routeSearchQuery.toLowerCase())
-                          ).length}
-                          onChange={() => {
-                            const filtered = routeConfigs.filter(config => 
-                              !routeSearchQuery || 
+                <div className="max-h-[500px] overflow-y-auto">
+                  <Table>
+                    <TableHeader className="sticky top-0 bg-white z-10">
+                      <TableRow>
+                        <TableHead className="w-12 bg-white">
+                          <input
+                            type="checkbox"
+                            checked={routeConfigs.length > 0 && selectedRouteIds.size === routeConfigs.filter(config =>
+                              !routeSearchQuery ||
                               config.flight_no.toLowerCase().includes(routeSearchQuery.toLowerCase()) ||
                               config.origin.toLowerCase().includes(routeSearchQuery.toLowerCase()) ||
                               (config.transfer || '').toLowerCase().includes(routeSearchQuery.toLowerCase()) ||
                               config.dest.toLowerCase().includes(routeSearchQuery.toLowerCase()) ||
                               (config.second_flight || '').toLowerCase().includes(routeSearchQuery.toLowerCase()) ||
                               config.route_type.toLowerCase().includes(routeSearchQuery.toLowerCase())
-                            );
-                            if (selectedRouteIds.size === filtered.length) {
-                              setSelectedRouteIds(new Set());
-                            } else {
-                              setSelectedRouteIds(new Set(filtered.map(r => r.id)));
-                            }
-                          }}
-                          className="w-4 h-4"
-                        />
-                      </TableHead>
-                      <TableHead>航班号</TableHead>
-                      <TableHead>始发</TableHead>
-                      <TableHead>中转</TableHead>
-                      <TableHead>目的</TableHead>
-                      <TableHead>起飞时间</TableHead>
-                      <TableHead>落地时间</TableHead>
-                      <TableHead>是否隔天</TableHead>
-                      <TableHead>二程航班</TableHead>
-                      <TableHead>路由</TableHead>
-                      <TableHead>操作</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {routeConfigs
-                      .filter(config => 
-                        !routeSearchQuery || 
-                        config.flight_no.toLowerCase().includes(routeSearchQuery.toLowerCase()) ||
-                        config.origin.toLowerCase().includes(routeSearchQuery.toLowerCase()) ||
-                        (config.transfer || '').toLowerCase().includes(routeSearchQuery.toLowerCase()) ||
-                        config.dest.toLowerCase().includes(routeSearchQuery.toLowerCase()) ||
-                        (config.second_flight || '').toLowerCase().includes(routeSearchQuery.toLowerCase()) ||
-                        config.route_type.toLowerCase().includes(routeSearchQuery.toLowerCase())
-                      )
-                      .map(config => (
-                      <TableRow key={config.id} className={selectedRouteIds.has(config.id) ? 'bg-blue-50' : ''}>
-                        <TableCell>
-                          <input
-                            type="checkbox"
-                            checked={selectedRouteIds.has(config.id)}
-                            onChange={() => toggleRouteSelection(config.id)}
+                            ).length && selectedRouteIds.size === routeConfigs.filter(config =>
+                              !routeSearchQuery ||
+                              config.flight_no.toLowerCase().includes(routeSearchQuery.toLowerCase()) ||
+                              config.origin.toLowerCase().includes(routeSearchQuery.toLowerCase()) ||
+                              (config.transfer || '').toLowerCase().includes(routeSearchQuery.toLowerCase()) ||
+                              config.dest.toLowerCase().includes(routeSearchQuery.toLowerCase()) ||
+                              (config.second_flight || '').toLowerCase().includes(routeSearchQuery.toLowerCase()) ||
+                              config.route_type.toLowerCase().includes(routeSearchQuery.toLowerCase())
+                            ).length}
+                            onChange={() => {
+                              const filtered = routeConfigs.filter(config =>
+                                !routeSearchQuery ||
+                                config.flight_no.toLowerCase().includes(routeSearchQuery.toLowerCase()) ||
+                                config.origin.toLowerCase().includes(routeSearchQuery.toLowerCase()) ||
+                                (config.transfer || '').toLowerCase().includes(routeSearchQuery.toLowerCase()) ||
+                                config.dest.toLowerCase().includes(routeSearchQuery.toLowerCase()) ||
+                                (config.second_flight || '').toLowerCase().includes(routeSearchQuery.toLowerCase()) ||
+                                config.route_type.toLowerCase().includes(routeSearchQuery.toLowerCase())
+                              );
+                              if (selectedRouteIds.size === filtered.length) {
+                                setSelectedRouteIds(new Set());
+                              } else {
+                                setSelectedRouteIds(new Set(filtered.map(r => r.id)));
+                              }
+                            }}
                             className="w-4 h-4"
                           />
-                        </TableCell>
-                        <TableCell>{config.flight_no}</TableCell>
-                        <TableCell>{config.origin}</TableCell>
-                        <TableCell>{config.transfer || '-'}</TableCell>
-                        <TableCell>{config.dest}</TableCell>
-                        <TableCell>{config.depart_time || '-'}</TableCell>
-                        <TableCell>{config.arrive_time || '-'}</TableCell>
-                        <TableCell>{config.is_next_day || '-'}</TableCell>
-                        <TableCell>{config.second_flight || '-'}</TableCell>
-                        <TableCell>
-                          <Badge variant={config.route_type === '空运' ? 'default' : 'secondary'}>
-                            {config.route_type}
-                          </Badge>
-                        </TableCell>
-                        <TableCell>
-                          <Button size="sm" variant="outline" className="mr-2"
-                            onClick={() => { setEditingRoute(config); setRouteModalOpen(true); }}>
-                            编辑
-                          </Button>
-                          <Button size="sm" variant="destructive"
-                            onClick={() => deleteRouteConfig(config.id)}>
-                            删除
-                          </Button>
-                        </TableCell>
+                        </TableHead>
+                        <TableHead className="bg-white">航班号</TableHead>
+                        <TableHead className="bg-white">始发</TableHead>
+                        <TableHead className="bg-white">中转</TableHead>
+                        <TableHead className="bg-white">目的</TableHead>
+                        <TableHead className="bg-white">起飞时间</TableHead>
+                        <TableHead className="bg-white">落地时间</TableHead>
+                        <TableHead className="bg-white">是否隔天</TableHead>
+                        <TableHead className="bg-white">二程航班</TableHead>
+                        <TableHead className="bg-white">路由</TableHead>
+                        <TableHead className="bg-white">操作</TableHead>
                       </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
+                    </TableHeader>
+                    <TableBody>
+                      {routeConfigs
+                        .filter(config =>
+                          !routeSearchQuery ||
+                          config.flight_no.toLowerCase().includes(routeSearchQuery.toLowerCase()) ||
+                          config.origin.toLowerCase().includes(routeSearchQuery.toLowerCase()) ||
+                          (config.transfer || '').toLowerCase().includes(routeSearchQuery.toLowerCase()) ||
+                          config.dest.toLowerCase().includes(routeSearchQuery.toLowerCase()) ||
+                          (config.second_flight || '').toLowerCase().includes(routeSearchQuery.toLowerCase()) ||
+                          config.route_type.toLowerCase().includes(routeSearchQuery.toLowerCase())
+                        )
+                        .map(config => (
+                        <TableRow key={config.id} className={selectedRouteIds.has(config.id) ? 'bg-blue-50' : ''}>
+                          <TableCell>
+                            <input
+                              type="checkbox"
+                              checked={selectedRouteIds.has(config.id)}
+                              onChange={() => toggleRouteSelection(config.id)}
+                              className="w-4 h-4"
+                            />
+                          </TableCell>
+                          <TableCell>{config.flight_no}</TableCell>
+                          <TableCell>{config.origin}</TableCell>
+                          <TableCell>{config.transfer || '-'}</TableCell>
+                          <TableCell>{config.dest}</TableCell>
+                          <TableCell>{config.depart_time || '-'}</TableCell>
+                          <TableCell>{config.arrive_time || '-'}</TableCell>
+                          <TableCell>{config.is_next_day || '-'}</TableCell>
+                          <TableCell>{config.second_flight || '-'}</TableCell>
+                          <TableCell>
+                            <Badge variant={config.route_type === '空运' ? 'default' : 'secondary'}>
+                              {config.route_type}
+                            </Badge>
+                          </TableCell>
+                          <TableCell>
+                            <Button size="sm" variant="outline" className="mr-2"
+                              onClick={() => { setEditingRoute(config); setRouteModalOpen(true); }}>
+                              编辑
+                            </Button>
+                            <Button size="sm" variant="destructive"
+                              onClick={() => deleteRouteConfig(config.id)}>
+                              删除
+                            </Button>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
               </CardContent>
             </Card>
           </div>
@@ -1913,62 +1921,64 @@ export default function LogisticsManagement() {
                   </div>
                 </div>
 
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>揽收日期</TableHead>
-                      <TableHead>仓库</TableHead>
-                      <TableHead>大包数</TableHead>
-                      <TableHead>重量</TableHead>
-                      <TableHead>总方数</TableHead>
-                      <TableHead>关东总</TableHead>
-                      <TableHead>关西总</TableHead>
-                      <TableHead>关东普货</TableHead>
-                      <TableHead>关东特货</TableHead>
-                      <TableHead>关西普货</TableHead>
-                      <TableHead>关西特货</TableHead>
-                      <TableHead>空运</TableHead>
-                      <TableHead>海空</TableHead>
-                      <TableHead>货物袋数齐全</TableHead>
-                      <TableHead>操作</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {getFilteredVolumeEstimates().slice(0, 10).map(record => (
-                      <TableRow key={record.id}>
-                        <TableCell>{record.collect_date}</TableCell>
-                        <TableCell>{record.warehouse}</TableCell>
-                        <TableCell>{record.package_count}</TableCell>
-                        <TableCell>{record.weight ? truncateToDecimals(record.weight, 2) : '0.00'}</TableCell>
-                        <TableCell>{(record.total_volume || 0).toFixed(3)}</TableCell>
-                        <TableCell>{(record.kanto_total || 0).toFixed(3)}</TableCell>
-                        <TableCell>{(record.kansai_total || 0).toFixed(3)}</TableCell>
-                        <TableCell>{(record.kanto_normal || 0).toFixed(3)}</TableCell>
-                        <TableCell>{(record.kanto_special || 0).toFixed(3)}</TableCell>
-                        <TableCell>{(record.kansai_normal || 0).toFixed(3)}</TableCell>
-                        <TableCell>{(record.kansai_special || 0).toFixed(3)}</TableCell>
-                        <TableCell>{(record.air_volume || 0).toFixed(3)}</TableCell>
-                        <TableCell>{(record.sea_air_volume || 0).toFixed(3)}</TableCell>
-                        <TableCell>{record.is_complete || '-'}</TableCell>
-                        <TableCell>
-                          <Button size="sm" variant="outline" className="mr-2"
-                            onClick={() => editVolumeEstimate(record)}>
-                            编辑
-                          </Button>
-                          <Button size="sm" variant="destructive"
-                            onClick={() => deleteVolumeEstimate(record.id)}>
-                            删除
-                          </Button>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                    {getFilteredVolumeEstimates().length === 0 && (
+                <div className="max-h-[500px] overflow-y-auto">
+                  <Table>
+                    <TableHeader className="sticky top-0 bg-white z-10">
                       <TableRow>
-                        <TableCell colSpan={15} className="text-center text-gray-500">暂无记录</TableCell>
+                        <TableHead className="bg-white">揽收日期</TableHead>
+                        <TableHead className="bg-white">仓库</TableHead>
+                        <TableHead className="bg-white">大包数</TableHead>
+                        <TableHead className="bg-white">重量</TableHead>
+                        <TableHead className="bg-white">总方数</TableHead>
+                        <TableHead className="bg-white">关东总</TableHead>
+                        <TableHead className="bg-white">关西总</TableHead>
+                        <TableHead className="bg-white">关东普货</TableHead>
+                        <TableHead className="bg-white">关东特货</TableHead>
+                        <TableHead className="bg-white">关西普货</TableHead>
+                        <TableHead className="bg-white">关西特货</TableHead>
+                        <TableHead className="bg-white">空运</TableHead>
+                        <TableHead className="bg-white">海空</TableHead>
+                        <TableHead className="bg-white">货物袋数齐全</TableHead>
+                        <TableHead className="bg-white">操作</TableHead>
                       </TableRow>
-                    )}
-                  </TableBody>
-                </Table>
+                    </TableHeader>
+                    <TableBody>
+                      {getFilteredVolumeEstimates().slice(0, 10).map(record => (
+                        <TableRow key={record.id}>
+                          <TableCell>{record.collect_date}</TableCell>
+                          <TableCell>{record.warehouse}</TableCell>
+                          <TableCell>{record.package_count}</TableCell>
+                          <TableCell>{record.weight ? truncateToDecimals(record.weight, 2) : '0.00'}</TableCell>
+                          <TableCell>{(record.total_volume || 0).toFixed(3)}</TableCell>
+                          <TableCell>{(record.kanto_total || 0).toFixed(3)}</TableCell>
+                          <TableCell>{(record.kansai_total || 0).toFixed(3)}</TableCell>
+                          <TableCell>{(record.kanto_normal || 0).toFixed(3)}</TableCell>
+                          <TableCell>{(record.kanto_special || 0).toFixed(3)}</TableCell>
+                          <TableCell>{(record.kansai_normal || 0).toFixed(3)}</TableCell>
+                          <TableCell>{(record.kansai_special || 0).toFixed(3)}</TableCell>
+                          <TableCell>{(record.air_volume || 0).toFixed(3)}</TableCell>
+                          <TableCell>{(record.sea_air_volume || 0).toFixed(3)}</TableCell>
+                          <TableCell>{record.is_complete || '-'}</TableCell>
+                          <TableCell>
+                            <Button size="sm" variant="outline" className="mr-2"
+                              onClick={() => editVolumeEstimate(record)}>
+                              编辑
+                            </Button>
+                            <Button size="sm" variant="destructive"
+                              onClick={() => deleteVolumeEstimate(record.id)}>
+                              删除
+                            </Button>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                      {getFilteredVolumeEstimates().length === 0 && (
+                        <TableRow>
+                          <TableCell colSpan={15} className="text-center text-gray-500">暂无记录</TableCell>
+                        </TableRow>
+                      )}
+                    </TableBody>
+                  </Table>
+                </div>
               </CardContent>
             </Card>
           </div>
@@ -2329,97 +2339,99 @@ export default function LogisticsManagement() {
                 <span className="text-sm text-gray-500">共 {mainOrders.length} 条记录</span>
               </CardHeader>
               <CardContent>
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead className="text-center px-2">揽收日期</TableHead>
-                      <TableHead className="text-center px-2">仓库</TableHead>
-                      <TableHead className="text-center px-2">口岸</TableHead>
-                      <TableHead className="text-center px-2">货物属性</TableHead>
-                      <TableHead className="text-center px-2">类别</TableHead>
-                      <TableHead className="text-center px-2">主单号</TableHead>
-                      <TableHead className="text-center px-2">航班号</TableHead>
-                      <TableHead className="text-center px-2">始发</TableHead>
-                      <TableHead className="text-center px-2">中转</TableHead>
-                      <TableHead className="text-center px-2">目的</TableHead>
-                      <TableHead className="text-center px-2">预计起飞</TableHead>
-                      <TableHead className="text-center px-2">预计落地</TableHead>
-                      <TableHead className="text-center px-2">打货上限(方)</TableHead>
-                      <TableHead className="text-center px-2">打货上限(件)</TableHead>
-                      <TableHead className="text-center px-2">实际件数</TableHead>
-                      <TableHead className="text-center px-2">实际方数</TableHead>
-                      <TableHead className="text-center px-2">操作</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {mainOrders.slice(0, 50).map(order => (
-                      <TableRow key={order.id}>
-                        <TableCell className="text-center px-2">{order.collect_date}</TableCell>
-                        <TableCell className="text-center px-2">{order.warehouse}</TableCell>
-                        <TableCell className="text-center px-2">{order.port}</TableCell>
-                        <TableCell className="text-center px-2">{order.cargo_type}</TableCell>
-                        <TableCell className="text-center px-2">{order.category || '-'}</TableCell>
-                        <TableCell className="text-center px-2">{order.main_no || '-'}</TableCell>
-                        <TableCell className="text-center px-2">{order.flight_no || '-'}</TableCell>
-                        <TableCell className="text-center px-2">{order.origin || '-'}</TableCell>
-                        <TableCell className="text-center px-2">{order.transfer || '-'}</TableCell>
-                        <TableCell className="text-center px-2">{order.dest || '-'}</TableCell>
-                        <TableCell className="text-center px-2">
-                          {order.actual_flight_date && order.depart_time 
-                            ? `${order.actual_flight_date} ${order.depart_time}` 
-                            : order.depart_time || '-'}
-                        </TableCell>
-                        <TableCell className="text-center px-2">
-                          {order.actual_flight_date && order.arrive_time 
-                            ? `${order.actual_flight_date} ${order.arrive_time}` 
-                            : order.arrive_time || '-'}
-                        </TableCell>
-                        <TableCell className="text-center px-2">{order.max_volume || '-'}</TableCell>
-                        <TableCell className="text-center px-2">{order.max_pieces || '-'}</TableCell>
-                        <TableCell className="text-center px-2">{order.actual_pieces || '-'}</TableCell>
-                        <TableCell className="text-center px-2">{order.actual_volume || '-'}</TableCell>
-                        <TableCell className="text-center px-2">
-                          <Button size="sm" variant="outline" className="mr-2"
-                            onClick={() => {
-                              setEditingOrder(order);
-                              setOrderForm({
-                                collect_date: order.collect_date,
-                                depart_date: order.depart_date || '',
-                                warehouse: order.warehouse,
-                                cargo_type: order.cargo_type,
-                                port: order.port,
-                                status: order.status || '',
-                                pack_req: order.pack_req || '',
-                                max_volume: order.max_volume || '',
-                                route_type: order.route_type || '',
-                                actual_flight_date: order.actual_flight_date || '',
-                                main_no: order.main_no || '',
-                                flight_no: order.flight_no || '',
-                                origin: order.origin || '',
-                                transfer: order.transfer || '',
-                                dest: order.dest || '',
-                                second_flight: order.second_flight || '',
-                                depart_time: order.depart_time || '',
-                                arrive_time: order.arrive_time || '',
-                                actual_pieces: order.actual_pieces?.toString() || '',
-                                actual_weight: order.actual_weight || '',
-                                actual_volume: order.actual_volume || '',
-                                actual_bills: order.actual_bills?.toString() || '',
-                                remark: order.remark || '',
-                              });
-                              setActiveTab('main-order');
-                            }}>
-                            编辑
-                          </Button>
-                          <Button size="sm" variant="destructive"
-                            onClick={() => deleteMainOrder(order.id)}>
-                            删除
-                          </Button>
-                        </TableCell>
+                <div className="max-h-[500px] overflow-y-auto">
+                  <Table>
+                    <TableHeader className="sticky top-0 bg-white z-10">
+                      <TableRow>
+                        <TableHead className="text-center px-2 bg-white">揽收日期</TableHead>
+                        <TableHead className="text-center px-2 bg-white">仓库</TableHead>
+                        <TableHead className="text-center px-2 bg-white">口岸</TableHead>
+                        <TableHead className="text-center px-2 bg-white">货物属性</TableHead>
+                        <TableHead className="text-center px-2 bg-white">类别</TableHead>
+                        <TableHead className="text-center px-2 bg-white">主单号</TableHead>
+                        <TableHead className="text-center px-2 bg-white">航班号</TableHead>
+                        <TableHead className="text-center px-2 bg-white">始发</TableHead>
+                        <TableHead className="text-center px-2 bg-white">中转</TableHead>
+                        <TableHead className="text-center px-2 bg-white">目的</TableHead>
+                        <TableHead className="text-center px-2 bg-white">预计起飞</TableHead>
+                        <TableHead className="text-center px-2 bg-white">预计落地</TableHead>
+                        <TableHead className="text-center px-2 bg-white">打货上限(方)</TableHead>
+                        <TableHead className="text-center px-2 bg-white">打货上限(件)</TableHead>
+                        <TableHead className="text-center px-2 bg-white">实际件数</TableHead>
+                        <TableHead className="text-center px-2 bg-white">实际方数</TableHead>
+                        <TableHead className="text-center px-2 bg-white">操作</TableHead>
                       </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
+                    </TableHeader>
+                    <TableBody>
+                      {mainOrders.slice(0, 50).map(order => (
+                        <TableRow key={order.id}>
+                          <TableCell className="text-center px-2">{order.collect_date}</TableCell>
+                          <TableCell className="text-center px-2">{order.warehouse}</TableCell>
+                          <TableCell className="text-center px-2">{order.port}</TableCell>
+                          <TableCell className="text-center px-2">{order.cargo_type}</TableCell>
+                          <TableCell className="text-center px-2">{order.category || '-'}</TableCell>
+                          <TableCell className="text-center px-2">{order.main_no || '-'}</TableCell>
+                          <TableCell className="text-center px-2">{order.flight_no || '-'}</TableCell>
+                          <TableCell className="text-center px-2">{order.origin || '-'}</TableCell>
+                          <TableCell className="text-center px-2">{order.transfer || '-'}</TableCell>
+                          <TableCell className="text-center px-2">{order.dest || '-'}</TableCell>
+                          <TableCell className="text-center px-2">
+                            {order.actual_flight_date && order.depart_time
+                              ? `${order.actual_flight_date} ${order.depart_time}`
+                              : order.depart_time || '-'}
+                          </TableCell>
+                          <TableCell className="text-center px-2">
+                            {order.actual_flight_date && order.arrive_time
+                              ? `${order.actual_flight_date} ${order.arrive_time}`
+                              : order.arrive_time || '-'}
+                          </TableCell>
+                          <TableCell className="text-center px-2">{order.max_volume || '-'}</TableCell>
+                          <TableCell className="text-center px-2">{order.max_pieces || '-'}</TableCell>
+                          <TableCell className="text-center px-2">{order.actual_pieces || '-'}</TableCell>
+                          <TableCell className="text-center px-2">{order.actual_volume || '-'}</TableCell>
+                          <TableCell className="text-center px-2">
+                            <Button size="sm" variant="outline" className="mr-2"
+                              onClick={() => {
+                                setEditingOrder(order);
+                                setOrderForm({
+                                  collect_date: order.collect_date,
+                                  depart_date: order.depart_date || '',
+                                  warehouse: order.warehouse,
+                                  cargo_type: order.cargo_type,
+                                  port: order.port,
+                                  status: order.status || '',
+                                  pack_req: order.pack_req || '',
+                                  max_volume: order.max_volume || '',
+                                  route_type: order.route_type || '',
+                                  actual_flight_date: order.actual_flight_date || '',
+                                  main_no: order.main_no || '',
+                                  flight_no: order.flight_no || '',
+                                  origin: order.origin || '',
+                                  transfer: order.transfer || '',
+                                  dest: order.dest || '',
+                                  second_flight: order.second_flight || '',
+                                  depart_time: order.depart_time || '',
+                                  arrive_time: order.arrive_time || '',
+                                  actual_pieces: order.actual_pieces?.toString() || '',
+                                  actual_weight: order.actual_weight || '',
+                                  actual_volume: order.actual_volume || '',
+                                  actual_bills: order.actual_bills?.toString() || '',
+                                  remark: order.remark || '',
+                                });
+                                setActiveTab('main-order');
+                              }}>
+                              编辑
+                            </Button>
+                            <Button size="sm" variant="destructive"
+                              onClick={() => deleteMainOrder(order.id)}>
+                              删除
+                            </Button>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
               </CardContent>
             </Card>
           </div>
@@ -2486,36 +2498,38 @@ export default function LogisticsManagement() {
               <CardHeader>查询结果</CardHeader>
               <CardContent>
                 {balanceResults.length > 0 ? (
-                  <Table className="w-full">
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead className="text-center px-2">仓库</TableHead>
-                        <TableHead className="text-center px-2">口岸</TableHead>
-                        <TableHead className="text-center px-2">货物属性</TableHead>
-                        <TableHead className="text-center px-2">预估方数</TableHead>
-                        <TableHead className="text-center px-2">打货上限汇总</TableHead>
-                        <TableHead className="text-center px-2">欠方</TableHead>
-                        <TableHead className="text-center px-2">余方</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {balanceResults.map((r, idx) => (
-                        <TableRow key={idx}>
-                          <TableCell className="text-center px-2">{r.warehouse}</TableCell>
-                          <TableCell className="text-center px-2">{r.port}</TableCell>
-                          <TableCell className="text-center px-2">{r.cargo_type}</TableCell>
-                          <TableCell className="text-center px-2">{r.estVolume.toFixed(3)}</TableCell>
-                          <TableCell className="text-center px-2">{r.maxVolume.toFixed(3)}</TableCell>
-                          <TableCell className="text-center px-2 font-semibold text-red-600">
-                            {r.deficit > 0 ? r.deficit.toFixed(3) : '0.000'}
-                          </TableCell>
-                          <TableCell className="text-center px-2 font-semibold text-green-600">
-                            {r.surplus > 0 ? r.surplus.toFixed(3) : '0.000'}
-                          </TableCell>
+                  <div className="max-h-[500px] overflow-y-auto">
+                    <Table className="w-full">
+                      <TableHeader className="sticky top-0 bg-white z-10">
+                        <TableRow>
+                          <TableHead className="text-center px-2 bg-white">仓库</TableHead>
+                          <TableHead className="text-center px-2 bg-white">口岸</TableHead>
+                          <TableHead className="text-center px-2 bg-white">货物属性</TableHead>
+                          <TableHead className="text-center px-2 bg-white">预估方数</TableHead>
+                          <TableHead className="text-center px-2 bg-white">打货上限汇总</TableHead>
+                          <TableHead className="text-center px-2 bg-white">欠方</TableHead>
+                          <TableHead className="text-center px-2 bg-white">余方</TableHead>
                         </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
+                      </TableHeader>
+                      <TableBody>
+                        {balanceResults.map((r, idx) => (
+                          <TableRow key={idx}>
+                            <TableCell className="text-center px-2">{r.warehouse}</TableCell>
+                            <TableCell className="text-center px-2">{r.port}</TableCell>
+                            <TableCell className="text-center px-2">{r.cargo_type}</TableCell>
+                            <TableCell className="text-center px-2">{r.estVolume.toFixed(3)}</TableCell>
+                            <TableCell className="text-center px-2">{r.maxVolume.toFixed(3)}</TableCell>
+                            <TableCell className="text-center px-2 font-semibold text-red-600">
+                              {r.deficit > 0 ? r.deficit.toFixed(3) : '0.000'}
+                            </TableCell>
+                            <TableCell className="text-center px-2 font-semibold text-green-600">
+                              {r.surplus > 0 ? r.surplus.toFixed(3) : '0.000'}
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </div>
                 ) : (
                   <div className="text-center text-gray-500 py-8">
                     请选择揽收日期后点击查询

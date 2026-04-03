@@ -1,5 +1,6 @@
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import { execSync } from 'child_process';
+import { config as dotenvConfig } from 'dotenv';
 
 let envLoaded = false;
 let supabaseClient: SupabaseClient | null = null;
@@ -31,7 +32,7 @@ function loadEnv(): void {
   // 沙箱环境：使用 Python 获取环境变量
   try {
     try {
-      require('dotenv').config();
+      dotenvConfig();
       if (process.env.COZE_SUPABASE_URL && process.env.COZE_SUPABASE_ANON_KEY) {
         envLoaded = true;
         return;
