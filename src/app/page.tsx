@@ -1535,15 +1535,15 @@ export default function LogisticsManagement() {
                   <Table style={{ tableLayout: 'fixed', width: '100%', minWidth: '1800px' }}>
                     <TableHeader className="sticky top-0 bg-white z-10" style={{ position: 'sticky', top: 0, zIndex: 10, backgroundColor: '#ffffff' }}>
                       <TableRow>
-                        <TableHead className="bg-white text-center px-1 py-1" style={{ backgroundColor: '#ffffff', zIndex: 10 }}>仓库</TableHead>
-                        <TableHead className="bg-white text-center px-1 py-1" style={{ backgroundColor: '#ffffff', zIndex: 10 }}>大包预估体积</TableHead>
-                        <TableHead className="bg-white text-center px-1 py-1" style={{ backgroundColor: '#ffffff', zIndex: 10 }}>关东目的港占比</TableHead>
-                        <TableHead className="bg-white text-center px-1 py-1" style={{ backgroundColor: '#ffffff', zIndex: 10 }}>关西目的港占比</TableHead>
-                        <TableHead className="bg-white text-center px-1 py-1" style={{ backgroundColor: '#ffffff', zIndex: 10 }}>关东普货占比</TableHead>
-                        <TableHead className="bg-white text-center px-1 py-1" style={{ backgroundColor: '#ffffff', zIndex: 10 }}>关东特货占比</TableHead>
-                        <TableHead className="bg-white text-center px-1 py-1" style={{ backgroundColor: '#ffffff', zIndex: 10 }}>关西普货占比</TableHead>
-                        <TableHead className="bg-white text-center px-1 py-1" style={{ backgroundColor: '#ffffff', zIndex: 10 }}>关西特货占比</TableHead>
-                        <TableHead className="bg-white text-center px-1 py-1" style={{ backgroundColor: '#ffffff', zIndex: 10 }}>操作</TableHead>
+                        <TableHead className="bg-white text-center px-1 py-1" style={{ backgroundColor: '#ffffff', zIndex: 10, width: '60px' }}>仓库</TableHead>
+                        <TableHead className="bg-white text-center px-1 py-1" style={{ backgroundColor: '#ffffff', zIndex: 10, width: '100px' }}>大包预估体积</TableHead>
+                        <TableHead className="bg-white text-center px-1 py-1" style={{ backgroundColor: '#ffffff', zIndex: 10, width: '80px' }}>关东目的港占比</TableHead>
+                        <TableHead className="bg-white text-center px-1 py-1" style={{ backgroundColor: '#ffffff', zIndex: 10, width: '80px' }}>关西目的港占比</TableHead>
+                        <TableHead className="bg-white text-center px-1 py-1" style={{ backgroundColor: '#ffffff', zIndex: 10, width: '80px' }}>关东普货占比</TableHead>
+                        <TableHead className="bg-white text-center px-1 py-1" style={{ backgroundColor: '#ffffff', zIndex: 10, width: '80px' }}>关东特货占比</TableHead>
+                        <TableHead className="bg-white text-center px-1 py-1" style={{ backgroundColor: '#ffffff', zIndex: 10, width: '80px' }}>关西普货占比</TableHead>
+                        <TableHead className="bg-white text-center px-1 py-1" style={{ backgroundColor: '#ffffff', zIndex: 10, width: '80px' }}>关西特货占比</TableHead>
+                        <TableHead className="bg-white text-center px-1 py-1" style={{ backgroundColor: '#ffffff', zIndex: 10, width: '100px' }}>操作</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -1600,14 +1600,14 @@ export default function LogisticsManagement() {
                   <Table style={{ tableLayout: 'fixed', width: '100%', minWidth: '2200px' }}>
                     <TableHeader className="sticky top-0 bg-white z-10" style={{ position: 'sticky', top: 0, zIndex: 10, backgroundColor: '#ffffff' }}>
                       <TableRow>
-                        <TableHead className="bg-white" style={{ backgroundColor: '#ffffff', zIndex: 10, minWidth: '80px' }}>仓库</TableHead>
-                        <TableHead className="bg-white" style={{ backgroundColor: '#ffffff', zIndex: 10, minWidth: '60px' }}>周几</TableHead>
-                        <TableHead className="bg-white" style={{ backgroundColor: '#ffffff', zIndex: 10, minWidth: '120px' }}>关东普货路由</TableHead>
-                        <TableHead className="bg-white" style={{ backgroundColor: '#ffffff', zIndex: 10, minWidth: '120px' }}>关西普货路由</TableHead>
-                        <TableHead className="bg-white" style={{ backgroundColor: '#ffffff', zIndex: 10, minWidth: '120px' }}>关东特货路由</TableHead>
-                        <TableHead className="bg-white" style={{ backgroundColor: '#ffffff', zIndex: 10, minWidth: '120px' }}>关西特货路由</TableHead>
-                        <TableHead className="bg-white" style={{ backgroundColor: '#ffffff', zIndex: 10, minWidth: '150px' }}>备注</TableHead>
-                        <TableHead className="bg-white" style={{ backgroundColor: '#ffffff', zIndex: 10, minWidth: '120px' }}>操作</TableHead>
+                        <TableHead className="bg-white text-center px-1 py-1" style={{ backgroundColor: '#ffffff', zIndex: 10, width: '60px' }}>仓库</TableHead>
+                        <TableHead className="bg-white text-center px-1 py-1" style={{ backgroundColor: '#ffffff', zIndex: 10, width: '50px' }}>周几</TableHead>
+                        <TableHead className="bg-white text-center px-1 py-1" style={{ backgroundColor: '#ffffff', zIndex: 10, width: '100px' }}>关东普货路由</TableHead>
+                        <TableHead className="bg-white text-center px-1 py-1" style={{ backgroundColor: '#ffffff', zIndex: 10, width: '100px' }}>关西普货路由</TableHead>
+                        <TableHead className="bg-white text-center px-1 py-1" style={{ backgroundColor: '#ffffff', zIndex: 10, width: '100px' }}>关东特货路由</TableHead>
+                        <TableHead className="bg-white text-center px-1 py-1" style={{ backgroundColor: '#ffffff', zIndex: 10, width: '100px' }}>关西特货路由</TableHead>
+                        <TableHead className="bg-white text-center px-1 py-1" style={{ backgroundColor: '#ffffff', zIndex: 10, width: '120px' }}>备注</TableHead>
+                        <TableHead className="bg-white text-center px-1 py-1" style={{ backgroundColor: '#ffffff', zIndex: 10, width: '100px' }}>操作</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -1619,14 +1619,14 @@ export default function LogisticsManagement() {
                         )
                         .map(config => (
                         <TableRow key={config.id}>
-                          <TableCell>{config.warehouse}</TableCell>
-                          <TableCell>{config.weekday}</TableCell>
-                          <TableCell>{config.kanto_normal || '-'}</TableCell>
-                          <TableCell>{config.kansai_normal || '-'}</TableCell>
-                          <TableCell>{config.kanto_special || '-'}</TableCell>
-                          <TableCell>{config.kansai_special || '-'}</TableCell>
-                          <TableCell>{config.remark || '-'}</TableCell>
-                          <TableCell>
+                          <TableCell className="text-center px-1 py-1">{config.warehouse}</TableCell>
+                          <TableCell className="text-center px-1 py-1">{config.weekday}</TableCell>
+                          <TableCell className="text-center px-1 py-1">{config.kanto_normal || '-'}</TableCell>
+                          <TableCell className="text-center px-1 py-1">{config.kansai_normal || '-'}</TableCell>
+                          <TableCell className="text-center px-1 py-1">{config.kanto_special || '-'}</TableCell>
+                          <TableCell className="text-center px-1 py-1">{config.kansai_special || '-'}</TableCell>
+                          <TableCell className="text-center px-1 py-1">{config.remark || '-'}</TableCell>
+                          <TableCell className="text-center px-1 py-1">
                             <Button size="sm" variant="outline" className="mr-2"
                               onClick={() => { setEditingFlight(config); setFlightModalOpen(true); }}>
                               编辑
@@ -1661,17 +1661,17 @@ export default function LogisticsManagement() {
                   <Table style={{ tableLayout: 'fixed' }}>
                     <TableHeader className="sticky top-0 bg-white z-10" style={{ position: 'sticky', top: 0, zIndex: 10, backgroundColor: '#ffffff' }}>
                       <TableRow>
-                        <TableHead className="bg-white" style={{ backgroundColor: '#ffffff', zIndex: 10, minWidth: '200px' }}>目的港代码</TableHead>
-                        <TableHead className="bg-white" style={{ backgroundColor: '#ffffff', zIndex: 10, minWidth: '150px' }}>所属区域</TableHead>
-                        <TableHead className="bg-white" style={{ backgroundColor: '#ffffff', zIndex: 10, minWidth: '180px' }}>操作</TableHead>
+                        <TableHead className="bg-white text-center px-1 py-1" style={{ backgroundColor: '#ffffff', zIndex: 10, width: '120px' }}>目的港代码</TableHead>
+                        <TableHead className="bg-white text-center px-1 py-1" style={{ backgroundColor: '#ffffff', zIndex: 10, width: '80px' }}>所属区域</TableHead>
+                        <TableHead className="bg-white text-center px-1 py-1" style={{ backgroundColor: '#ffffff', zIndex: 10, width: '120px' }}>操作</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
                       {portConfigs.map(config => (
                         <TableRow key={config.id}>
-                          <TableCell>{config.port_code}</TableCell>
-                          <TableCell>{config.region}</TableCell>
-                          <TableCell>
+                          <TableCell className="text-center px-1 py-1">{config.port_code}</TableCell>
+                          <TableCell className="text-center px-1 py-1">{config.region}</TableCell>
+                          <TableCell className="text-center px-1 py-1">
                             <Button size="sm" variant="outline" className="mr-2"
                               onClick={() => { setEditingPort(config); setPortModalOpen(true); }}>
                               编辑
@@ -1729,7 +1729,7 @@ export default function LogisticsManagement() {
                   <Table style={{ tableLayout: 'fixed', whiteSpace: 'nowrap', minWidth: '1800px' }}>
                     <TableHeader className="sticky top-0 bg-white z-10" style={{ position: 'sticky', top: 0, zIndex: 10, backgroundColor: '#ffffff' }}>
                       <TableRow>
-                        <TableHead className="bg-white text-center px-1 py-1" style={{ backgroundColor: '#ffffff', zIndex: 10, minWidth: '50px' }}>
+                        <TableHead className="bg-white text-center px-1 py-1" style={{ backgroundColor: '#ffffff', zIndex: 10, width: '40px' }}>
                           <input
                             type="checkbox"
                             checked={routeConfigs.length > 0 && selectedRouteIds.size === routeConfigs.filter(config =>
@@ -1768,16 +1768,16 @@ export default function LogisticsManagement() {
                             className="w-4 h-4"
                           />
                         </TableHead>
-                        <TableHead className="bg-white text-center px-1 py-1" style={{ backgroundColor: '#ffffff', zIndex: 10, minWidth: '120px' }}>航班号</TableHead>
-                        <TableHead className="bg-white text-center px-1 py-1" style={{ backgroundColor: '#ffffff', zIndex: 10, minWidth: '60px' }}>始发</TableHead>
-                        <TableHead className="bg-white text-center px-1 py-1" style={{ backgroundColor: '#ffffff', zIndex: 10, minWidth: '60px' }}>中转</TableHead>
-                        <TableHead className="bg-white text-center px-1 py-1" style={{ backgroundColor: '#ffffff', zIndex: 10, minWidth: '60px' }}>目的</TableHead>
-                        <TableHead className="bg-white text-center px-1 py-1" style={{ backgroundColor: '#ffffff', zIndex: 10, minWidth: '100px' }}>起飞时间</TableHead>
-                        <TableHead className="bg-white text-center px-1 py-1" style={{ backgroundColor: '#ffffff', zIndex: 10, minWidth: '100px' }}>落地时间</TableHead>
-                        <TableHead className="bg-white text-center px-1 py-1" style={{ backgroundColor: '#ffffff', zIndex: 10, minWidth: '80px' }}>是否隔天</TableHead>
-                        <TableHead className="bg-white text-center px-1 py-1" style={{ backgroundColor: '#ffffff', zIndex: 10, minWidth: '120px' }}>二程航班</TableHead>
-                        <TableHead className="bg-white text-center px-1 py-1" style={{ backgroundColor: '#ffffff', zIndex: 10, minWidth: '80px' }}>路由</TableHead>
-                        <TableHead className="bg-white text-center px-1 py-1" style={{ backgroundColor: '#ffffff', zIndex: 10, minWidth: '120px' }}>操作</TableHead>
+                        <TableHead className="bg-white text-center px-1 py-1" style={{ backgroundColor: '#ffffff', zIndex: 10, width: '90px' }}>航班号</TableHead>
+                        <TableHead className="bg-white text-center px-1 py-1" style={{ backgroundColor: '#ffffff', zIndex: 10, width: '50px' }}>始发</TableHead>
+                        <TableHead className="bg-white text-center px-1 py-1" style={{ backgroundColor: '#ffffff', zIndex: 10, width: '50px' }}>中转</TableHead>
+                        <TableHead className="bg-white text-center px-1 py-1" style={{ backgroundColor: '#ffffff', zIndex: 10, width: '50px' }}>目的</TableHead>
+                        <TableHead className="bg-white text-center px-1 py-1" style={{ backgroundColor: '#ffffff', zIndex: 10, width: '80px' }}>起飞时间</TableHead>
+                        <TableHead className="bg-white text-center px-1 py-1" style={{ backgroundColor: '#ffffff', zIndex: 10, width: '80px' }}>落地时间</TableHead>
+                        <TableHead className="bg-white text-center px-1 py-1" style={{ backgroundColor: '#ffffff', zIndex: 10, width: '60px' }}>是否隔天</TableHead>
+                        <TableHead className="bg-white text-center px-1 py-1" style={{ backgroundColor: '#ffffff', zIndex: 10, width: '90px' }}>二程航班</TableHead>
+                        <TableHead className="bg-white text-center px-1 py-1" style={{ backgroundColor: '#ffffff', zIndex: 10, width: '60px' }}>路由</TableHead>
+                        <TableHead className="bg-white text-center px-1 py-1" style={{ backgroundColor: '#ffffff', zIndex: 10, width: '100px' }}>操作</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -1793,7 +1793,7 @@ export default function LogisticsManagement() {
                         )
                         .map(config => (
                         <TableRow key={config.id} className={selectedRouteIds.has(config.id) ? 'bg-blue-50' : ''}>
-                          <TableCell className="text-center px-1 py-1" style={{ minWidth: '50px' }}>
+                          <TableCell className="text-center px-1 py-1" style={{ width: '40px' }}>
                             <input
                               type="checkbox"
                               checked={selectedRouteIds.has(config.id)}
@@ -1801,20 +1801,20 @@ export default function LogisticsManagement() {
                               className="w-4 h-4"
                             />
                           </TableCell>
-                          <TableCell className="text-center px-1 py-1" style={{ minWidth: '120px' }}>{config.flight_no}</TableCell>
-                          <TableCell className="text-center px-1 py-1" style={{ minWidth: '60px' }}>{config.origin}</TableCell>
-                          <TableCell className="text-center px-1 py-1" style={{ minWidth: '60px' }}>{config.transfer || '-'}</TableCell>
-                          <TableCell className="text-center px-1 py-1" style={{ minWidth: '60px' }}>{config.dest}</TableCell>
-                          <TableCell className="text-center px-1 py-1" style={{ minWidth: '100px' }}>{config.depart_time || '-'}</TableCell>
-                          <TableCell className="text-center px-1 py-1" style={{ minWidth: '100px' }}>{config.arrive_time || '-'}</TableCell>
-                          <TableCell className="text-center px-1 py-1" style={{ minWidth: '80px' }}>{config.is_next_day || '-'}</TableCell>
-                          <TableCell className="text-center px-1 py-1" style={{ minWidth: '120px' }}>{config.second_flight || '-'}</TableCell>
-                          <TableCell className="text-center px-1 py-1" style={{ minWidth: '80px' }}>
+                          <TableCell className="text-center px-1 py-1" style={{ width: '90px' }}>{config.flight_no}</TableCell>
+                          <TableCell className="text-center px-1 py-1" style={{ width: '50px' }}>{config.origin}</TableCell>
+                          <TableCell className="text-center px-1 py-1" style={{ width: '50px' }}>{config.transfer || '-'}</TableCell>
+                          <TableCell className="text-center px-1 py-1" style={{ width: '50px' }}>{config.dest}</TableCell>
+                          <TableCell className="text-center px-1 py-1" style={{ width: '80px' }}>{config.depart_time || '-'}</TableCell>
+                          <TableCell className="text-center px-1 py-1" style={{ width: '80px' }}>{config.arrive_time || '-'}</TableCell>
+                          <TableCell className="text-center px-1 py-1" style={{ width: '60px' }}>{config.is_next_day || '-'}</TableCell>
+                          <TableCell className="text-center px-1 py-1" style={{ width: '90px' }}>{config.second_flight || '-'}</TableCell>
+                          <TableCell className="text-center px-1 py-1" style={{ width: '60px' }}>
                             <Badge variant={config.route_type === '空运' ? 'default' : 'secondary'}>
                               {config.route_type}
                             </Badge>
                           </TableCell>
-                          <TableCell className="text-center px-1 py-1" style={{ minWidth: '120px' }}>
+                          <TableCell className="text-center px-1 py-1" style={{ width: '100px' }}>
                             <Button size="sm" variant="outline" className="mr-2"
                               onClick={() => { setEditingRoute(config); setRouteModalOpen(true); }}>
                               编辑
@@ -1999,41 +1999,41 @@ export default function LogisticsManagement() {
                   <Table>
                     <TableHeader className="sticky top-0 bg-white z-50" style={{ position: 'sticky', top: 0, zIndex: 50, backgroundColor: 'white' }}>
                       <TableRow>
-                        <TableHead className="bg-white" style={{ backgroundColor: '#ffffff', zIndex: 10, minWidth: '120px' }}>揽收日期</TableHead>
-                        <TableHead className="bg-white" style={{ backgroundColor: '#ffffff', zIndex: 10, minWidth: '80px' }}>仓库</TableHead>
-                        <TableHead className="bg-white" style={{ backgroundColor: '#ffffff', zIndex: 10, minWidth: '90px' }}>大包数</TableHead>
-                        <TableHead className="bg-white" style={{ backgroundColor: '#ffffff', zIndex: 10, minWidth: '90px' }}>重量</TableHead>
-                        <TableHead className="bg-white" style={{ backgroundColor: '#ffffff', zIndex: 10, minWidth: '100px' }}>总方数</TableHead>
-                        <TableHead className="bg-white" style={{ backgroundColor: '#ffffff', zIndex: 10, minWidth: '100px' }}>关东总</TableHead>
-                        <TableHead className="bg-white" style={{ backgroundColor: '#ffffff', zIndex: 10, minWidth: '100px' }}>关西总</TableHead>
-                        <TableHead className="bg-white" style={{ backgroundColor: '#ffffff', zIndex: 10, minWidth: '100px' }}>关东普货</TableHead>
-                        <TableHead className="bg-white" style={{ backgroundColor: '#ffffff', zIndex: 10, minWidth: '100px' }}>关东特货</TableHead>
-                        <TableHead className="bg-white" style={{ backgroundColor: '#ffffff', zIndex: 10, minWidth: '100px' }}>关西普货</TableHead>
-                        <TableHead className="bg-white" style={{ backgroundColor: '#ffffff', zIndex: 10, minWidth: '100px' }}>关西特货</TableHead>
-                        <TableHead className="bg-white" style={{ backgroundColor: '#ffffff', zIndex: 10, minWidth: '100px' }}>空运</TableHead>
-                        <TableHead className="bg-white" style={{ backgroundColor: '#ffffff', zIndex: 10, minWidth: '100px' }}>海空</TableHead>
-                        <TableHead className="bg-white" style={{ backgroundColor: '#ffffff', zIndex: 10, minWidth: '140px' }}>货物袋数齐全</TableHead>
-                        <TableHead className="bg-white" style={{ backgroundColor: '#ffffff', zIndex: 10, minWidth: '160px' }}>操作</TableHead>
+                        <TableHead className="bg-white text-center px-1 py-1" style={{ backgroundColor: '#ffffff', zIndex: 10, width: '90px' }}>揽收日期</TableHead>
+                        <TableHead className="bg-white text-center px-1 py-1" style={{ backgroundColor: '#ffffff', zIndex: 10, width: '60px' }}>仓库</TableHead>
+                        <TableHead className="bg-white text-center px-1 py-1" style={{ backgroundColor: '#ffffff', zIndex: 10, width: '70px' }}>大包数</TableHead>
+                        <TableHead className="bg-white text-center px-1 py-1" style={{ backgroundColor: '#ffffff', zIndex: 10, width: '70px' }}>重量</TableHead>
+                        <TableHead className="bg-white text-center px-1 py-1" style={{ backgroundColor: '#ffffff', zIndex: 10, width: '80px' }}>总方数</TableHead>
+                        <TableHead className="bg-white text-center px-1 py-1" style={{ backgroundColor: '#ffffff', zIndex: 10, width: '80px' }}>关东总</TableHead>
+                        <TableHead className="bg-white text-center px-1 py-1" style={{ backgroundColor: '#ffffff', zIndex: 10, width: '80px' }}>关西总</TableHead>
+                        <TableHead className="bg-white text-center px-1 py-1" style={{ backgroundColor: '#ffffff', zIndex: 10, width: '80px' }}>关东普货</TableHead>
+                        <TableHead className="bg-white text-center px-1 py-1" style={{ backgroundColor: '#ffffff', zIndex: 10, width: '80px' }}>关东特货</TableHead>
+                        <TableHead className="bg-white text-center px-1 py-1" style={{ backgroundColor: '#ffffff', zIndex: 10, width: '80px' }}>关西普货</TableHead>
+                        <TableHead className="bg-white text-center px-1 py-1" style={{ backgroundColor: '#ffffff', zIndex: 10, width: '80px' }}>关西特货</TableHead>
+                        <TableHead className="bg-white text-center px-1 py-1" style={{ backgroundColor: '#ffffff', zIndex: 10, width: '70px' }}>空运</TableHead>
+                        <TableHead className="bg-white text-center px-1 py-1" style={{ backgroundColor: '#ffffff', zIndex: 10, width: '70px' }}>海空</TableHead>
+                        <TableHead className="bg-white text-center px-1 py-1" style={{ backgroundColor: '#ffffff', zIndex: 10, width: '110px' }}>货物袋数齐全</TableHead>
+                        <TableHead className="bg-white text-center px-1 py-1" style={{ backgroundColor: '#ffffff', zIndex: 10, width: '120px' }}>操作</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
                       {getFilteredVolumeEstimates().slice(0, 10).map(record => (
                         <TableRow key={record.id}>
-                          <TableCell>{record.collect_date}</TableCell>
-                          <TableCell>{record.warehouse}</TableCell>
-                          <TableCell>{record.package_count}</TableCell>
-                          <TableCell>{record.weight ? truncateToDecimals(record.weight, 2) : '0.00'}</TableCell>
-                          <TableCell>{(record.total_volume || 0).toFixed(3)}</TableCell>
-                          <TableCell>{(record.kanto_total || 0).toFixed(3)}</TableCell>
-                          <TableCell>{(record.kansai_total || 0).toFixed(3)}</TableCell>
-                          <TableCell>{(record.kanto_normal || 0).toFixed(3)}</TableCell>
-                          <TableCell>{(record.kanto_special || 0).toFixed(3)}</TableCell>
-                          <TableCell>{(record.kansai_normal || 0).toFixed(3)}</TableCell>
-                          <TableCell>{(record.kansai_special || 0).toFixed(3)}</TableCell>
-                          <TableCell>{(record.air_volume || 0).toFixed(3)}</TableCell>
-                          <TableCell>{(record.sea_air_volume || 0).toFixed(3)}</TableCell>
-                          <TableCell>{record.is_complete || '-'}</TableCell>
-                          <TableCell>
+                          <TableCell className="text-center px-1 py-1">{record.collect_date}</TableCell>
+                          <TableCell className="text-center px-1 py-1">{record.warehouse}</TableCell>
+                          <TableCell className="text-center px-1 py-1">{record.package_count}</TableCell>
+                          <TableCell className="text-center px-1 py-1">{record.weight ? truncateToDecimals(record.weight, 2) : '0.00'}</TableCell>
+                          <TableCell className="text-center px-1 py-1">{(record.total_volume || 0).toFixed(3)}</TableCell>
+                          <TableCell className="text-center px-1 py-1">{(record.kanto_total || 0).toFixed(3)}</TableCell>
+                          <TableCell className="text-center px-1 py-1">{(record.kansai_total || 0).toFixed(3)}</TableCell>
+                          <TableCell className="text-center px-1 py-1">{(record.kanto_normal || 0).toFixed(3)}</TableCell>
+                          <TableCell className="text-center px-1 py-1">{(record.kanto_special || 0).toFixed(3)}</TableCell>
+                          <TableCell className="text-center px-1 py-1">{(record.kansai_normal || 0).toFixed(3)}</TableCell>
+                          <TableCell className="text-center px-1 py-1">{(record.kansai_special || 0).toFixed(3)}</TableCell>
+                          <TableCell className="text-center px-1 py-1">{(record.air_volume || 0).toFixed(3)}</TableCell>
+                          <TableCell className="text-center px-1 py-1">{(record.sea_air_volume || 0).toFixed(3)}</TableCell>
+                          <TableCell className="text-center px-1 py-1">{record.is_complete || '-'}</TableCell>
+                          <TableCell className="text-center px-1 py-1">
                             <Button size="sm" variant="outline" className="mr-2"
                               onClick={() => editVolumeEstimate(record)}>
                               编辑
@@ -2611,30 +2611,30 @@ export default function LogisticsManagement() {
               <CardContent>
                 {balanceResults.length > 0 ? (
                   <div className="max-h-[300px] overflow-y-auto relative">
-                    <Table className="w-full">
+                    <Table style={{ tableLayout: 'fixed' }} className="w-full">
                       <TableHeader className="sticky top-0 bg-white z-50" style={{ position: 'sticky', top: 0, zIndex: 50, backgroundColor: 'white' }}>
                         <TableRow>
-                          <TableHead className="text-center px-2 bg-white" style={{ backgroundColor: '#ffffff', zIndex: 10 }}>仓库</TableHead>
-                          <TableHead className="text-center px-2 bg-white" style={{ backgroundColor: '#ffffff', zIndex: 10 }}>口岸</TableHead>
-                          <TableHead className="text-center px-2 bg-white" style={{ backgroundColor: '#ffffff', zIndex: 10 }}>货物属性</TableHead>
-                          <TableHead className="text-center px-2 bg-white" style={{ backgroundColor: '#ffffff', zIndex: 10 }}>预估方数</TableHead>
-                          <TableHead className="text-center px-2 bg-white" style={{ backgroundColor: '#ffffff', zIndex: 10 }}>打货上限汇总</TableHead>
-                          <TableHead className="text-center px-2 bg-white" style={{ backgroundColor: '#ffffff', zIndex: 10 }}>欠方</TableHead>
-                          <TableHead className="text-center px-2 bg-white" style={{ backgroundColor: '#ffffff', zIndex: 10 }}>余方</TableHead>
+                          <TableHead className="text-center px-1 py-1 bg-white" style={{ backgroundColor: '#ffffff', zIndex: 10, width: '60px' }}>仓库</TableHead>
+                          <TableHead className="text-center px-1 py-1 bg-white" style={{ backgroundColor: '#ffffff', zIndex: 10, width: '60px' }}>口岸</TableHead>
+                          <TableHead className="text-center px-1 py-1 bg-white" style={{ backgroundColor: '#ffffff', zIndex: 10, width: '60px' }}>货物属性</TableHead>
+                          <TableHead className="text-center px-1 py-1 bg-white" style={{ backgroundColor: '#ffffff', zIndex: 10, width: '80px' }}>预估方数</TableHead>
+                          <TableHead className="text-center px-1 py-1 bg-white" style={{ backgroundColor: '#ffffff', zIndex: 10, width: '100px' }}>打货上限汇总</TableHead>
+                          <TableHead className="text-center px-1 py-1 bg-white" style={{ backgroundColor: '#ffffff', zIndex: 10, width: '80px' }}>欠方</TableHead>
+                          <TableHead className="text-center px-1 py-1 bg-white" style={{ backgroundColor: '#ffffff', zIndex: 10, width: '80px' }}>余方</TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>
                         {balanceResults.map((r, idx) => (
                           <TableRow key={idx}>
-                            <TableCell className="text-center px-2">{r.warehouse}</TableCell>
-                            <TableCell className="text-center px-2">{r.port}</TableCell>
-                            <TableCell className="text-center px-2">{r.cargo_type}</TableCell>
-                            <TableCell className="text-center px-2">{r.estVolume.toFixed(3)}</TableCell>
-                            <TableCell className="text-center px-2">{r.maxVolume.toFixed(3)}</TableCell>
-                            <TableCell className="text-center px-2 font-semibold text-red-600">
+                            <TableCell className="text-center px-1 py-1">{r.warehouse}</TableCell>
+                            <TableCell className="text-center px-1 py-1">{r.port}</TableCell>
+                            <TableCell className="text-center px-1 py-1">{r.cargo_type}</TableCell>
+                            <TableCell className="text-center px-1 py-1">{r.estVolume.toFixed(3)}</TableCell>
+                            <TableCell className="text-center px-1 py-1">{r.maxVolume.toFixed(3)}</TableCell>
+                            <TableCell className="text-center px-1 py-1 font-semibold text-red-600">
                               {r.deficit > 0 ? r.deficit.toFixed(3) : '0.000'}
                             </TableCell>
-                            <TableCell className="text-center px-2 font-semibold text-green-600">
+                            <TableCell className="text-center px-1 py-1 font-semibold text-green-600">
                               {r.surplus > 0 ? r.surplus.toFixed(3) : '0.000'}
                             </TableCell>
                           </TableRow>
@@ -2986,62 +2986,62 @@ export default function LogisticsManagement() {
             }}>查询</Button>
           </div>
           <div className="flex-1 overflow-auto border rounded-lg" style={{ maxHeight: 'calc(90vh - 200px)' }}>
-            <Table className="w-full text-base">
+            <Table style={{ tableLayout: 'fixed' }} className="w-full text-base">
               <TableHeader className="sticky top-0 bg-white z-10">
                 <TableRow>
-                  <TableHead className="bg-gray-50 text-center px-2">揽收日期</TableHead>
-                  <TableHead className="bg-gray-50 text-center px-2">仓库</TableHead>
-                  <TableHead className="bg-gray-50 text-center px-2">口岸</TableHead>
-                  <TableHead className="bg-gray-50 text-center px-2">货物属性</TableHead>
-                  <TableHead className="bg-gray-50 text-center px-2">路由类型</TableHead>
-                  <TableHead className="bg-gray-50 text-center px-2">类别</TableHead>
-                  <TableHead className="bg-gray-50 text-center px-2">主单号</TableHead>
-                  <TableHead className="bg-gray-50 text-center px-2">航班号</TableHead>
-                  <TableHead className="bg-gray-50 text-center px-2">目的港</TableHead>
-                  <TableHead className="bg-gray-50 text-center px-2">打货上限</TableHead>
-                  <TableHead className="bg-gray-50 text-center px-2">起飞时间</TableHead>
-                  <TableHead className="bg-gray-50 text-center px-2">二程航班</TableHead>
-                  <TableHead className="bg-gray-50 text-center px-2">到港时间</TableHead>
-                  <TableHead className="bg-gray-50 text-center px-2">实际件数</TableHead>
-                  <TableHead className="bg-gray-50 text-center px-2">实际重量</TableHead>
-                  <TableHead className="bg-gray-50 text-center px-2">实际体积</TableHead>
-                  <TableHead className="bg-gray-50 text-center px-2">实际票数</TableHead>
-                  <TableHead className="bg-gray-50 text-center px-2">备注</TableHead>
-                  <TableHead className="bg-gray-50 text-center px-2 sticky right-0">操作</TableHead>
+                  <TableHead className="bg-gray-50 text-center px-1 py-1" style={{ width: '90px' }}>揽收日期</TableHead>
+                  <TableHead className="bg-gray-50 text-center px-1 py-1" style={{ width: '60px' }}>仓库</TableHead>
+                  <TableHead className="bg-gray-50 text-center px-1 py-1" style={{ width: '60px' }}>口岸</TableHead>
+                  <TableHead className="bg-gray-50 text-center px-1 py-1" style={{ width: '60px' }}>货物属性</TableHead>
+                  <TableHead className="bg-gray-50 text-center px-1 py-1" style={{ width: '70px' }}>路由类型</TableHead>
+                  <TableHead className="bg-gray-50 text-center px-1 py-1" style={{ width: '60px' }}>类别</TableHead>
+                  <TableHead className="bg-gray-50 text-center px-1 py-1" style={{ width: '100px' }}>主单号</TableHead>
+                  <TableHead className="bg-gray-50 text-center px-1 py-1" style={{ width: '70px' }}>航班号</TableHead>
+                  <TableHead className="bg-gray-50 text-center px-1 py-1" style={{ width: '60px' }}>目的港</TableHead>
+                  <TableHead className="bg-gray-50 text-center px-1 py-1" style={{ width: '80px' }}>打货上限</TableHead>
+                  <TableHead className="bg-gray-50 text-center px-1 py-1" style={{ width: '120px' }}>起飞时间</TableHead>
+                  <TableHead className="bg-gray-50 text-center px-1 py-1" style={{ width: '80px' }}>二程航班</TableHead>
+                  <TableHead className="bg-gray-50 text-center px-1 py-1" style={{ width: '120px' }}>到港时间</TableHead>
+                  <TableHead className="bg-gray-50 text-center px-1 py-1" style={{ width: '70px' }}>实际件数</TableHead>
+                  <TableHead className="bg-gray-50 text-center px-1 py-1" style={{ width: '70px' }}>实际重量</TableHead>
+                  <TableHead className="bg-gray-50 text-center px-1 py-1" style={{ width: '70px' }}>实际体积</TableHead>
+                  <TableHead className="bg-gray-50 text-center px-1 py-1" style={{ width: '70px' }}>实际票数</TableHead>
+                  <TableHead className="bg-gray-50 text-center px-1 py-1" style={{ width: '80px' }}>备注</TableHead>
+                  <TableHead className="bg-gray-50 text-center px-1 py-1 sticky right-0" style={{ width: '100px' }}>操作</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {mainOrders.slice(0, 100).map(order => (
                   <TableRow key={order.id} className="h-10">
-                    <TableCell className="text-center">{order.collect_date}</TableCell>
-                    <TableCell className="text-center">{order.warehouse}</TableCell>
-                    <TableCell className="text-center">{order.port}</TableCell>
-                    <TableCell className="text-center">{order.cargo_type}</TableCell>
-                    <TableCell className="text-center">
+                    <TableCell className="text-center px-1 py-1">{order.collect_date}</TableCell>
+                    <TableCell className="text-center px-1 py-1">{order.warehouse}</TableCell>
+                    <TableCell className="text-center px-1 py-1">{order.port}</TableCell>
+                    <TableCell className="text-center px-1 py-1">{order.cargo_type}</TableCell>
+                    <TableCell className="text-center px-1 py-1">
                       {order.route_type ? (
                         <Badge variant={order.route_type === '空运' ? 'default' : 'secondary'}>
                           {order.route_type}
                         </Badge>
                       ) : '-'}
                     </TableCell>
-                    <TableCell className="text-center">{order.category || '-'}</TableCell>
-                    <TableCell className="text-center">{order.main_no || '-'}</TableCell>
-                    <TableCell className="text-center">{order.flight_no || '-'}</TableCell>
-                    <TableCell className="text-center">{order.dest || '-'}</TableCell>
-                    <TableCell className="text-center">{order.max_volume || '-'}</TableCell>
-                    <TableCell className="text-center">
+                    <TableCell className="text-center px-1 py-1">{order.category || '-'}</TableCell>
+                    <TableCell className="text-center px-1 py-1">{order.main_no || '-'}</TableCell>
+                    <TableCell className="text-center px-1 py-1">{order.flight_no || '-'}</TableCell>
+                    <TableCell className="text-center px-1 py-1">{order.dest || '-'}</TableCell>
+                    <TableCell className="text-center px-1 py-1">{order.max_volume || '-'}</TableCell>
+                    <TableCell className="text-center px-1 py-1">
                       {formatDateTime(order.actual_flight_date, order.depart_time) || '-'}
                     </TableCell>
-                    <TableCell className="text-center">{order.second_flight || '-'}</TableCell>
-                    <TableCell className="text-center">
+                    <TableCell className="text-center px-1 py-1">{order.second_flight || '-'}</TableCell>
+                    <TableCell className="text-center px-1 py-1">
                       {formatDateTime(order.actual_flight_date, order.arrive_time) || '-'}
                     </TableCell>
-                    <TableCell className="text-center">{order.actual_pieces || '-'}</TableCell>
-                    <TableCell className="text-center">{order.actual_weight || '-'}</TableCell>
-                    <TableCell className="text-center">{order.actual_volume || '-'}</TableCell>
-                    <TableCell className="text-center">{order.actual_bills || '-'}</TableCell>
-                    <TableCell className="text-center truncate max-w-[100px]" title={order.remark || ''}>{order.remark || '-'}</TableCell>
-                    <TableCell className="text-center sticky right-0 bg-white">
+                    <TableCell className="text-center px-1 py-1">{order.actual_pieces || '-'}</TableCell>
+                    <TableCell className="text-center px-1 py-1">{order.actual_weight || '-'}</TableCell>
+                    <TableCell className="text-center px-1 py-1">{order.actual_volume || '-'}</TableCell>
+                    <TableCell className="text-center px-1 py-1">{order.actual_bills || '-'}</TableCell>
+                    <TableCell className="text-center px-1 py-1 truncate max-w-[100px]" title={order.remark || ''}>{order.remark || '-'}</TableCell>
+                    <TableCell className="text-center px-1 py-1 sticky right-0 bg-white">
                       <Button size="sm" className="bg-blue-600 hover:bg-blue-700 text-white mr-1"
                         onClick={() => {
                           setEditingOrder(order);
