@@ -2449,59 +2449,59 @@ export default function LogisticsManagement() {
                 <span className="font-semibold">查询结果</span>
                 <span className="text-sm text-gray-500">共 {mainOrders.length} 条记录</span>
               </div>
-              <div style={{ position: 'relative', overflow: 'auto', maxHeight: '800px', borderTop: '1px solid #e5e7eb' }}>
-                <table style={{ tableLayout: 'fixed', width: 'max-content', minWidth: '2200px', borderCollapse: 'separate', borderSpacing: 0 }}>
+              <div className="overflow-x-auto" style={{ maxHeight: '800px', overflowY: 'auto' }}>
+                <table style={{ borderCollapse: 'collapse', minWidth: '2200px' }}>
                   <thead>
                     <tr>
-                      <th className="text-center px-2 py-2" style={{ width: '100px', position: 'sticky', top: 0, left: 0, zIndex: 30, backgroundColor: '#ffffff', borderRight: '2px solid #e5e7eb', willChange: 'transform' }}>揽收日期</th>
-                      <th className="text-center px-2 py-2" style={{ width: '60px', position: 'sticky', top: 0, left: '100px', zIndex: 30, backgroundColor: '#ffffff', borderRight: '2px solid #e5e7eb', willChange: 'transform' }}>仓库</th>
-                      <th className="text-center px-2 py-2" style={{ width: '60px', position: 'sticky', top: 0, left: '160px', zIndex: 30, backgroundColor: '#ffffff', borderRight: '2px solid #e5e7eb', willChange: 'transform' }}>口岸</th>
-                      <th className="text-center px-2 py-2" style={{ width: '60px', position: 'sticky', top: 0, left: '220px', zIndex: 30, backgroundColor: '#ffffff', borderRight: '2px solid #e5e7eb', willChange: 'transform' }}>货物属性</th>
-                      <th className="text-center px-2 py-2" style={{ width: '80px', position: 'sticky', top: 0, left: '280px', zIndex: 30, backgroundColor: '#ffffff', borderRight: '2px solid #e5e7eb', willChange: 'transform' }}>路由类型</th>
-                      <th className="text-center px-2 py-2" style={{ width: '120px', position: 'sticky', top: 0, zIndex: 20, backgroundColor: '#ffffff' }}>主单号</th>
-                      <th className="text-center px-2 py-2" style={{ width: '90px', position: 'sticky', top: 0, zIndex: 20, backgroundColor: '#ffffff' }}>航班号</th>
-                      <th className="text-center px-2 py-2" style={{ width: '60px', position: 'sticky', top: 0, zIndex: 20, backgroundColor: '#ffffff' }}>始发</th>
-                      <th className="text-center px-2 py-2" style={{ width: '60px', position: 'sticky', top: 0, zIndex: 20, backgroundColor: '#ffffff' }}>中转</th>
-                      <th className="text-center px-2 py-2" style={{ width: '60px', position: 'sticky', top: 0, zIndex: 20, backgroundColor: '#ffffff' }}>目的</th>
-                      <th className="text-center px-2 py-2" style={{ width: '160px', position: 'sticky', top: 0, zIndex: 20, backgroundColor: '#ffffff' }}>预计起飞</th>
-                      <th className="text-center px-2 py-2" style={{ width: '160px', position: 'sticky', top: 0, zIndex: 20, backgroundColor: '#ffffff' }}>预计落地</th>
-                      <th className="text-center px-2 py-2" style={{ width: '90px', position: 'sticky', top: 0, zIndex: 20, backgroundColor: '#ffffff' }}>打货上限(方)</th>
-                      <th className="text-center px-2 py-2" style={{ width: '90px', position: 'sticky', top: 0, zIndex: 20, backgroundColor: '#ffffff' }}>打货上限(件)</th>
-                      <th className="text-center px-2 py-2" style={{ width: '90px', position: 'sticky', top: 0, zIndex: 20, backgroundColor: '#ffffff' }}>实际件数</th>
-                      <th className="text-center px-2 py-2" style={{ width: '90px', position: 'sticky', top: 0, zIndex: 20, backgroundColor: '#ffffff' }}>实际方数</th>
-                      <th className="text-center px-2 py-2" style={{ width: '80px', position: 'sticky', top: 0, zIndex: 20, backgroundColor: '#ffffff' }}>操作</th>
+                      <th style={{ position: 'sticky', left: 0, top: 0, zIndex: 30, backgroundColor: '#fff', minWidth: '100px', borderRight: '2px solid #e5e7eb' }} className="text-center px-2 py-2">揽收日期</th>
+                      <th style={{ position: 'sticky', left: '100px', top: 0, zIndex: 30, backgroundColor: '#fff', minWidth: '60px', borderRight: '2px solid #e5e7eb' }} className="text-center px-2 py-2">仓库</th>
+                      <th style={{ position: 'sticky', left: '160px', top: 0, zIndex: 30, backgroundColor: '#fff', minWidth: '60px', borderRight: '2px solid #e5e7eb' }} className="text-center px-2 py-2">口岸</th>
+                      <th style={{ position: 'sticky', left: '220px', top: 0, zIndex: 30, backgroundColor: '#fff', minWidth: '60px', borderRight: '2px solid #e5e7eb' }} className="text-center px-2 py-2">货物属性</th>
+                      <th style={{ position: 'sticky', left: '280px', top: 0, zIndex: 30, backgroundColor: '#fff', minWidth: '80px', borderRight: '2px solid #e5e7eb' }} className="text-center px-2 py-2">路由类型</th>
+                      <th style={{ position: 'sticky', top: 0, zIndex: 20, backgroundColor: '#fff', minWidth: '120px' }} className="text-center px-2 py-2">主单号</th>
+                      <th style={{ position: 'sticky', top: 0, zIndex: 20, backgroundColor: '#fff', minWidth: '90px' }} className="text-center px-2 py-2">航班号</th>
+                      <th style={{ position: 'sticky', top: 0, zIndex: 20, backgroundColor: '#fff', minWidth: '60px' }} className="text-center px-2 py-2">始发</th>
+                      <th style={{ position: 'sticky', top: 0, zIndex: 20, backgroundColor: '#fff', minWidth: '60px' }} className="text-center px-2 py-2">中转</th>
+                      <th style={{ position: 'sticky', top: 0, zIndex: 20, backgroundColor: '#fff', minWidth: '60px' }} className="text-center px-2 py-2">目的</th>
+                      <th style={{ position: 'sticky', top: 0, zIndex: 20, backgroundColor: '#fff', minWidth: '160px' }} className="text-center px-2 py-2">预计起飞</th>
+                      <th style={{ position: 'sticky', top: 0, zIndex: 20, backgroundColor: '#fff', minWidth: '160px' }} className="text-center px-2 py-2">预计落地</th>
+                      <th style={{ position: 'sticky', top: 0, zIndex: 20, backgroundColor: '#fff', minWidth: '90px' }} className="text-center px-2 py-2">打货上限(方)</th>
+                      <th style={{ position: 'sticky', top: 0, zIndex: 20, backgroundColor: '#fff', minWidth: '90px' }} className="text-center px-2 py-2">打货上限(件)</th>
+                      <th style={{ position: 'sticky', top: 0, zIndex: 20, backgroundColor: '#fff', minWidth: '90px' }} className="text-center px-2 py-2">实际件数</th>
+                      <th style={{ position: 'sticky', top: 0, zIndex: 20, backgroundColor: '#fff', minWidth: '90px' }} className="text-center px-2 py-2">实际方数</th>
+                      <th style={{ position: 'sticky', top: 0, zIndex: 20, backgroundColor: '#fff', minWidth: '80px' }} className="text-center px-2 py-2">操作</th>
                     </tr>
                   </thead>
                   <tbody>
                     {mainOrders.slice(0, 50).map(order => (
-                      <tr key={order.id} className="border-b hover:bg-gray-50">
-                        <td className="text-center px-2 py-2" style={{ width: '100px', position: 'sticky', left: 0, zIndex: 25, borderRight: '2px solid #e5e7eb', backgroundColor: 'white', willChange: 'transform' }}>{order.collect_date}</td>
-                        <td className="text-center px-2 py-2" style={{ width: '60px', position: 'sticky', left: '100px', zIndex: 25, borderRight: '2px solid #e5e7eb', backgroundColor: 'white', willChange: 'transform' }}>{order.warehouse}</td>
-                        <td className="text-center px-2 py-2" style={{ width: '60px', position: 'sticky', left: '160px', zIndex: 25, borderRight: '2px solid #e5e7eb', backgroundColor: 'white', willChange: 'transform' }}>{order.port}</td>
-                        <td className="text-center px-2 py-2" style={{ width: '60px', position: 'sticky', left: '220px', zIndex: 25, borderRight: '2px solid #e5e7eb', backgroundColor: 'white', willChange: 'transform' }}>{order.cargo_type}</td>
-                        <td className="text-center px-2 py-2" style={{ width: '80px', position: 'sticky', left: '280px', zIndex: 25, borderRight: '2px solid #e5e7eb', backgroundColor: 'white', willChange: 'transform' }}>
+                      <tr key={order.id} className="border-b hover:bg-gray-50" style={{ height: 'auto' }}>
+                        <td style={{ position: 'sticky', left: 0, zIndex: 25, backgroundColor: '#fff', minWidth: '100px', borderRight: '2px solid #e5e7eb' }} className="text-center px-2 py-2">{order.collect_date}</td>
+                        <td style={{ position: 'sticky', left: '100px', zIndex: 25, backgroundColor: '#fff', minWidth: '60px', borderRight: '2px solid #e5e7eb' }} className="text-center px-2 py-2">{order.warehouse}</td>
+                        <td style={{ position: 'sticky', left: '160px', zIndex: 25, backgroundColor: '#fff', minWidth: '60px', borderRight: '2px solid #e5e7eb' }} className="text-center px-2 py-2">{order.port}</td>
+                        <td style={{ position: 'sticky', left: '220px', zIndex: 25, backgroundColor: '#fff', minWidth: '60px', borderRight: '2px solid #e5e7eb' }} className="text-center px-2 py-2">{order.cargo_type}</td>
+                        <td style={{ position: 'sticky', left: '280px', zIndex: 25, backgroundColor: '#fff', minWidth: '80px', borderRight: '2px solid #e5e7eb' }} className="text-center px-2 py-2">
                           {order.route_type ? (
                             <Badge variant={order.route_type === '空运' ? 'default' : 'secondary'}>
                               {order.route_type}
                             </Badge>
                           ) : '-'}
                         </td>
-                        <td className="text-center px-2 py-2" style={{ width: '120px' }}>{order.main_no || '-'}</td>
-                        <td className="text-center px-2 py-2" style={{ width: '90px' }}>{order.flight_no || '-'}</td>
-                        <td className="text-center px-2 py-2" style={{ width: '60px' }}>{order.origin || '-'}</td>
-                        <td className="text-center px-2 py-2" style={{ width: '60px' }}>{order.transfer || '-'}</td>
-                        <td className="text-center px-2 py-2" style={{ width: '60px' }}>{order.dest || '-'}</td>
-                        <td className="text-center px-2 py-2" style={{ width: '160px' }}>
+                        <td style={{ minWidth: '120px' }} className="text-center px-2 py-2">{order.main_no || '-'}</td>
+                        <td style={{ minWidth: '90px' }} className="text-center px-2 py-2">{order.flight_no || '-'}</td>
+                        <td style={{ minWidth: '60px' }} className="text-center px-2 py-2">{order.origin || '-'}</td>
+                        <td style={{ minWidth: '60px' }} className="text-center px-2 py-2">{order.transfer || '-'}</td>
+                        <td style={{ minWidth: '60px' }} className="text-center px-2 py-2">{order.dest || '-'}</td>
+                        <td style={{ minWidth: '160px' }} className="text-center px-2 py-2">
                           {formatDateTime(order.actual_flight_date, order.depart_time) || '-'}
                         </td>
-                        <td className="text-center px-2 py-2" style={{ width: '160px' }}>
+                        <td style={{ minWidth: '160px' }} className="text-center px-2 py-2">
                           {formatDateTime(order.actual_flight_date, order.arrive_time) || '-'}
                         </td>
-                        <td className="text-center px-2 py-2" style={{ width: '90px' }}>{order.max_volume || '-'}</td>
-                        <td className="text-center px-2 py-2" style={{ width: '90px' }}>{order.max_pieces || '-'}</td>
-                        <td className="text-center px-2 py-2" style={{ width: '90px' }}>{order.actual_pieces || '-'}</td>
-                        <td className="text-center px-2 py-2" style={{ width: '90px' }}>{order.actual_volume || '-'}</td>
-                        <td className="text-center px-2 py-2" style={{ width: '80px' }}>
+                        <td style={{ minWidth: '90px' }} className="text-center px-2 py-2">{order.max_volume || '-'}</td>
+                        <td style={{ minWidth: '90px' }} className="text-center px-2 py-2">{order.max_pieces || '-'}</td>
+                        <td style={{ minWidth: '90px' }} className="text-center px-2 py-2">{order.actual_pieces || '-'}</td>
+                        <td style={{ minWidth: '90px' }} className="text-center px-2 py-2">{order.actual_volume || '-'}</td>
+                        <td style={{ minWidth: '80px' }} className="text-center px-2 py-2">
                           <Button size="sm" variant="outline" className="mr-2"
                             onClick={() => {
                               setEditingOrder(order);
