@@ -1535,29 +1535,29 @@ export default function LogisticsManagement() {
                   <Table style={{ tableLayout: 'auto', width: '100%', minWidth: '1800px' }}>
                     <TableHeader className="sticky top-0 bg-white z-10" style={{ position: 'sticky', top: 0, zIndex: 10, backgroundColor: '#ffffff' }}>
                       <TableRow>
-                        <TableHead className="bg-white" style={{ backgroundColor: '#ffffff', zIndex: 10 }}>仓库</TableHead>
-                        <TableHead className="bg-white" style={{ backgroundColor: '#ffffff', zIndex: 10 }}>大包预估体积</TableHead>
-                        <TableHead className="bg-white" style={{ backgroundColor: '#ffffff', zIndex: 10 }}>关东目的港占比</TableHead>
-                        <TableHead className="bg-white" style={{ backgroundColor: '#ffffff', zIndex: 10 }}>关西目的港占比</TableHead>
-                        <TableHead className="bg-white" style={{ backgroundColor: '#ffffff', zIndex: 10 }}>关东普货占比</TableHead>
-                        <TableHead className="bg-white" style={{ backgroundColor: '#ffffff', zIndex: 10 }}>关东特货占比</TableHead>
-                        <TableHead className="bg-white" style={{ backgroundColor: '#ffffff', zIndex: 10 }}>关西普货占比</TableHead>
-                        <TableHead className="bg-white" style={{ backgroundColor: '#ffffff', zIndex: 10 }}>关西特货占比</TableHead>
-                        <TableHead className="bg-white" style={{ backgroundColor: '#ffffff', zIndex: 10 }}>操作</TableHead>
+                        <TableHead className="bg-white text-center px-1 py-1" style={{ backgroundColor: '#ffffff', zIndex: 10 }}>仓库</TableHead>
+                        <TableHead className="bg-white text-center px-1 py-1" style={{ backgroundColor: '#ffffff', zIndex: 10 }}>大包预估体积</TableHead>
+                        <TableHead className="bg-white text-center px-1 py-1" style={{ backgroundColor: '#ffffff', zIndex: 10 }}>关东目的港占比</TableHead>
+                        <TableHead className="bg-white text-center px-1 py-1" style={{ backgroundColor: '#ffffff', zIndex: 10 }}>关西目的港占比</TableHead>
+                        <TableHead className="bg-white text-center px-1 py-1" style={{ backgroundColor: '#ffffff', zIndex: 10 }}>关东普货占比</TableHead>
+                        <TableHead className="bg-white text-center px-1 py-1" style={{ backgroundColor: '#ffffff', zIndex: 10 }}>关东特货占比</TableHead>
+                        <TableHead className="bg-white text-center px-1 py-1" style={{ backgroundColor: '#ffffff', zIndex: 10 }}>关西普货占比</TableHead>
+                        <TableHead className="bg-white text-center px-1 py-1" style={{ backgroundColor: '#ffffff', zIndex: 10 }}>关西特货占比</TableHead>
+                        <TableHead className="bg-white text-center px-1 py-1" style={{ backgroundColor: '#ffffff', zIndex: 10 }}>操作</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
                       {areaConfigs.map(config => (
                         <TableRow key={config.id}>
-                          <TableCell>{config.warehouse}</TableCell>
-                          <TableCell>{config.package_volume}</TableCell>
-                          <TableCell>{config.kanto_ratio}%</TableCell>
-                          <TableCell>{config.kansai_ratio}%</TableCell>
-                          <TableCell>{config.kanto_normal_ratio}%</TableCell>
-                          <TableCell>{config.kanto_special_ratio}%</TableCell>
-                          <TableCell>{config.kansai_normal_ratio}%</TableCell>
-                          <TableCell>{config.kansai_special_ratio}%</TableCell>
-                          <TableCell>
+                          <TableCell className="text-center px-1 py-1">{config.warehouse}</TableCell>
+                          <TableCell className="text-center px-1 py-1">{config.package_volume}</TableCell>
+                          <TableCell className="text-center px-1 py-1">{config.kanto_ratio}%</TableCell>
+                          <TableCell className="text-center px-1 py-1">{config.kansai_ratio}%</TableCell>
+                          <TableCell className="text-center px-1 py-1">{config.kanto_normal_ratio}%</TableCell>
+                          <TableCell className="text-center px-1 py-1">{config.kanto_special_ratio}%</TableCell>
+                          <TableCell className="text-center px-1 py-1">{config.kansai_normal_ratio}%</TableCell>
+                          <TableCell className="text-center px-1 py-1">{config.kansai_special_ratio}%</TableCell>
+                          <TableCell className="text-center px-1 py-1">
                             <Button size="sm" variant="outline" className="mr-2"
                               onClick={() => { setEditingArea(config); setAreaModalOpen(true); }}>
                               编辑
