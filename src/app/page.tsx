@@ -1532,7 +1532,7 @@ export default function LogisticsManagement() {
               </CardHeader>
               <CardContent>
                 <div className="overflow-auto relative" style={{ minWidth: '1800px' }}>
-                  <Table style={{ tableLayout: 'auto', width: '100%', minWidth: '1800px' }}>
+                  <Table style={{ tableLayout: 'fixed', width: '100%', minWidth: '1800px' }}>
                     <TableHeader className="sticky top-0 bg-white z-10" style={{ position: 'sticky', top: 0, zIndex: 10, backgroundColor: '#ffffff' }}>
                       <TableRow>
                         <TableHead className="bg-white text-center px-1 py-1" style={{ backgroundColor: '#ffffff', zIndex: 10 }}>仓库</TableHead>
@@ -1597,7 +1597,7 @@ export default function LogisticsManagement() {
               </CardHeader>
               <CardContent>
                 <div className="max-h-[800px] overflow-auto relative">
-                  <Table style={{ tableLayout: 'auto', width: '100%', minWidth: '2200px' }}>
+                  <Table style={{ tableLayout: 'fixed', width: '100%', minWidth: '2200px' }}>
                     <TableHeader className="sticky top-0 bg-white z-10" style={{ position: 'sticky', top: 0, zIndex: 10, backgroundColor: '#ffffff' }}>
                       <TableRow>
                         <TableHead className="bg-white" style={{ backgroundColor: '#ffffff', zIndex: 10, minWidth: '80px' }}>仓库</TableHead>
@@ -1658,7 +1658,7 @@ export default function LogisticsManagement() {
               </CardHeader>
               <CardContent>
                 <div className="max-h-[800px] overflow-auto relative">
-                  <Table style={{ tableLayout: 'auto' }}>
+                  <Table style={{ tableLayout: 'fixed' }}>
                     <TableHeader className="sticky top-0 bg-white z-10" style={{ position: 'sticky', top: 0, zIndex: 10, backgroundColor: '#ffffff' }}>
                       <TableRow>
                         <TableHead className="bg-white" style={{ backgroundColor: '#ffffff', zIndex: 10, minWidth: '200px' }}>目的港代码</TableHead>
@@ -1726,7 +1726,7 @@ export default function LogisticsManagement() {
               </CardHeader>
               <CardContent>
                 <div className="overflow-auto relative">
-                  <Table style={{ tableLayout: 'auto', whiteSpace: 'nowrap', minWidth: '1800px' }}>
+                  <Table style={{ tableLayout: 'fixed', whiteSpace: 'nowrap', minWidth: '1800px' }}>
                     <TableHeader className="sticky top-0 bg-white z-10" style={{ position: 'sticky', top: 0, zIndex: 10, backgroundColor: '#ffffff' }}>
                       <TableRow>
                         <TableHead className="bg-white text-center px-1 py-1" style={{ backgroundColor: '#ffffff', zIndex: 10, minWidth: '50px' }}>
