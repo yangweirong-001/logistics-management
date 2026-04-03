@@ -1532,7 +1532,7 @@ export default function LogisticsManagement() {
               </CardHeader>
               <CardContent>
                 <div className="overflow-auto relative">
-                  <Table style={{ tableLayout: 'fixed', width: '100%' }}>
+                  <Table style={{ tableLayout: 'fixed', width: '100%', minWidth: '1000px' }}>
                     <TableHeader className="sticky top-0 bg-white z-10" style={{ position: 'sticky', top: 0, zIndex: 10, backgroundColor: '#ffffff' }}>
                       <TableRow>
                         <TableHead className="bg-white text-center px-1 py-1" style={{ backgroundColor: '#ffffff', zIndex: 10, width: '60px' }}>仓库</TableHead>
@@ -1597,7 +1597,7 @@ export default function LogisticsManagement() {
               </CardHeader>
               <CardContent>
                 <div className="max-h-[800px] overflow-auto relative">
-                  <Table style={{ tableLayout: 'fixed', width: '100%' }}>
+                  <Table style={{ tableLayout: 'fixed', width: '100%', minWidth: '1000px' }}>
                     <TableHeader className="sticky top-0 bg-white z-10" style={{ position: 'sticky', top: 0, zIndex: 10, backgroundColor: '#ffffff' }}>
                       <TableRow>
                         <TableHead className="bg-white text-center px-1 py-1" style={{ backgroundColor: '#ffffff', zIndex: 10, width: '60px' }}>仓库</TableHead>
@@ -1726,7 +1726,7 @@ export default function LogisticsManagement() {
               </CardHeader>
               <CardContent>
                 <div className="overflow-auto relative">
-                  <Table style={{ tableLayout: 'fixed', whiteSpace: 'nowrap' }}>
+                  <Table style={{ tableLayout: 'fixed', whiteSpace: 'nowrap', minWidth: '1200px' }}>
                     <TableHeader className="sticky top-0 bg-white z-10" style={{ position: 'sticky', top: 0, zIndex: 10, backgroundColor: '#ffffff' }}>
                       <TableRow>
                         <TableHead className="bg-white text-center px-1 py-1" style={{ backgroundColor: '#ffffff', zIndex: 10, width: '40px' }}>
