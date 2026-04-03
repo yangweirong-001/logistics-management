@@ -2444,109 +2444,107 @@ export default function LogisticsManagement() {
               </CardContent>
             </Card>
             
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between">
-                <span>查询结果</span>
+            <div>
+              <div className="flex flex-row items-center justify-between px-6 py-4 border-b bg-white rounded-t-lg">
+                <span className="font-semibold">查询结果</span>
                 <span className="text-sm text-gray-500">共 {mainOrders.length} 条记录</span>
-              </CardHeader>
-              <CardContent className="p-0">
-                <div className="overflow-auto max-h-[800px]">
-                  <table style={{ tableLayout: 'auto', minWidth: '2200px', whiteSpace: 'nowrap', borderCollapse: 'separate', borderSpacing: 0 }}>
-                    <thead>
-                      <tr>
-                        <th className="text-center px-2 py-2" style={{ minWidth: '100px', position: 'sticky', top: 0, left: 0, zIndex: 30, backgroundColor: '#ffffff', borderRight: '2px solid #e5e7eb' }}>揽收日期</th>
-                        <th className="text-center px-2 py-2" style={{ minWidth: '60px', position: 'sticky', top: 0, left: '100px', zIndex: 30, backgroundColor: '#ffffff', borderRight: '2px solid #e5e7eb' }}>仓库</th>
-                        <th className="text-center px-2 py-2" style={{ minWidth: '60px', position: 'sticky', top: 0, left: '160px', zIndex: 30, backgroundColor: '#ffffff', borderRight: '2px solid #e5e7eb' }}>口岸</th>
-                        <th className="text-center px-2 py-2" style={{ minWidth: '60px', position: 'sticky', top: 0, left: '220px', zIndex: 30, backgroundColor: '#ffffff', borderRight: '2px solid #e5e7eb' }}>货物属性</th>
-                        <th className="text-center px-2 py-2" style={{ minWidth: '80px', position: 'sticky', top: 0, left: '280px', zIndex: 30, backgroundColor: '#ffffff', borderRight: '2px solid #e5e7eb' }}>路由类型</th>
-                        <th className="text-center px-2 py-2" style={{ minWidth: '120px', position: 'sticky', top: 0, zIndex: 20, backgroundColor: '#ffffff' }}>主单号</th>
-                        <th className="text-center px-2 py-2" style={{ minWidth: '90px', position: 'sticky', top: 0, zIndex: 20, backgroundColor: '#ffffff' }}>航班号</th>
-                        <th className="text-center px-2 py-2" style={{ minWidth: '60px', position: 'sticky', top: 0, zIndex: 20, backgroundColor: '#ffffff' }}>始发</th>
-                        <th className="text-center px-2 py-2" style={{ minWidth: '60px', position: 'sticky', top: 0, zIndex: 20, backgroundColor: '#ffffff' }}>中转</th>
-                        <th className="text-center px-2 py-2" style={{ minWidth: '60px', position: 'sticky', top: 0, zIndex: 20, backgroundColor: '#ffffff' }}>目的</th>
-                        <th className="text-center px-2 py-2" style={{ minWidth: '160px', position: 'sticky', top: 0, zIndex: 20, backgroundColor: '#ffffff' }}>预计起飞</th>
-                        <th className="text-center px-2 py-2" style={{ minWidth: '160px', position: 'sticky', top: 0, zIndex: 20, backgroundColor: '#ffffff' }}>预计落地</th>
-                        <th className="text-center px-2 py-2" style={{ minWidth: '90px', position: 'sticky', top: 0, zIndex: 20, backgroundColor: '#ffffff' }}>打货上限(方)</th>
-                        <th className="text-center px-2 py-2" style={{ minWidth: '90px', position: 'sticky', top: 0, zIndex: 20, backgroundColor: '#ffffff' }}>打货上限(件)</th>
-                        <th className="text-center px-2 py-2" style={{ minWidth: '90px', position: 'sticky', top: 0, zIndex: 20, backgroundColor: '#ffffff' }}>实际件数</th>
-                        <th className="text-center px-2 py-2" style={{ minWidth: '90px', position: 'sticky', top: 0, zIndex: 20, backgroundColor: '#ffffff' }}>实际方数</th>
-                        <th className="text-center px-2 py-2" style={{ minWidth: '80px', position: 'sticky', top: 0, zIndex: 20, backgroundColor: '#ffffff' }}>操作</th>
+              </div>
+              <div style={{ position: 'relative', overflow: 'auto', maxHeight: '800px', borderTop: '1px solid #e5e7eb' }}>
+                <table style={{ tableLayout: 'fixed', width: 'max-content', minWidth: '2200px', borderCollapse: 'separate', borderSpacing: 0 }}>
+                  <thead>
+                    <tr>
+                      <th className="text-center px-2 py-2" style={{ width: '100px', position: 'sticky', top: 0, left: 0, zIndex: 30, backgroundColor: '#ffffff', borderRight: '2px solid #e5e7eb', willChange: 'transform' }}>揽收日期</th>
+                      <th className="text-center px-2 py-2" style={{ width: '60px', position: 'sticky', top: 0, left: '100px', zIndex: 30, backgroundColor: '#ffffff', borderRight: '2px solid #e5e7eb', willChange: 'transform' }}>仓库</th>
+                      <th className="text-center px-2 py-2" style={{ width: '60px', position: 'sticky', top: 0, left: '160px', zIndex: 30, backgroundColor: '#ffffff', borderRight: '2px solid #e5e7eb', willChange: 'transform' }}>口岸</th>
+                      <th className="text-center px-2 py-2" style={{ width: '60px', position: 'sticky', top: 0, left: '220px', zIndex: 30, backgroundColor: '#ffffff', borderRight: '2px solid #e5e7eb', willChange: 'transform' }}>货物属性</th>
+                      <th className="text-center px-2 py-2" style={{ width: '80px', position: 'sticky', top: 0, left: '280px', zIndex: 30, backgroundColor: '#ffffff', borderRight: '2px solid #e5e7eb', willChange: 'transform' }}>路由类型</th>
+                      <th className="text-center px-2 py-2" style={{ width: '120px', position: 'sticky', top: 0, zIndex: 20, backgroundColor: '#ffffff' }}>主单号</th>
+                      <th className="text-center px-2 py-2" style={{ width: '90px', position: 'sticky', top: 0, zIndex: 20, backgroundColor: '#ffffff' }}>航班号</th>
+                      <th className="text-center px-2 py-2" style={{ width: '60px', position: 'sticky', top: 0, zIndex: 20, backgroundColor: '#ffffff' }}>始发</th>
+                      <th className="text-center px-2 py-2" style={{ width: '60px', position: 'sticky', top: 0, zIndex: 20, backgroundColor: '#ffffff' }}>中转</th>
+                      <th className="text-center px-2 py-2" style={{ width: '60px', position: 'sticky', top: 0, zIndex: 20, backgroundColor: '#ffffff' }}>目的</th>
+                      <th className="text-center px-2 py-2" style={{ width: '160px', position: 'sticky', top: 0, zIndex: 20, backgroundColor: '#ffffff' }}>预计起飞</th>
+                      <th className="text-center px-2 py-2" style={{ width: '160px', position: 'sticky', top: 0, zIndex: 20, backgroundColor: '#ffffff' }}>预计落地</th>
+                      <th className="text-center px-2 py-2" style={{ width: '90px', position: 'sticky', top: 0, zIndex: 20, backgroundColor: '#ffffff' }}>打货上限(方)</th>
+                      <th className="text-center px-2 py-2" style={{ width: '90px', position: 'sticky', top: 0, zIndex: 20, backgroundColor: '#ffffff' }}>打货上限(件)</th>
+                      <th className="text-center px-2 py-2" style={{ width: '90px', position: 'sticky', top: 0, zIndex: 20, backgroundColor: '#ffffff' }}>实际件数</th>
+                      <th className="text-center px-2 py-2" style={{ width: '90px', position: 'sticky', top: 0, zIndex: 20, backgroundColor: '#ffffff' }}>实际方数</th>
+                      <th className="text-center px-2 py-2" style={{ width: '80px', position: 'sticky', top: 0, zIndex: 20, backgroundColor: '#ffffff' }}>操作</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {mainOrders.slice(0, 50).map(order => (
+                      <tr key={order.id} className="border-b hover:bg-gray-50">
+                        <td className="text-center px-2 py-2" style={{ width: '100px', position: 'sticky', left: 0, zIndex: 25, borderRight: '2px solid #e5e7eb', backgroundColor: 'white', willChange: 'transform' }}>{order.collect_date}</td>
+                        <td className="text-center px-2 py-2" style={{ width: '60px', position: 'sticky', left: '100px', zIndex: 25, borderRight: '2px solid #e5e7eb', backgroundColor: 'white', willChange: 'transform' }}>{order.warehouse}</td>
+                        <td className="text-center px-2 py-2" style={{ width: '60px', position: 'sticky', left: '160px', zIndex: 25, borderRight: '2px solid #e5e7eb', backgroundColor: 'white', willChange: 'transform' }}>{order.port}</td>
+                        <td className="text-center px-2 py-2" style={{ width: '60px', position: 'sticky', left: '220px', zIndex: 25, borderRight: '2px solid #e5e7eb', backgroundColor: 'white', willChange: 'transform' }}>{order.cargo_type}</td>
+                        <td className="text-center px-2 py-2" style={{ width: '80px', position: 'sticky', left: '280px', zIndex: 25, borderRight: '2px solid #e5e7eb', backgroundColor: 'white', willChange: 'transform' }}>
+                          {order.route_type ? (
+                            <Badge variant={order.route_type === '空运' ? 'default' : 'secondary'}>
+                              {order.route_type}
+                            </Badge>
+                          ) : '-'}
+                        </td>
+                        <td className="text-center px-2 py-2" style={{ width: '120px' }}>{order.main_no || '-'}</td>
+                        <td className="text-center px-2 py-2" style={{ width: '90px' }}>{order.flight_no || '-'}</td>
+                        <td className="text-center px-2 py-2" style={{ width: '60px' }}>{order.origin || '-'}</td>
+                        <td className="text-center px-2 py-2" style={{ width: '60px' }}>{order.transfer || '-'}</td>
+                        <td className="text-center px-2 py-2" style={{ width: '60px' }}>{order.dest || '-'}</td>
+                        <td className="text-center px-2 py-2" style={{ width: '160px' }}>
+                          {formatDateTime(order.actual_flight_date, order.depart_time) || '-'}
+                        </td>
+                        <td className="text-center px-2 py-2" style={{ width: '160px' }}>
+                          {formatDateTime(order.actual_flight_date, order.arrive_time) || '-'}
+                        </td>
+                        <td className="text-center px-2 py-2" style={{ width: '90px' }}>{order.max_volume || '-'}</td>
+                        <td className="text-center px-2 py-2" style={{ width: '90px' }}>{order.max_pieces || '-'}</td>
+                        <td className="text-center px-2 py-2" style={{ width: '90px' }}>{order.actual_pieces || '-'}</td>
+                        <td className="text-center px-2 py-2" style={{ width: '90px' }}>{order.actual_volume || '-'}</td>
+                        <td className="text-center px-2 py-2" style={{ width: '80px' }}>
+                          <Button size="sm" variant="outline" className="mr-2"
+                            onClick={() => {
+                              setEditingOrder(order);
+                              setOrderForm({
+                                collect_date: order.collect_date,
+                                depart_date: order.depart_date || '',
+                                warehouse: order.warehouse,
+                                cargo_type: order.cargo_type,
+                                port: order.port,
+                                status: order.status || '',
+                                pack_req: order.pack_req || '',
+                                max_volume: order.max_volume || '',
+                                route_type: order.route_type || '',
+                                actual_flight_date: order.actual_flight_date || '',
+                                main_no: order.main_no || '',
+                                flight_no: order.flight_no || '',
+                                origin: order.origin || '',
+                                transfer: order.transfer || '',
+                                dest: order.dest || '',
+                                second_flight: order.second_flight || '',
+                                depart_time: order.depart_time || '',
+                                arrive_time: order.arrive_time || '',
+                                actual_pieces: order.actual_pieces?.toString() || '',
+                                actual_weight: order.actual_weight || '',
+                                actual_volume: order.actual_volume || '',
+                                actual_bills: order.actual_bills?.toString() || '',
+                                remark: order.remark || '',
+                              });
+                              setActiveTab('main-order');
+                            }}>
+                            编辑
+                          </Button>
+                          <Button size="sm" variant="destructive"
+                            onClick={() => deleteMainOrder(order.id)}>
+                            删除
+                          </Button>
+                        </td>
                       </tr>
-                    </thead>
-                    <tbody>
-                      {mainOrders.slice(0, 50).map(order => (
-                        <tr key={order.id} className="border-b hover:bg-gray-50">
-                          <td className="text-center px-2 py-2" style={{ minWidth: '100px', position: 'sticky', left: 0, zIndex: 25, borderRight: '2px solid #e5e7eb', backgroundColor: 'white' }}>{order.collect_date}</td>
-                          <td className="text-center px-2 py-2" style={{ minWidth: '60px', position: 'sticky', left: '100px', zIndex: 25, borderRight: '2px solid #e5e7eb', backgroundColor: 'white' }}>{order.warehouse}</td>
-                          <td className="text-center px-2 py-2" style={{ minWidth: '60px', position: 'sticky', left: '160px', zIndex: 25, borderRight: '2px solid #e5e7eb', backgroundColor: 'white' }}>{order.port}</td>
-                          <td className="text-center px-2 py-2" style={{ minWidth: '60px', position: 'sticky', left: '220px', zIndex: 25, borderRight: '2px solid #e5e7eb', backgroundColor: 'white' }}>{order.cargo_type}</td>
-                          <td className="text-center px-2 py-2" style={{ minWidth: '80px', position: 'sticky', left: '280px', zIndex: 25, borderRight: '2px solid #e5e7eb', backgroundColor: 'white' }}>
-                            {order.route_type ? (
-                              <Badge variant={order.route_type === '空运' ? 'default' : 'secondary'}>
-                                {order.route_type}
-                              </Badge>
-                            ) : '-'}
-                          </td>
-                          <td className="text-center px-2 py-2" style={{ minWidth: '120px' }}>{order.main_no || '-'}</td>
-                          <td className="text-center px-2 py-2" style={{ minWidth: '90px' }}>{order.flight_no || '-'}</td>
-                          <td className="text-center px-2 py-2" style={{ minWidth: '60px' }}>{order.origin || '-'}</td>
-                          <td className="text-center px-2 py-2" style={{ minWidth: '60px' }}>{order.transfer || '-'}</td>
-                          <td className="text-center px-2 py-2" style={{ minWidth: '60px' }}>{order.dest || '-'}</td>
-                          <td className="text-center px-2 py-2" style={{ minWidth: '160px' }}>
-                            {formatDateTime(order.actual_flight_date, order.depart_time) || '-'}
-                          </td>
-                          <td className="text-center px-2 py-2" style={{ minWidth: '160px' }}>
-                            {formatDateTime(order.actual_flight_date, order.arrive_time) || '-'}
-                          </td>
-                          <td className="text-center px-2 py-2" style={{ minWidth: '90px' }}>{order.max_volume || '-'}</td>
-                          <td className="text-center px-2 py-2" style={{ minWidth: '90px' }}>{order.max_pieces || '-'}</td>
-                          <td className="text-center px-2 py-2" style={{ minWidth: '90px' }}>{order.actual_pieces || '-'}</td>
-                          <td className="text-center px-2 py-2" style={{ minWidth: '90px' }}>{order.actual_volume || '-'}</td>
-                          <td className="text-center px-2 py-2" style={{ minWidth: '80px' }}>
-                            <Button size="sm" variant="outline" className="mr-2"
-                              onClick={() => {
-                                setEditingOrder(order);
-                                setOrderForm({
-                                  collect_date: order.collect_date,
-                                  depart_date: order.depart_date || '',
-                                  warehouse: order.warehouse,
-                                  cargo_type: order.cargo_type,
-                                  port: order.port,
-                                  status: order.status || '',
-                                  pack_req: order.pack_req || '',
-                                  max_volume: order.max_volume || '',
-                                  route_type: order.route_type || '',
-                                  actual_flight_date: order.actual_flight_date || '',
-                                  main_no: order.main_no || '',
-                                  flight_no: order.flight_no || '',
-                                  origin: order.origin || '',
-                                  transfer: order.transfer || '',
-                                  dest: order.dest || '',
-                                  second_flight: order.second_flight || '',
-                                  depart_time: order.depart_time || '',
-                                  arrive_time: order.arrive_time || '',
-                                  actual_pieces: order.actual_pieces?.toString() || '',
-                                  actual_weight: order.actual_weight || '',
-                                  actual_volume: order.actual_volume || '',
-                                  actual_bills: order.actual_bills?.toString() || '',
-                                  remark: order.remark || '',
-                                });
-                                setActiveTab('main-order');
-                              }}>
-                              编辑
-                            </Button>
-                            <Button size="sm" variant="destructive"
-                              onClick={() => deleteMainOrder(order.id)}>
-                              删除
-                            </Button>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </CardContent>
-            </Card>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
           </div>
         )}
         
