@@ -1714,8 +1714,8 @@ export default function LogisticsManagement() {
                 </div>
               </CardHeader>
               <CardContent>
-                <div className="max-h-[800px] overflow-auto relative">
-                  <Table style={{ tableLayout: 'fixed', width: '100%' }}>
+                <div className="overflow-auto relative">
+                  <Table style={{ tableLayout: 'auto', whiteSpace: 'nowrap' }}>
                     <TableHeader className="sticky top-0 bg-white z-[9999]" style={{ position: 'sticky', top: 0, zIndex: 9999, backgroundColor: '#ffffff' }}>
                       <TableRow>
                         <TableHead className="w-12 bg-white" style={{ backgroundColor: '#ffffff', zIndex: 9999 }}>
