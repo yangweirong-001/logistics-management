@@ -1480,7 +1480,7 @@ export default function LogisticsManagement() {
                 </Button>
               </CardHeader>
               <CardContent>
-                <div className="max-h-[500px] overflow-y-auto relative">
+                <div className="max-h-[300px] overflow-y-auto relative">
                   <Table>
                     <TableHeader className="sticky top-0 bg-white z-50" style={{ position: 'sticky', top: 0, zIndex: 50, backgroundColor: 'white' }}>
                       <TableRow>
@@ -1545,7 +1545,7 @@ export default function LogisticsManagement() {
                 </div>
               </CardHeader>
               <CardContent>
-                <div className="max-h-[500px] overflow-y-auto relative">
+                <div className="max-h-[300px] overflow-y-auto relative">
                   <Table>
                     <TableHeader className="sticky top-0 bg-white z-50" style={{ position: 'sticky', top: 0, zIndex: 50, backgroundColor: 'white' }}>
                       <TableRow>
@@ -1606,7 +1606,7 @@ export default function LogisticsManagement() {
                 </Button>
               </CardHeader>
               <CardContent>
-                <div className="max-h-[500px] overflow-y-auto relative">
+                <div className="max-h-[300px] overflow-y-auto relative">
                   <Table>
                     <TableHeader className="sticky top-0 bg-white z-50" style={{ position: 'sticky', top: 0, zIndex: 50, backgroundColor: 'white' }}>
                       <TableRow>
@@ -1674,7 +1674,7 @@ export default function LogisticsManagement() {
                 </div>
               </CardHeader>
               <CardContent>
-                <div className="max-h-[500px] overflow-y-auto relative">
+                <div className="max-h-[300px] overflow-y-auto relative">
                   <Table>
                     <TableHeader className="sticky top-0 bg-white z-50" style={{ position: 'sticky', top: 0, zIndex: 50, backgroundColor: 'white' }}>
                       <TableRow>
@@ -1944,7 +1944,7 @@ export default function LogisticsManagement() {
                   </div>
                 </div>
 
-                <div className="max-h-[500px] overflow-y-auto relative">
+                <div className="max-h-[300px] overflow-y-auto relative">
                   <Table>
                     <TableHeader className="sticky top-0 bg-white z-50" style={{ position: 'sticky', top: 0, zIndex: 50, backgroundColor: 'white' }}>
                       <TableRow>
@@ -2409,7 +2409,7 @@ export default function LogisticsManagement() {
                 <span className="text-sm text-gray-500">共 {mainOrders.length} 条记录</span>
               </CardHeader>
               <CardContent>
-                <div className="max-h-[500px] overflow-y-auto relative">
+                <div className="max-h-[300px] overflow-y-auto relative">
                   <Table>
                     <TableHeader className="sticky top-0 bg-white z-50" style={{ position: 'sticky', top: 0, zIndex: 50, backgroundColor: 'white' }}>
                       <TableRow>
@@ -2576,7 +2576,7 @@ export default function LogisticsManagement() {
               <CardHeader>查询结果</CardHeader>
               <CardContent>
                 {balanceResults.length > 0 ? (
-                  <div className="max-h-[500px] overflow-y-auto relative">
+                  <div className="max-h-[300px] overflow-y-auto relative">
                     <Table className="w-full">
                       <TableHeader className="sticky top-0 bg-white z-50" style={{ position: 'sticky', top: 0, zIndex: 50, backgroundColor: 'white' }}>
                         <TableRow>
