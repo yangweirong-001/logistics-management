@@ -18,8 +18,17 @@ export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
     const collectDate = searchParams.get('collectDate');
+    const startDate = searchParams.get('startDate');
+    const endDate = searchParams.get('endDate');
     const warehouse = searchParams.get('warehouse');
-    
+
+    // 支持日期范围查询
+    if (startDate && endDate) {
+      const data = await mainOrderApi.getByDateRange(startDate, endDate);
+      return NextResponse.json({ success: true, data });
+    }
+
+    // 支持单日期查询
     if (collectDate || warehouse) {
       const data = await mainOrderApi.query({
         collectDate: collectDate || undefined,
@@ -27,7 +36,8 @@ export async function GET(request: NextRequest) {
       });
       return NextResponse.json({ success: true, data });
     }
-    
+
+    // 查询全部
     const data = await mainOrderApi.getAll();
     return NextResponse.json({ success: true, data });
   } catch (error) {

@@ -287,8 +287,11 @@ export default function LogisticsManagement() {
   }>>([]);
   
   // 主单查询条件
-  const [orderQueryDate, setOrderQueryDate] = useState('');
+  const [orderQueryStartDate, setOrderQueryStartDate] = useState('');
+  const [orderQueryEndDate, setOrderQueryEndDate] = useState('');
   const [orderQueryWarehouse, setOrderQueryWarehouse] = useState('全部');
+  const [orderQueryOrigin, setOrderQueryOrigin] = useState('全部');
+  const [orderQueryRouteType, setOrderQueryRouteType] = useState('全部');
 
   // 方数预估筛选条件
   const [volumeFilterStartDate, setVolumeFilterStartDate] = useState('');
@@ -349,20 +352,40 @@ export default function LogisticsManagement() {
   const queryMainOrders = async () => {
     let url = '/api/main-order';
     const params = new URLSearchParams();
-    if (orderQueryDate) {
-      params.append('collectDate', orderQueryDate);
+
+    // 日期范围筛选
+    if (orderQueryStartDate && orderQueryEndDate) {
+      params.append('startDate', orderQueryStartDate);
+      params.append('endDate', orderQueryEndDate);
+    } else if (orderQueryStartDate) {
+      params.append('collectDate', orderQueryStartDate);
     }
+
     if (params.toString()) {
       url += `?${params.toString()}`;
     }
+
     const res = await fetch(url);
     const data = await res.json();
+
     if (data.success) {
       let results = data.data;
+
       // 前端过滤仓库
       if (orderQueryWarehouse && orderQueryWarehouse !== '全部') {
         results = results.filter((o: MainOrder) => o.warehouse === orderQueryWarehouse);
       }
+
+      // 前端过滤始发
+      if (orderQueryOrigin && orderQueryOrigin !== '全部') {
+        results = results.filter((o: MainOrder) => o.origin === orderQueryOrigin);
+      }
+
+      // 前端过滤路由类型
+      if (orderQueryRouteType && orderQueryRouteType !== '全部') {
+        results = results.filter((o: MainOrder) => o.route_type === orderQueryRouteType);
+      }
+
       setMainOrders(results);
     }
   };
@@ -2305,11 +2328,16 @@ export default function LogisticsManagement() {
                 </Button>
               </CardHeader>
               <CardContent>
-                <div className="grid grid-cols-4 gap-4 mb-4">
+                <div className="grid grid-cols-5 gap-4 mb-4">
                   <div>
-                    <Label>揽收日期</Label>
-                    <Input type="date" value={orderQueryDate} 
-                      onChange={e => setOrderQueryDate(e.target.value)} />
+                    <Label>开始日期</Label>
+                    <Input type="date" value={orderQueryStartDate}
+                      onChange={e => setOrderQueryStartDate(e.target.value)} />
+                  </div>
+                  <div>
+                    <Label>结束日期</Label>
+                    <Input type="date" value={orderQueryEndDate}
+                      onChange={e => setOrderQueryEndDate(e.target.value)} />
                   </div>
                   <div>
                     <Label>仓库</Label>
@@ -2326,9 +2354,51 @@ export default function LogisticsManagement() {
                       </SelectContent>
                     </Select>
                   </div>
-                  <div className="flex items-end">
-                    <Button onClick={queryMainOrders}>查询</Button>
+                  <div>
+                    <Label>始发</Label>
+                    <Select value={orderQueryOrigin} onValueChange={v => setOrderQueryOrigin(v)}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="全部">
+                          {orderQueryOrigin === '全部' ? '全部' : orderQueryOrigin}
+                        </SelectValue>
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="全部">全部</SelectItem>
+                        <SelectItem value="HKG">HKG</SelectItem>
+                        <SelectItem value="SZX">SZX</SelectItem>
+                        <SelectItem value="CAN">CAN</SelectItem>
+                        <SelectItem value="NGB">NGB</SelectItem>
+                        <SelectItem value="PVG">PVG</SelectItem>
+                        <SelectItem value="CKG">CKG</SelectItem>
+                        <SelectItem value="CTU">CTU</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
+                  <div>
+                    <Label>路由类型</Label>
+                    <Select value={orderQueryRouteType} onValueChange={v => setOrderQueryRouteType(v)}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="全部">
+                          {orderQueryRouteType === '全部' ? '全部' : orderQueryRouteType}
+                        </SelectValue>
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="全部">全部</SelectItem>
+                        <SelectItem value="空运">空运</SelectItem>
+                        <SelectItem value="海空">海空</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+                <div className="flex gap-3">
+                  <Button onClick={queryMainOrders}>查询</Button>
+                  <Button variant="outline" onClick={() => {
+                    setOrderQueryStartDate('');
+                    setOrderQueryEndDate('');
+                    setOrderQueryWarehouse('全部');
+                    setOrderQueryOrigin('全部');
+                    setOrderQueryRouteType('全部');
+                  }}>重置筛选</Button>
                 </div>
               </CardContent>
             </Card>
@@ -2348,6 +2418,7 @@ export default function LogisticsManagement() {
                         <TableHead className="text-center px-2 bg-white">口岸</TableHead>
                         <TableHead className="text-center px-2 bg-white">货物属性</TableHead>
                         <TableHead className="text-center px-2 bg-white">类别</TableHead>
+                        <TableHead className="text-center px-2 bg-white">路由类型</TableHead>
                         <TableHead className="text-center px-2 bg-white">主单号</TableHead>
                         <TableHead className="text-center px-2 bg-white">航班号</TableHead>
                         <TableHead className="text-center px-2 bg-white">始发</TableHead>
@@ -2370,6 +2441,13 @@ export default function LogisticsManagement() {
                           <TableCell className="text-center px-2">{order.port}</TableCell>
                           <TableCell className="text-center px-2">{order.cargo_type}</TableCell>
                           <TableCell className="text-center px-2">{order.category || '-'}</TableCell>
+                          <TableCell className="text-center px-2">
+                            {order.route_type ? (
+                              <Badge variant={order.route_type === '空运' ? 'default' : 'secondary'}>
+                                {order.route_type}
+                              </Badge>
+                            ) : '-'}
+                          </TableCell>
                           <TableCell className="text-center px-2">{order.main_no || '-'}</TableCell>
                           <TableCell className="text-center px-2">{order.flight_no || '-'}</TableCell>
                           <TableCell className="text-center px-2">{order.origin || '-'}</TableCell>

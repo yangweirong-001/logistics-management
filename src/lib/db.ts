@@ -232,6 +232,16 @@ export const mainOrderApi = {
     return data;
   },
 
+  async getByDateRange(startDate: string, endDate: string) {
+    const { data, error } = await client.from('main_orders')
+      .select('*')
+      .gte('collect_date', startDate)
+      .lte('collect_date', endDate)
+      .order('collect_date', { ascending: false });
+    if (error) throw new Error(`查询失败: ${error.message}`);
+    return data;
+  },
+
   async getBalance(params: { collectDate: string; warehouse: string; port: string; cargoType: string }) {
     const { data, error } = await client.from('main_orders')
       .select('*')
