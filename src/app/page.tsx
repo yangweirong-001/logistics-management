@@ -121,6 +121,30 @@ const addDays = (dateStr: string, days: number) => {
   return date.toISOString().split('T')[0];
 };
 
+// 格式化时间为 HH:mm
+const formatTime = (timeStr: string | null | undefined): string => {
+  if (!timeStr) return '';
+  const cleanTime = timeStr.trim();
+
+  // 尝试解析 HH:mm:ss 格式，只取 HH:mm
+  const timeMatch = cleanTime.match(/^(\d{1,2}):(\d{1,2})(?::(\d{1,2}(?:\.\d+)?))?$/);
+  if (timeMatch) {
+    const hours = String(parseInt(timeMatch[1])).padStart(2, '0');
+    const minutes = String(parseInt(timeMatch[2])).padStart(2, '0');
+    return `${hours}:${minutes}`;
+  }
+
+  // 尝试解析纯数字时间（Excel 时间格式，如 20.37）
+  const numMatch = cleanTime.match(/^(\d{1,2})\.(\d{2})$/);
+  if (numMatch) {
+    const hours = String(parseInt(numMatch[1])).padStart(2, '0');
+    const minutes = String(parseInt(numMatch[2])).padStart(2, '0');
+    return `${hours}:${minutes}`;
+  }
+
+  return cleanTime;
+};
+
 // 导出Excel功能
 const exportToExcel = (data: MainOrder[], filename: string) => {
   // 定义列标题和对应的字段
@@ -156,8 +180,8 @@ const exportToExcel = (data: MainOrder[], filename: string) => {
     order.origin || '',
     order.transfer || '',
     order.dest || '',
-    order.depart_time || '',
-    order.arrive_time || '',
+    formatTime(order.depart_time),
+    formatTime(order.arrive_time),
     order.actual_pieces?.toString() || '',
     order.actual_weight || '',
     order.actual_volume || '',
@@ -285,20 +309,6 @@ export default function LogisticsManagement() {
     deficit: number;
     surplus: number;
   }>>([]);
-  
-  // 格式化时间为 HH:mm
-  const formatTime = (timeStr: string | null | undefined): string => {
-    if (!timeStr) return '';
-    const cleanTime = timeStr.trim();
-    // 尝试解析 HH:mm:ss 格式，只取 HH:mm
-    const timeMatch = cleanTime.match(/^(\d{1,2}):(\d{1,2})(?::(\d{1,2}))?$/);
-    if (timeMatch) {
-      const hours = String(parseInt(timeMatch[1])).padStart(2, '0');
-      const minutes = String(parseInt(timeMatch[2])).padStart(2, '0');
-      return `${hours}:${minutes}`;
-    }
-    return cleanTime;
-  };
 
   // 格式化日期时间
   const formatDateTime = (dateStr: string | null | undefined, timeStr: string | null | undefined): string => {
