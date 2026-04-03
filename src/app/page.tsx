@@ -1647,7 +1647,7 @@ export default function LogisticsManagement() {
               </CardHeader>
               <CardContent>
                 <div className="max-h-[800px] overflow-auto relative">
-                  <Table style={{ tableLayout: 'fixed', width: '100%' }}>
+                  <Table style={{ tableLayout: 'auto' }}>
                     <TableHeader className="sticky top-0 bg-white z-[9999]" style={{ position: 'sticky', top: 0, zIndex: 9999, backgroundColor: '#ffffff' }}>
                       <TableRow>
                         <TableHead className="bg-white" style={{ backgroundColor: '#ffffff', zIndex: 9999 }}>目的港代码</TableHead>
