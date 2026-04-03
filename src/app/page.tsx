@@ -2442,11 +2442,11 @@ export default function LogisticsManagement() {
                 <Table style={{ tableLayout: 'auto', minWidth: '2200px', whiteSpace: 'nowrap' }} className="max-h-[800px]">
                     <TableHeader className="sticky top-0 bg-white z-10" style={{ position: 'sticky', top: 0, zIndex: 10, backgroundColor: '#ffffff' }}>
                       <TableRow>
-                        <TableHead className="text-center px-2 py-2 bg-white" style={{ backgroundColor: '#ffffff', minWidth: '100px' }}>揽收日期</TableHead>
-                        <TableHead className="text-center px-2 py-2 bg-white" style={{ backgroundColor: '#ffffff', minWidth: '60px' }}>仓库</TableHead>
-                        <TableHead className="text-center px-2 py-2 bg-white" style={{ backgroundColor: '#ffffff', minWidth: '60px' }}>口岸</TableHead>
-                        <TableHead className="text-center px-2 py-2 bg-white" style={{ backgroundColor: '#ffffff', minWidth: '60px' }}>货物属性</TableHead>
-                        <TableHead className="text-center px-2 py-2 bg-white" style={{ backgroundColor: '#ffffff', minWidth: '80px' }}>路由类型</TableHead>
+                        <TableHead className="text-center px-2 py-2 bg-white sticky left-0 z-20" style={{ backgroundColor: '#ffffff', minWidth: '100px', left: 0, position: 'sticky', zIndex: 20, borderRight: '2px solid #e5e7eb' }}>揽收日期</TableHead>
+                        <TableHead className="text-center px-2 py-2 bg-white sticky left-0 z-20" style={{ backgroundColor: '#ffffff', minWidth: '60px', left: '100px', position: 'sticky', zIndex: 20, borderRight: '2px solid #e5e7eb' }}>仓库</TableHead>
+                        <TableHead className="text-center px-2 py-2 bg-white sticky left-0 z-20" style={{ backgroundColor: '#ffffff', minWidth: '60px', left: '160px', position: 'sticky', zIndex: 20, borderRight: '2px solid #e5e7eb' }}>口岸</TableHead>
+                        <TableHead className="text-center px-2 py-2 bg-white sticky left-0 z-20" style={{ backgroundColor: '#ffffff', minWidth: '60px', left: '220px', position: 'sticky', zIndex: 20, borderRight: '2px solid #e5e7eb' }}>货物属性</TableHead>
+                        <TableHead className="text-center px-2 py-2 bg-white sticky left-0 z-20" style={{ backgroundColor: '#ffffff', minWidth: '80px', left: '280px', position: 'sticky', zIndex: 20, borderRight: '2px solid #e5e7eb' }}>路由类型</TableHead>
                         <TableHead className="text-center px-2 py-2 bg-white" style={{ backgroundColor: '#ffffff', minWidth: '120px' }}>主单号</TableHead>
                         <TableHead className="text-center px-2 py-2 bg-white" style={{ backgroundColor: '#ffffff', minWidth: '90px' }}>航班号</TableHead>
                         <TableHead className="text-center px-2 py-2 bg-white" style={{ backgroundColor: '#ffffff', minWidth: '60px' }}>始发</TableHead>
@@ -2464,11 +2464,11 @@ export default function LogisticsManagement() {
                     <TableBody>
                       {mainOrders.slice(0, 50).map(order => (
                         <TableRow key={order.id}>
-                          <TableCell className="text-center px-2 py-2" style={{ minWidth: '100px' }}>{order.collect_date}</TableCell>
-                          <TableCell className="text-center px-2 py-2" style={{ minWidth: '60px' }}>{order.warehouse}</TableCell>
-                          <TableCell className="text-center px-2 py-2" style={{ minWidth: '60px' }}>{order.port}</TableCell>
-                          <TableCell className="text-center px-2 py-2" style={{ minWidth: '60px' }}>{order.cargo_type}</TableCell>
-                          <TableCell className="text-center px-2 py-2" style={{ minWidth: '80px' }}>
+                          <TableCell className="text-center px-2 py-2 sticky left-0 z-20 bg-white" style={{ minWidth: '100px', left: 0, position: 'sticky', zIndex: 20, borderRight: '2px solid #e5e7eb', backgroundColor: 'white' }}>{order.collect_date}</TableCell>
+                          <TableCell className="text-center px-2 py-2 sticky left-0 z-20 bg-white" style={{ minWidth: '60px', left: '100px', position: 'sticky', zIndex: 20, borderRight: '2px solid #e5e7eb', backgroundColor: 'white' }}>{order.warehouse}</TableCell>
+                          <TableCell className="text-center px-2 py-2 sticky left-0 z-20 bg-white" style={{ minWidth: '60px', left: '160px', position: 'sticky', zIndex: 20, borderRight: '2px solid #e5e7eb', backgroundColor: 'white' }}>{order.port}</TableCell>
+                          <TableCell className="text-center px-2 py-2 sticky left-0 z-20 bg-white" style={{ minWidth: '60px', left: '220px', position: 'sticky', zIndex: 20, borderRight: '2px solid #e5e7eb', backgroundColor: 'white' }}>{order.cargo_type}</TableCell>
+                          <TableCell className="text-center px-2 py-2 sticky left-0 z-20 bg-white" style={{ minWidth: '80px', left: '280px', position: 'sticky', zIndex: 20, borderRight: '2px solid #e5e7eb', backgroundColor: 'white' }}>
                             {order.route_type ? (
                               <Badge variant={order.route_type === '空运' ? 'default' : 'secondary'}>
                                 {order.route_type}
