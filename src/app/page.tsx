@@ -1586,7 +1586,7 @@ export default function LogisticsManagement() {
               </CardHeader>
               <CardContent>
                 <div className="max-h-[800px] overflow-auto relative">
-                  <Table style={{ tableLayout: 'auto', width: '100%', minWidth: '2500px' }}>
+                  <Table style={{ tableLayout: 'auto', width: '100%', minWidth: '2200px' }}>
                     <TableHeader className="sticky top-0 bg-white z-[9999]" style={{ position: 'sticky', top: 0, zIndex: 9999, backgroundColor: '#ffffff' }}>
                       <TableRow>
                         <TableHead className="bg-white" style={{ backgroundColor: '#ffffff', zIndex: 9999 }}>仓库</TableHead>
@@ -2447,7 +2447,6 @@ export default function LogisticsManagement() {
                         <TableHead className="text-center px-2 bg-white" style={{ backgroundColor: '#ffffff', zIndex: 9999 }}>仓库</TableHead>
                         <TableHead className="text-center px-2 bg-white" style={{ backgroundColor: '#ffffff', zIndex: 9999 }}>口岸</TableHead>
                         <TableHead className="text-center px-2 bg-white" style={{ backgroundColor: '#ffffff', zIndex: 9999 }}>货物属性</TableHead>
-                        <TableHead className="text-center px-2 bg-white" style={{ backgroundColor: '#ffffff', zIndex: 9999 }}>类别</TableHead>
                         <TableHead className="text-center px-2 bg-white" style={{ backgroundColor: '#ffffff', zIndex: 9999 }}>路由类型</TableHead>
                         <TableHead className="text-center px-2 bg-white" style={{ backgroundColor: '#ffffff', zIndex: 9999 }}>主单号</TableHead>
                         <TableHead className="text-center px-2 bg-white" style={{ backgroundColor: '#ffffff', zIndex: 9999 }}>航班号</TableHead>
@@ -2470,7 +2469,6 @@ export default function LogisticsManagement() {
                           <TableCell className="text-center px-2">{order.warehouse}</TableCell>
                           <TableCell className="text-center px-2">{order.port}</TableCell>
                           <TableCell className="text-center px-2">{order.cargo_type}</TableCell>
-                          <TableCell className="text-center px-2">{order.category || '-'}</TableCell>
                           <TableCell className="text-center px-2">
                             {order.route_type ? (
                               <Badge variant={order.route_type === '空运' ? 'default' : 'secondary'}>
@@ -3068,7 +3066,7 @@ export default function LogisticsManagement() {
                 ))}
                 {mainOrders.length === 0 && (
                   <TableRow>
-                    <TableCell colSpan={17} className="text-center text-gray-500 py-8">暂无记录</TableCell>
+                    <TableCell colSpan={16} className="text-center text-gray-500 py-8">暂无记录</TableCell>
                   </TableRow>
                 )}
               </TableBody>
