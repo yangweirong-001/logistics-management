@@ -2350,7 +2350,7 @@ export default function LogisticsManagement() {
         {/* 主单查询 */}
         {activeTab === 'order-query' && (
           <div>
-            <Card className="mb-5">
+            <Card className="mb-5 sticky top-0 z-20 bg-white" style={{ top: saving ? '32px' : '0' }}>
               <CardHeader className="flex flex-row items-center justify-between">
                 <CardTitle>主单查询</CardTitle>
                 <Button 
