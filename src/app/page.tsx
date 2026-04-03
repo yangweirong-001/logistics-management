@@ -463,15 +463,22 @@ export default function LogisticsManagement() {
     // 必填字段校验
     if (!flight_no || !origin || !dest) return;
     
-    const transfer = orderForm.transfer || '';
+    const transfer = (orderForm.transfer || '').trim();
     
     // 查找匹配的路由
     const matchedRoute = routeConfigs.find(r => {
-      const routeTransfer = r.transfer || '';
+      const routeTransfer = (r.transfer || '').trim();
+      // 中转站匹配：两边都为空（包括 '-'）视为匹配
+      const transferMatch = 
+        (routeTransfer === '' || routeTransfer === '-') && 
+        (transfer === '' || transfer === '-') 
+          ? true 
+          : routeTransfer === transfer;
+      
       return (
         r.flight_no === flight_no &&
         r.origin === origin &&
-        routeTransfer === transfer &&
+        transferMatch &&
         r.dest === dest
       );
     });
@@ -484,6 +491,8 @@ export default function LogisticsManagement() {
         depart_time: matchedRoute.depart_time || '',
         arrive_time: matchedRoute.arrive_time || '',
       }));
+    } else {
+      console.log('未匹配到路由', { flight_no, origin, transfer, dest, routeConfigs: routeConfigs.length });
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [orderForm.flight_no, orderForm.origin, orderForm.transfer, orderForm.dest, routeConfigs]);
@@ -1247,16 +1256,22 @@ export default function LogisticsManagement() {
     // 必填字段校验
     if (!flight_no || !origin || !dest) return;
     
-    // 规范化中转站（空字符串和null视为相同）
     const normalizedTransfer = (transfer || '').trim();
     
     // 查找匹配的路由
     const matchedRoute = routeConfigs.find(r => {
       const routeTransfer = (r.transfer || '').trim();
+      // 中转站匹配：两边都为空（包括 '-'）视为匹配
+      const transferMatch = 
+        (routeTransfer === '' || routeTransfer === '-') && 
+        (normalizedTransfer === '' || normalizedTransfer === '-') 
+          ? true 
+          : routeTransfer === normalizedTransfer;
+      
       return (
         r.flight_no === flight_no &&
         r.origin === origin &&
-        routeTransfer === normalizedTransfer &&
+        transferMatch &&
         r.dest === dest
       );
     });
