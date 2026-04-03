@@ -292,6 +292,7 @@ export default function LogisticsManagement() {
   const [orderQueryWarehouse, setOrderQueryWarehouse] = useState('全部');
   const [orderQueryOrigin, setOrderQueryOrigin] = useState('全部');
   const [orderQueryRouteType, setOrderQueryRouteType] = useState('全部');
+  const [uniqueOrigins, setUniqueOrigins] = useState<string[]>([]);
 
   // 方数预估筛选条件
   const [volumeFilterStartDate, setVolumeFilterStartDate] = useState('');
@@ -323,7 +324,15 @@ export default function LogisticsManagement() {
   const loadRouteConfigs = async () => {
     const res = await fetch('/api/route-config');
     const data = await res.json();
-    if (data.success) setRouteConfigs(data.data);
+    if (data.success) {
+      setRouteConfigs(data.data);
+      // 提取唯一的始发值
+      const origins: string[] = data.data
+        .map((r: RouteConfig) => r.origin)
+        .filter((o: string | null): o is string => Boolean(o));
+      const uniqueOrigins = [...new Set(origins)];
+      setUniqueOrigins(uniqueOrigins);
+    }
   };
   
   const loadVolumeEstimates = async () => {
@@ -2364,13 +2373,9 @@ export default function LogisticsManagement() {
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="全部">全部</SelectItem>
-                        <SelectItem value="HKG">HKG</SelectItem>
-                        <SelectItem value="SZX">SZX</SelectItem>
-                        <SelectItem value="CAN">CAN</SelectItem>
-                        <SelectItem value="NGB">NGB</SelectItem>
-                        <SelectItem value="PVG">PVG</SelectItem>
-                        <SelectItem value="CKG">CKG</SelectItem>
-                        <SelectItem value="CTU">CTU</SelectItem>
+                        {uniqueOrigins.map(origin => (
+                          <SelectItem key={origin} value={origin}>{origin}</SelectItem>
+                        ))}
                       </SelectContent>
                     </Select>
                   </div>
