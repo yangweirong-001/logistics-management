@@ -1489,19 +1489,19 @@ export default function LogisticsManagement() {
                 </Button>
               </CardHeader>
               <CardContent>
-                <div className="max-h-[600px] overflow-y-auto relative">
-                  <Table>
-                    <TableHeader className="sticky top-0 bg-white z-50" style={{ position: 'sticky', top: 0, zIndex: 50, backgroundColor: 'white' }}>
+                <div className="max-h-[800px] overflow-auto relative">
+                  <Table style={{ tableLayout: 'fixed', width: '100%' }}>
+                    <TableHeader className="sticky top-0 bg-white z-[9999]" style={{ position: 'sticky', top: 0, zIndex: 9999, backgroundColor: '#ffffff' }}>
                       <TableRow>
-                        <TableHead className="bg-white" style={{ backgroundColor: 'white' }}>仓库</TableHead>
-                        <TableHead className="bg-white" style={{ backgroundColor: 'white' }}>大包预估体积</TableHead>
-                        <TableHead className="bg-white" style={{ backgroundColor: 'white' }}>关东目的港占比</TableHead>
-                        <TableHead className="bg-white" style={{ backgroundColor: 'white' }}>关西目的港占比</TableHead>
-                        <TableHead className="bg-white" style={{ backgroundColor: 'white' }}>关东普货占比</TableHead>
-                        <TableHead className="bg-white" style={{ backgroundColor: 'white' }}>关东特货占比</TableHead>
-                        <TableHead className="bg-white" style={{ backgroundColor: 'white' }}>关西普货占比</TableHead>
-                        <TableHead className="bg-white" style={{ backgroundColor: 'white' }}>关西特货占比</TableHead>
-                        <TableHead className="bg-white" style={{ backgroundColor: 'white' }}>操作</TableHead>
+                        <TableHead className="bg-white" style={{ backgroundColor: '#ffffff', zIndex: 9999 }}>仓库</TableHead>
+                        <TableHead className="bg-white" style={{ backgroundColor: '#ffffff', zIndex: 9999 }}>大包预估体积</TableHead>
+                        <TableHead className="bg-white" style={{ backgroundColor: '#ffffff', zIndex: 9999 }}>关东目的港占比</TableHead>
+                        <TableHead className="bg-white" style={{ backgroundColor: '#ffffff', zIndex: 9999 }}>关西目的港占比</TableHead>
+                        <TableHead className="bg-white" style={{ backgroundColor: '#ffffff', zIndex: 9999 }}>关东普货占比</TableHead>
+                        <TableHead className="bg-white" style={{ backgroundColor: '#ffffff', zIndex: 9999 }}>关东特货占比</TableHead>
+                        <TableHead className="bg-white" style={{ backgroundColor: '#ffffff', zIndex: 9999 }}>关西普货占比</TableHead>
+                        <TableHead className="bg-white" style={{ backgroundColor: '#ffffff', zIndex: 9999 }}>关西特货占比</TableHead>
+                        <TableHead className="bg-white" style={{ backgroundColor: '#ffffff', zIndex: 9999 }}>操作</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -1554,18 +1554,18 @@ export default function LogisticsManagement() {
                 </div>
               </CardHeader>
               <CardContent>
-                <div className="max-h-[600px] overflow-y-auto relative">
-                  <Table>
-                    <TableHeader className="sticky top-0 bg-white z-50" style={{ position: 'sticky', top: 0, zIndex: 50, backgroundColor: 'white' }}>
+                <div className="max-h-[800px] overflow-auto relative">
+                  <Table style={{ tableLayout: 'fixed', width: '100%' }}>
+                    <TableHeader className="sticky top-0 bg-white z-[9999]" style={{ position: 'sticky', top: 0, zIndex: 9999, backgroundColor: '#ffffff' }}>
                       <TableRow>
-                        <TableHead className="bg-white" style={{ backgroundColor: 'white' }}>仓库</TableHead>
-                        <TableHead className="bg-white" style={{ backgroundColor: 'white' }}>周几</TableHead>
-                        <TableHead className="bg-white" style={{ backgroundColor: 'white' }}>关东普货路由</TableHead>
-                        <TableHead className="bg-white" style={{ backgroundColor: 'white' }}>关西普货路由</TableHead>
-                        <TableHead className="bg-white" style={{ backgroundColor: 'white' }}>关东特货路由</TableHead>
-                        <TableHead className="bg-white" style={{ backgroundColor: 'white' }}>关西特货路由</TableHead>
-                        <TableHead className="bg-white" style={{ backgroundColor: 'white' }}>备注</TableHead>
-                        <TableHead className="bg-white" style={{ backgroundColor: 'white' }}>操作</TableHead>
+                        <TableHead className="bg-white" style={{ backgroundColor: '#ffffff', zIndex: 9999 }}>仓库</TableHead>
+                        <TableHead className="bg-white" style={{ backgroundColor: '#ffffff', zIndex: 9999 }}>周几</TableHead>
+                        <TableHead className="bg-white" style={{ backgroundColor: '#ffffff', zIndex: 9999 }}>关东普货路由</TableHead>
+                        <TableHead className="bg-white" style={{ backgroundColor: '#ffffff', zIndex: 9999 }}>关西普货路由</TableHead>
+                        <TableHead className="bg-white" style={{ backgroundColor: '#ffffff', zIndex: 9999 }}>关东特货路由</TableHead>
+                        <TableHead className="bg-white" style={{ backgroundColor: '#ffffff', zIndex: 9999 }}>关西特货路由</TableHead>
+                        <TableHead className="bg-white" style={{ backgroundColor: '#ffffff', zIndex: 9999 }}>备注</TableHead>
+                        <TableHead className="bg-white" style={{ backgroundColor: '#ffffff', zIndex: 9999 }}>操作</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -1615,13 +1615,13 @@ export default function LogisticsManagement() {
                 </Button>
               </CardHeader>
               <CardContent>
-                <div className="max-h-[600px] overflow-y-auto relative">
-                  <Table>
-                    <TableHeader className="sticky top-0 bg-white z-50" style={{ position: 'sticky', top: 0, zIndex: 50, backgroundColor: 'white' }}>
+                <div className="max-h-[800px] overflow-auto relative">
+                  <Table style={{ tableLayout: 'fixed', width: '100%' }}>
+                    <TableHeader className="sticky top-0 bg-white z-[9999]" style={{ position: 'sticky', top: 0, zIndex: 9999, backgroundColor: '#ffffff' }}>
                       <TableRow>
-                        <TableHead className="bg-white" style={{ backgroundColor: 'white' }}>目的港代码</TableHead>
-                        <TableHead className="bg-white" style={{ backgroundColor: 'white' }}>所属区域</TableHead>
-                        <TableHead className="bg-white" style={{ backgroundColor: 'white' }}>操作</TableHead>
+                        <TableHead className="bg-white" style={{ backgroundColor: '#ffffff', zIndex: 9999 }}>目的港代码</TableHead>
+                        <TableHead className="bg-white" style={{ backgroundColor: '#ffffff', zIndex: 9999 }}>所属区域</TableHead>
+                        <TableHead className="bg-white" style={{ backgroundColor: '#ffffff', zIndex: 9999 }}>操作</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -1683,11 +1683,11 @@ export default function LogisticsManagement() {
                 </div>
               </CardHeader>
               <CardContent>
-                <div className="max-h-[600px] overflow-y-auto relative">
-                  <Table>
-                    <TableHeader className="sticky top-0 bg-white z-50" style={{ position: 'sticky', top: 0, zIndex: 50, backgroundColor: 'white' }}>
+                <div className="max-h-[800px] overflow-auto relative">
+                  <Table style={{ tableLayout: 'fixed', width: '100%' }}>
+                    <TableHeader className="sticky top-0 bg-white z-[9999]" style={{ position: 'sticky', top: 0, zIndex: 9999, backgroundColor: '#ffffff' }}>
                       <TableRow>
-                        <TableHead className="w-12 bg-white" style={{ backgroundColor: 'white' }}>
+                        <TableHead className="w-12 bg-white" style={{ backgroundColor: '#ffffff', zIndex: 9999 }}>
                           <input
                             type="checkbox"
                             checked={routeConfigs.length > 0 && selectedRouteIds.size === routeConfigs.filter(config =>
@@ -1726,16 +1726,16 @@ export default function LogisticsManagement() {
                             className="w-4 h-4"
                           />
                         </TableHead>
-                        <TableHead className="bg-white" style={{ backgroundColor: 'white' }}>航班号</TableHead>
-                        <TableHead className="bg-white" style={{ backgroundColor: 'white' }}>始发</TableHead>
-                        <TableHead className="bg-white" style={{ backgroundColor: 'white' }}>中转</TableHead>
-                        <TableHead className="bg-white" style={{ backgroundColor: 'white' }}>目的</TableHead>
-                        <TableHead className="bg-white" style={{ backgroundColor: 'white' }}>起飞时间</TableHead>
-                        <TableHead className="bg-white" style={{ backgroundColor: 'white' }}>落地时间</TableHead>
-                        <TableHead className="bg-white" style={{ backgroundColor: 'white' }}>是否隔天</TableHead>
-                        <TableHead className="bg-white" style={{ backgroundColor: 'white' }}>二程航班</TableHead>
-                        <TableHead className="bg-white" style={{ backgroundColor: 'white' }}>路由</TableHead>
-                        <TableHead className="bg-white" style={{ backgroundColor: 'white' }}>操作</TableHead>
+                        <TableHead className="bg-white" style={{ backgroundColor: '#ffffff', zIndex: 9999 }}>航班号</TableHead>
+                        <TableHead className="bg-white" style={{ backgroundColor: '#ffffff', zIndex: 9999 }}>始发</TableHead>
+                        <TableHead className="bg-white" style={{ backgroundColor: '#ffffff', zIndex: 9999 }}>中转</TableHead>
+                        <TableHead className="bg-white" style={{ backgroundColor: '#ffffff', zIndex: 9999 }}>目的</TableHead>
+                        <TableHead className="bg-white" style={{ backgroundColor: '#ffffff', zIndex: 9999 }}>起飞时间</TableHead>
+                        <TableHead className="bg-white" style={{ backgroundColor: '#ffffff', zIndex: 9999 }}>落地时间</TableHead>
+                        <TableHead className="bg-white" style={{ backgroundColor: '#ffffff', zIndex: 9999 }}>是否隔天</TableHead>
+                        <TableHead className="bg-white" style={{ backgroundColor: '#ffffff', zIndex: 9999 }}>二程航班</TableHead>
+                        <TableHead className="bg-white" style={{ backgroundColor: '#ffffff', zIndex: 9999 }}>路由</TableHead>
+                        <TableHead className="bg-white" style={{ backgroundColor: '#ffffff', zIndex: 9999 }}>操作</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -1957,21 +1957,21 @@ export default function LogisticsManagement() {
                   <Table>
                     <TableHeader className="sticky top-0 bg-white z-50" style={{ position: 'sticky', top: 0, zIndex: 50, backgroundColor: 'white' }}>
                       <TableRow>
-                        <TableHead className="bg-white" style={{ backgroundColor: 'white' }}>揽收日期</TableHead>
-                        <TableHead className="bg-white" style={{ backgroundColor: 'white' }}>仓库</TableHead>
-                        <TableHead className="bg-white" style={{ backgroundColor: 'white' }}>大包数</TableHead>
-                        <TableHead className="bg-white" style={{ backgroundColor: 'white' }}>重量</TableHead>
-                        <TableHead className="bg-white" style={{ backgroundColor: 'white' }}>总方数</TableHead>
-                        <TableHead className="bg-white" style={{ backgroundColor: 'white' }}>关东总</TableHead>
-                        <TableHead className="bg-white" style={{ backgroundColor: 'white' }}>关西总</TableHead>
-                        <TableHead className="bg-white" style={{ backgroundColor: 'white' }}>关东普货</TableHead>
-                        <TableHead className="bg-white" style={{ backgroundColor: 'white' }}>关东特货</TableHead>
-                        <TableHead className="bg-white" style={{ backgroundColor: 'white' }}>关西普货</TableHead>
-                        <TableHead className="bg-white" style={{ backgroundColor: 'white' }}>关西特货</TableHead>
-                        <TableHead className="bg-white" style={{ backgroundColor: 'white' }}>空运</TableHead>
-                        <TableHead className="bg-white" style={{ backgroundColor: 'white' }}>海空</TableHead>
-                        <TableHead className="bg-white" style={{ backgroundColor: 'white' }}>货物袋数齐全</TableHead>
-                        <TableHead className="bg-white" style={{ backgroundColor: 'white' }}>操作</TableHead>
+                        <TableHead className="bg-white" style={{ backgroundColor: '#ffffff', zIndex: 9999 }}>揽收日期</TableHead>
+                        <TableHead className="bg-white" style={{ backgroundColor: '#ffffff', zIndex: 9999 }}>仓库</TableHead>
+                        <TableHead className="bg-white" style={{ backgroundColor: '#ffffff', zIndex: 9999 }}>大包数</TableHead>
+                        <TableHead className="bg-white" style={{ backgroundColor: '#ffffff', zIndex: 9999 }}>重量</TableHead>
+                        <TableHead className="bg-white" style={{ backgroundColor: '#ffffff', zIndex: 9999 }}>总方数</TableHead>
+                        <TableHead className="bg-white" style={{ backgroundColor: '#ffffff', zIndex: 9999 }}>关东总</TableHead>
+                        <TableHead className="bg-white" style={{ backgroundColor: '#ffffff', zIndex: 9999 }}>关西总</TableHead>
+                        <TableHead className="bg-white" style={{ backgroundColor: '#ffffff', zIndex: 9999 }}>关东普货</TableHead>
+                        <TableHead className="bg-white" style={{ backgroundColor: '#ffffff', zIndex: 9999 }}>关东特货</TableHead>
+                        <TableHead className="bg-white" style={{ backgroundColor: '#ffffff', zIndex: 9999 }}>关西普货</TableHead>
+                        <TableHead className="bg-white" style={{ backgroundColor: '#ffffff', zIndex: 9999 }}>关西特货</TableHead>
+                        <TableHead className="bg-white" style={{ backgroundColor: '#ffffff', zIndex: 9999 }}>空运</TableHead>
+                        <TableHead className="bg-white" style={{ backgroundColor: '#ffffff', zIndex: 9999 }}>海空</TableHead>
+                        <TableHead className="bg-white" style={{ backgroundColor: '#ffffff', zIndex: 9999 }}>货物袋数齐全</TableHead>
+                        <TableHead className="bg-white" style={{ backgroundColor: '#ffffff', zIndex: 9999 }}>操作</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -2414,28 +2414,28 @@ export default function LogisticsManagement() {
                 <span className="text-sm text-gray-500">共 {mainOrders.length} 条记录</span>
               </CardHeader>
               <CardContent>
-                <div className="max-h-[600px] overflow-y-auto relative">
-                  <Table>
-                    <TableHeader className="sticky top-0 bg-white z-50" style={{ position: 'sticky', top: 0, zIndex: 50, backgroundColor: 'white' }}>
+                <div className="max-h-[800px] overflow-auto relative">
+                  <Table style={{ tableLayout: 'fixed', width: '100%' }}>
+                    <TableHeader className="sticky top-0 bg-white z-[9999]" style={{ position: 'sticky', top: 0, zIndex: 9999, backgroundColor: '#ffffff' }}>
                       <TableRow>
-                        <TableHead className="text-center px-2 bg-white" style={{ backgroundColor: 'white' }}>揽收日期</TableHead>
-                        <TableHead className="text-center px-2 bg-white" style={{ backgroundColor: 'white' }}>仓库</TableHead>
-                        <TableHead className="text-center px-2 bg-white" style={{ backgroundColor: 'white' }}>口岸</TableHead>
-                        <TableHead className="text-center px-2 bg-white" style={{ backgroundColor: 'white' }}>货物属性</TableHead>
-                        <TableHead className="text-center px-2 bg-white" style={{ backgroundColor: 'white' }}>类别</TableHead>
-                        <TableHead className="text-center px-2 bg-white" style={{ backgroundColor: 'white' }}>路由类型</TableHead>
-                        <TableHead className="text-center px-2 bg-white" style={{ backgroundColor: 'white' }}>主单号</TableHead>
-                        <TableHead className="text-center px-2 bg-white" style={{ backgroundColor: 'white' }}>航班号</TableHead>
-                        <TableHead className="text-center px-2 bg-white" style={{ backgroundColor: 'white' }}>始发</TableHead>
-                        <TableHead className="text-center px-2 bg-white" style={{ backgroundColor: 'white' }}>中转</TableHead>
-                        <TableHead className="text-center px-2 bg-white" style={{ backgroundColor: 'white' }}>目的</TableHead>
-                        <TableHead className="text-center px-2 bg-white" style={{ backgroundColor: 'white' }}>预计起飞</TableHead>
-                        <TableHead className="text-center px-2 bg-white" style={{ backgroundColor: 'white' }}>预计落地</TableHead>
-                        <TableHead className="text-center px-2 bg-white" style={{ backgroundColor: 'white' }}>打货上限(方)</TableHead>
-                        <TableHead className="text-center px-2 bg-white" style={{ backgroundColor: 'white' }}>打货上限(件)</TableHead>
-                        <TableHead className="text-center px-2 bg-white" style={{ backgroundColor: 'white' }}>实际件数</TableHead>
-                        <TableHead className="text-center px-2 bg-white" style={{ backgroundColor: 'white' }}>实际方数</TableHead>
-                        <TableHead className="text-center px-2 bg-white" style={{ backgroundColor: 'white' }}>操作</TableHead>
+                        <TableHead className="text-center px-2 bg-white" style={{ backgroundColor: '#ffffff', zIndex: 9999 }}>揽收日期</TableHead>
+                        <TableHead className="text-center px-2 bg-white" style={{ backgroundColor: '#ffffff', zIndex: 9999 }}>仓库</TableHead>
+                        <TableHead className="text-center px-2 bg-white" style={{ backgroundColor: '#ffffff', zIndex: 9999 }}>口岸</TableHead>
+                        <TableHead className="text-center px-2 bg-white" style={{ backgroundColor: '#ffffff', zIndex: 9999 }}>货物属性</TableHead>
+                        <TableHead className="text-center px-2 bg-white" style={{ backgroundColor: '#ffffff', zIndex: 9999 }}>类别</TableHead>
+                        <TableHead className="text-center px-2 bg-white" style={{ backgroundColor: '#ffffff', zIndex: 9999 }}>路由类型</TableHead>
+                        <TableHead className="text-center px-2 bg-white" style={{ backgroundColor: '#ffffff', zIndex: 9999 }}>主单号</TableHead>
+                        <TableHead className="text-center px-2 bg-white" style={{ backgroundColor: '#ffffff', zIndex: 9999 }}>航班号</TableHead>
+                        <TableHead className="text-center px-2 bg-white" style={{ backgroundColor: '#ffffff', zIndex: 9999 }}>始发</TableHead>
+                        <TableHead className="text-center px-2 bg-white" style={{ backgroundColor: '#ffffff', zIndex: 9999 }}>中转</TableHead>
+                        <TableHead className="text-center px-2 bg-white" style={{ backgroundColor: '#ffffff', zIndex: 9999 }}>目的</TableHead>
+                        <TableHead className="text-center px-2 bg-white" style={{ backgroundColor: '#ffffff', zIndex: 9999 }}>预计起飞</TableHead>
+                        <TableHead className="text-center px-2 bg-white" style={{ backgroundColor: '#ffffff', zIndex: 9999 }}>预计落地</TableHead>
+                        <TableHead className="text-center px-2 bg-white" style={{ backgroundColor: '#ffffff', zIndex: 9999 }}>打货上限(方)</TableHead>
+                        <TableHead className="text-center px-2 bg-white" style={{ backgroundColor: '#ffffff', zIndex: 9999 }}>打货上限(件)</TableHead>
+                        <TableHead className="text-center px-2 bg-white" style={{ backgroundColor: '#ffffff', zIndex: 9999 }}>实际件数</TableHead>
+                        <TableHead className="text-center px-2 bg-white" style={{ backgroundColor: '#ffffff', zIndex: 9999 }}>实际方数</TableHead>
+                        <TableHead className="text-center px-2 bg-white" style={{ backgroundColor: '#ffffff', zIndex: 9999 }}>操作</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -2585,13 +2585,13 @@ export default function LogisticsManagement() {
                     <Table className="w-full">
                       <TableHeader className="sticky top-0 bg-white z-50" style={{ position: 'sticky', top: 0, zIndex: 50, backgroundColor: 'white' }}>
                         <TableRow>
-                          <TableHead className="text-center px-2 bg-white" style={{ backgroundColor: 'white' }}>仓库</TableHead>
-                          <TableHead className="text-center px-2 bg-white" style={{ backgroundColor: 'white' }}>口岸</TableHead>
-                          <TableHead className="text-center px-2 bg-white" style={{ backgroundColor: 'white' }}>货物属性</TableHead>
-                          <TableHead className="text-center px-2 bg-white" style={{ backgroundColor: 'white' }}>预估方数</TableHead>
-                          <TableHead className="text-center px-2 bg-white" style={{ backgroundColor: 'white' }}>打货上限汇总</TableHead>
-                          <TableHead className="text-center px-2 bg-white" style={{ backgroundColor: 'white' }}>欠方</TableHead>
-                          <TableHead className="text-center px-2 bg-white" style={{ backgroundColor: 'white' }}>余方</TableHead>
+                          <TableHead className="text-center px-2 bg-white" style={{ backgroundColor: '#ffffff', zIndex: 9999 }}>仓库</TableHead>
+                          <TableHead className="text-center px-2 bg-white" style={{ backgroundColor: '#ffffff', zIndex: 9999 }}>口岸</TableHead>
+                          <TableHead className="text-center px-2 bg-white" style={{ backgroundColor: '#ffffff', zIndex: 9999 }}>货物属性</TableHead>
+                          <TableHead className="text-center px-2 bg-white" style={{ backgroundColor: '#ffffff', zIndex: 9999 }}>预估方数</TableHead>
+                          <TableHead className="text-center px-2 bg-white" style={{ backgroundColor: '#ffffff', zIndex: 9999 }}>打货上限汇总</TableHead>
+                          <TableHead className="text-center px-2 bg-white" style={{ backgroundColor: '#ffffff', zIndex: 9999 }}>欠方</TableHead>
+                          <TableHead className="text-center px-2 bg-white" style={{ backgroundColor: '#ffffff', zIndex: 9999 }}>余方</TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>
