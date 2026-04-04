@@ -273,6 +273,8 @@ export default function LogisticsManagement() {
     kansaiSpecial: number;
     airVolume: number;
     seaAirVolume: number;
+    configuredAirVolume: number;
+    configuredSeaAirVolume: number;
     unconfiguredVolume: number;
   } | null>(null);
   
@@ -575,10 +577,10 @@ export default function LogisticsManagement() {
             
             const weekday = getWeekday(volumeForm.collect_date);
             const flightConfig = flightConfigs.find(f => f.warehouse === volumeForm.warehouse && f.weekday === weekday);
-            
+
             let airVolume = 0;
             let seaAirVolume = 0;
-            
+
             if (flightConfig) {
               if (flightConfig.kanto_normal === '空运') airVolume += kantoNormal;
               else if (flightConfig.kanto_normal === '海空') seaAirVolume += kantoNormal;
@@ -590,8 +592,17 @@ export default function LogisticsManagement() {
               else if (flightConfig.kansai_special === '海空') seaAirVolume += kansaiSpecial;
             }
 
-            // 计算未配置方数：总方数 - 空运方数 - 海空方数
-            const unconfiguredVolume = totalVolume - airVolume - seaAirVolume;
+            // 计算主单已配置方数：从主单发放中筛选
+            const configuredAirVolume = mainOrders
+              .filter(o => o.collect_date === volumeForm.collect_date && o.warehouse === volumeForm.warehouse && o.route_type === '空运')
+              .reduce((sum, o) => sum + (parseFloat(o.actual_volume || '0') || 0), 0);
+
+            const configuredSeaAirVolume = mainOrders
+              .filter(o => o.collect_date === volumeForm.collect_date && o.warehouse === volumeForm.warehouse && o.route_type === '海空')
+              .reduce((sum, o) => sum + (parseFloat(o.actual_volume || '0') || 0), 0);
+
+            // 计算未配置方数：总方数 - 空运主单已配置方数 - 海空主单已配置方数
+            const unconfiguredVolume = totalVolume - configuredAirVolume - configuredSeaAirVolume;
 
             setVolumeResult({
               totalVolume,
@@ -603,6 +614,8 @@ export default function LogisticsManagement() {
               kansaiSpecial,
               airVolume,
               seaAirVolume,
+              configuredAirVolume,
+              configuredSeaAirVolume,
               unconfiguredVolume,
             });
           } catch {
@@ -617,8 +630,8 @@ export default function LogisticsManagement() {
     }, 100);
     
     return () => clearTimeout(timer);
-   
-  }, [volumeForm.collect_date, volumeForm.warehouse, volumeForm.package_count, areaConfigs, flightConfigs]);
+
+  }, [volumeForm.collect_date, volumeForm.warehouse, volumeForm.package_count, areaConfigs, flightConfigs, mainOrders]);
   
   // 监听主单表单航班信息变化，自动匹配路由填充时间
   useEffect(() => {
@@ -2006,18 +2019,32 @@ export default function LogisticsManagement() {
                       <div className="text-sm text-gray-600">关西特货</div>
                     </div>
                   </div>
-                  <div className="grid grid-cols-3 gap-4">
+                  <div className="grid grid-cols-2 gap-4 mb-3">
                     <div className="bg-cyan-50 rounded-lg p-3 text-center">
                       <div className="text-xl font-bold text-cyan-600">{volumeResult ? volumeResult.airVolume.toFixed(3) : '0'}</div>
-                      <div className="text-sm text-gray-600">空运方数</div>
+                      <div className="text-sm text-gray-600">应配置空运方数</div>
                     </div>
                     <div className="bg-amber-50 rounded-lg p-3 text-center">
                       <div className="text-xl font-bold text-amber-600">{volumeResult ? volumeResult.seaAirVolume.toFixed(3) : '0'}</div>
-                      <div className="text-sm text-gray-600">海空方数</div>
+                      <div className="text-sm text-gray-600">应配置海空方数</div>
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-4 gap-4">
+                    <div className="bg-green-50 rounded-lg p-3 text-center">
+                      <div className="text-xl font-bold text-green-600">{volumeResult ? volumeResult.configuredAirVolume.toFixed(3) : '0'}</div>
+                      <div className="text-sm text-gray-600">空运主单已配置方数</div>
+                    </div>
+                    <div className="bg-blue-50 rounded-lg p-3 text-center">
+                      <div className="text-xl font-bold text-blue-600">{volumeResult ? volumeResult.configuredSeaAirVolume.toFixed(3) : '0'}</div>
+                      <div className="text-sm text-gray-600">海空主单已配置方数</div>
                     </div>
                     <div className="bg-gray-50 rounded-lg p-3 text-center">
                       <div className="text-xl font-bold text-gray-600">{volumeResult ? volumeResult.unconfiguredVolume.toFixed(3) : '0'}</div>
                       <div className="text-sm text-gray-600">未配置方数</div>
+                    </div>
+                    <div className="bg-purple-50 rounded-lg p-3 text-center">
+                      <div className="text-xl font-bold text-purple-600">{volumeResult ? (volumeResult.configuredAirVolume + volumeResult.configuredSeaAirVolume).toFixed(3) : '0'}</div>
+                      <div className="text-sm text-gray-600">已配置总方数</div>
                     </div>
                   </div>
                 </div>
