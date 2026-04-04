@@ -181,7 +181,7 @@ const exportToExcel = (data: MainOrder[], filename: string) => {
     order.transfer || '',
     order.dest || '',
     formatTime(order.depart_time),
-    formatTime(order.arrive_time),
+    formatArrivalDateTime(order.actual_flight_date, order.depart_time, order.arrive_time),
     order.actual_pieces?.toString() || '',
     order.actual_weight || '',
     order.actual_volume || '',
@@ -315,6 +315,25 @@ export default function LogisticsManagement() {
     if (!dateStr) return formatTime(timeStr);
     if (!timeStr) return dateStr;
     return `${dateStr} ${formatTime(timeStr)}`;
+  };
+
+  // 计算预计落地时间（考虑隔天）
+  const formatArrivalDateTime = (
+    flightDate: string | null | undefined,
+    departTime: string | null | undefined,
+    arriveTime: string | null | undefined
+  ): string => {
+    if (!flightDate) return formatTime(arriveTime);
+    if (!arriveTime) return flightDate;
+
+    // 判断是否隔天：如果落地时间小于起飞时间，说明是隔天
+    let isNextDay = false;
+    if (departTime && arriveTime) {
+      isNextDay = departTime > arriveTime;
+    }
+
+    const arrivalDate = isNextDay ? addDays(flightDate, 1) : flightDate;
+    return `${arrivalDate} ${formatTime(arriveTime)}`;
   };
 
   // 主单查询条件
@@ -2301,7 +2320,7 @@ export default function LogisticsManagement() {
                   </div>
                   <div>
                     <Label className="text-sm text-gray-600 mb-1 block">到港时间</Label>
-                    <Input className="bg-gray-100" value={formatDateTime(orderForm.actual_flight_date, orderForm.arrive_time)}
+                    <Input className="bg-gray-100" value={formatArrivalDateTime(orderForm.actual_flight_date, orderForm.depart_time, orderForm.arrive_time)}
                       readOnly placeholder="自动填充" />
                   </div>
                   <div>
@@ -2495,7 +2514,7 @@ export default function LogisticsManagement() {
                           {formatDateTime(order.actual_flight_date, order.depart_time) || '-'}
                         </td>
                         <td style={{ minWidth: '160px', backgroundColor: '#fff' }} className="text-center px-2 py-2">
-                          {formatDateTime(order.actual_flight_date, order.arrive_time) || '-'}
+                          {formatArrivalDateTime(order.actual_flight_date, order.depart_time, order.arrive_time) || '-'}
                         </td>
                         <td style={{ minWidth: '90px', backgroundColor: '#fff' }} className="text-center px-2 py-2">{order.max_volume || '-'}</td>
                         <td style={{ minWidth: '90px', backgroundColor: '#fff' }} className="text-center px-2 py-2">{order.max_pieces || '-'}</td>
@@ -3032,7 +3051,7 @@ export default function LogisticsManagement() {
                     </TableCell>
                     <TableCell className="text-center px-1 py-1">{order.second_flight || '-'}</TableCell>
                     <TableCell className="text-center px-1 py-1">
-                      {formatDateTime(order.actual_flight_date, order.arrive_time) || '-'}
+                      {formatArrivalDateTime(order.actual_flight_date, order.depart_time, order.arrive_time) || '-'}
                     </TableCell>
                     <TableCell className="text-center px-1 py-1">{order.actual_pieces || '-'}</TableCell>
                     <TableCell className="text-center px-1 py-1">{order.actual_weight || '-'}</TableCell>
