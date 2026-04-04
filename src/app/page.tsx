@@ -145,27 +145,8 @@ const formatTime = (timeStr: string | null | undefined): string => {
   return cleanTime;
 };
 
-// 计算预计落地时间（考虑隔天）
-const formatArrivalDateTime = (
-  flightDate: string | null | undefined,
-  departTime: string | null | undefined,
-  arriveTime: string | null | undefined
-): string => {
-  if (!flightDate) return formatTime(arriveTime);
-  if (!arriveTime) return flightDate;
-
-  // 判断是否隔天：如果落地时间小于起飞时间，说明是隔天
-  let isNextDay = false;
-  if (departTime && arriveTime) {
-    isNextDay = departTime > arriveTime;
-  }
-
-  const arrivalDate = isNextDay ? addDays(flightDate, 1) : flightDate;
-  return `${arrivalDate} ${formatTime(arriveTime)}`;
-};
-
 // 导出Excel功能
-const exportToExcel = (data: MainOrder[], filename: string) => {
+const exportToExcel = (data: MainOrder[], filename: string, routeConfigs: RouteConfig[]) => {
   // 定义列标题和对应的字段
   const headers = [
     '揽收日期', '揽收星期', '发货日期', '发货星期', '仓库', '货物属性', '口岸', '类别',
@@ -174,7 +155,51 @@ const exportToExcel = (data: MainOrder[], filename: string) => {
     '中转港', '目的港', '起飞时间', '到港时间', '实际件数', '实际重量', '实际方数',
     '实际票数', '备注'
   ];
-  
+
+  // 计算预计落地时间的辅助函数（用于Excel导出）
+  const formatArrivalDateTimeForExport = (
+    order: MainOrder
+  ): string => {
+    const { flight_no, origin, transfer, dest, actual_flight_date, depart_time, arrive_time } = order;
+
+    if (!actual_flight_date) return formatTime(arrive_time);
+    if (!arrive_time) return actual_flight_date;
+
+    // 查找匹配的路由配置
+    const transferValue = (transfer || '').trim();
+    const matchedRoute = routeConfigs.find(r => {
+      const routeTransfer = (r.transfer || '').trim();
+      // 中转站匹配：两边都为空（包括 '-'）视为匹配
+      const transferMatch =
+        (routeTransfer === '' || routeTransfer === '-') &&
+        (transferValue === '' || transferValue === '-')
+          ? true
+          : routeTransfer === transferValue;
+
+      return (
+        r.flight_no === flight_no &&
+        r.origin === origin &&
+        transferMatch &&
+        r.dest === dest
+      );
+    });
+
+    // 判断是否隔天
+    let isNextDay = false;
+    if (matchedRoute) {
+      // 使用路由配置中的 is_next_day 字段
+      isNextDay = matchedRoute.is_next_day === '是' || matchedRoute.is_next_day === 'yes';
+    } else {
+      // 如果找不到路由配置，使用时间比较作为备用方案
+      if (depart_time && arrive_time) {
+        isNextDay = depart_time > arrive_time;
+      }
+    }
+
+    const arrivalDate = isNextDay ? addDays(actual_flight_date, 1) : actual_flight_date;
+    return `${arrivalDate} ${formatTime(arrive_time)}`;
+  };
+
   // 转换数据
   const rows = data.map(order => [
     order.collect_date || '',
@@ -200,7 +225,7 @@ const exportToExcel = (data: MainOrder[], filename: string) => {
     order.transfer || '',
     order.dest || '',
     formatTime(order.depart_time),
-    formatArrivalDateTime(order.actual_flight_date, order.depart_time, order.arrive_time),
+    formatArrivalDateTimeForExport(order),
     order.actual_pieces?.toString() || '',
     order.actual_weight || '',
     order.actual_volume || '',
@@ -334,6 +359,51 @@ export default function LogisticsManagement() {
     if (!dateStr) return formatTime(timeStr);
     if (!timeStr) return dateStr;
     return `${dateStr} ${formatTime(timeStr)}`;
+  };
+
+  // 计算预计落地时间（使用路由配置中的 is_next_day 字段）
+  const formatArrivalDateTime = (
+    order: Pick<MainOrder, 'flight_no' | 'origin' | 'transfer' | 'dest' | 'actual_flight_date' | 'depart_time' | 'arrive_time'>
+  ): string => {
+    const { flight_no, origin, transfer, dest, actual_flight_date, arrive_time } = order;
+
+    if (!actual_flight_date) return formatTime(arrive_time);
+    if (!arrive_time) return actual_flight_date;
+
+    // 查找匹配的路由配置
+    const transferValue = (transfer || '').trim();
+    const matchedRoute = routeConfigs.find(r => {
+      const routeTransfer = (r.transfer || '').trim();
+      // 中转站匹配：两边都为空（包括 '-'）视为匹配
+      const transferMatch =
+        (routeTransfer === '' || routeTransfer === '-') &&
+        (transferValue === '' || transferValue === '-')
+          ? true
+          : routeTransfer === transferValue;
+
+      return (
+        r.flight_no === flight_no &&
+        r.origin === origin &&
+        transferMatch &&
+        r.dest === dest
+      );
+    });
+
+    // 判断是否隔天
+    let isNextDay = false;
+    if (matchedRoute) {
+      // 使用路由配置中的 is_next_day 字段
+      isNextDay = matchedRoute.is_next_day === '是' || matchedRoute.is_next_day === 'yes';
+    } else {
+      // 如果找不到路由配置，使用时间比较作为备用方案
+      const { depart_time } = order;
+      if (depart_time && arrive_time) {
+        isNextDay = depart_time > arrive_time;
+      }
+    }
+
+    const arrivalDate = isNextDay ? addDays(actual_flight_date, 1) : actual_flight_date;
+    return `${arrivalDate} ${formatTime(arrive_time)}`;
   };
 
   // 主单查询条件
@@ -2320,7 +2390,15 @@ export default function LogisticsManagement() {
                   </div>
                   <div>
                     <Label className="text-sm text-gray-600 mb-1 block">到港时间</Label>
-                    <Input className="bg-gray-100" value={formatArrivalDateTime(orderForm.actual_flight_date, orderForm.depart_time, orderForm.arrive_time)}
+                    <Input className="bg-gray-100" value={formatArrivalDateTime({
+                      flight_no: orderForm.flight_no || '',
+                      origin: orderForm.origin || '',
+                      transfer: orderForm.transfer || '',
+                      dest: orderForm.dest || '',
+                      actual_flight_date: orderForm.actual_flight_date || null,
+                      depart_time: orderForm.depart_time || null,
+                      arrive_time: orderForm.arrive_time || null
+                    })}
                       readOnly placeholder="自动填充" />
                   </div>
                   <div>
@@ -2383,8 +2461,8 @@ export default function LogisticsManagement() {
             <Card className="mb-5 sticky top-0 z-20 bg-white" style={{ top: saving ? '32px' : '0' }}>
               <CardHeader className="flex flex-row items-center justify-between">
                 <CardTitle>主单查询</CardTitle>
-                <Button 
-                  onClick={() => exportToExcel(mainOrders, `主单查询_${new Date().toISOString().split('T')[0]}`)}
+                <Button
+                  onClick={() => exportToExcel(mainOrders, `主单查询_${new Date().toISOString().split('T')[0]}`, routeConfigs)}
                   disabled={mainOrders.length === 0}
                   className="bg-green-600 hover:bg-green-700"
                 >
@@ -2514,7 +2592,7 @@ export default function LogisticsManagement() {
                           {formatDateTime(order.actual_flight_date, order.depart_time) || '-'}
                         </td>
                         <td style={{ minWidth: '160px', backgroundColor: '#fff' }} className="text-center px-2 py-2">
-                          {formatArrivalDateTime(order.actual_flight_date, order.depart_time, order.arrive_time) || '-'}
+                          {formatArrivalDateTime(order) || '-'}
                         </td>
                         <td style={{ minWidth: '90px', backgroundColor: '#fff' }} className="text-center px-2 py-2">{order.max_volume || '-'}</td>
                         <td style={{ minWidth: '90px', backgroundColor: '#fff' }} className="text-center px-2 py-2">{order.max_pieces || '-'}</td>
@@ -3051,7 +3129,7 @@ export default function LogisticsManagement() {
                     </TableCell>
                     <TableCell className="text-center px-1 py-1">{order.second_flight || '-'}</TableCell>
                     <TableCell className="text-center px-1 py-1">
-                      {formatArrivalDateTime(order.actual_flight_date, order.depart_time, order.arrive_time) || '-'}
+                      {formatArrivalDateTime(order) || '-'}
                     </TableCell>
                     <TableCell className="text-center px-1 py-1">{order.actual_pieces || '-'}</TableCell>
                     <TableCell className="text-center px-1 py-1">{order.actual_weight || '-'}</TableCell>
