@@ -53,13 +53,50 @@ pnpm dev
 5. **访问应用**
 打开浏览器访问：http://localhost:3000
 
-## 🌐 在线部署
+## 🌐 自动部署
 
-本项目已部署在 Vercel，支持自动部署。
+本项目已配置 **GitHub Actions 自动部署**，每次推送代码到 `main` 分支后会自动构建并部署到 Vercel。
 
-**访问地址**：[点击访问](https://logistics-management-xxx.vercel.app)
+### 快速部署
 
-### 手动部署
+**Windows 用户**：双击运行 `auto-deploy.bat`
+**Mac/Linux 用户**：运行 `bash auto-deploy.sh`
+
+脚本会自动完成：
+1. 检查并提交代码
+2. 拉取最新代码
+3. 安装依赖
+4. 构建项目
+5. 推送到 GitHub
+6. 触发 GitHub Actions 自动部署
+
+### 配置步骤
+
+1. **获取 Vercel Token**
+   - 访问 Vercel Dashboard → Settings → Tokens
+   - 创建 Token，名称为 `GitHub Actions`
+   - 复制 Token
+
+2. **配置 GitHub Secrets**
+   - 访问 GitHub 仓库 → Settings → Secrets and variables → Actions
+   - 添加 Secret：
+     - Name: `VERCEL_TOKEN`
+     - Secret: 粘贴 Vercel Token
+
+3. **推送代码触发部署**
+   ```bash
+   git add .
+   git commit -m "chore: 更新功能"
+   git push origin main
+   ```
+
+4. **查看部署状态**
+   - GitHub Actions: https://github.com/yangweirong-001/logistics-management/actions
+   - Vercel Dashboard: https://vercel.com/dashboard
+
+**详细配置说明**：查看 [GITHUB_ACTIONS_GUIDE.md](./GITHUB_ACTIONS_GUIDE.md)
+
+### 手动部署到 Vercel
 
 1. 在 Vercel 导入 GitHub 仓库
 2. 配置 Supabase 环境变量
