@@ -154,3 +154,28 @@ export const mainOrders = pgTable("main_orders", {
 	pgPolicy("main_orders_允许公开写入", { as: "permissive", for: "insert", to: ["public"] }),
 	pgPolicy("main_orders_允许公开读取", { as: "permissive", for: "select", to: ["public"] }),
 ]);
+
+export const flightExceptions = pgTable("flight_exceptions", {
+	id: serial().primaryKey().notNull(),
+	departDate: varchar("depart_date", { length: 20 }).notNull(),
+	flightDate: varchar("flight_date", { length: 20 }).notNull(),
+	flightNo: varchar("flight_no", { length: 20 }).notNull(),
+	mainNo: varchar("main_no", { length: 50 }).notNull(),
+	bills: integer("bills").notNull(),
+	origin: varchar({ length: 10 }).notNull(),
+	transfer: varchar({ length: 10 }),
+	dest: varchar({ length: 10 }).notNull(),
+	exceptionReason: varchar("exception_reason", { length: 500 }).notNull(),
+	remark: varchar({ length: 500 }),
+	createdAt: timestamp("created_at", { withTimezone: true, mode: 'string' }).defaultNow().notNull(),
+	updatedAt: timestamp("updated_at", { withTimezone: true, mode: 'string' }).defaultNow(),
+}, (table) => [
+	index("flight_exceptions_depart_date_idx").using("btree", table.departDate.asc().nullsLast().op("text_ops")),
+	index("flight_exceptions_flight_date_idx").using("btree", table.flightDate.asc().nullsLast().op("text_ops")),
+	index("flight_exceptions_main_no_idx").using("btree", table.mainNo.asc().nullsLast().op("text_ops")),
+	pgPolicy("flight_exceptions_允许公开删除", { as: "permissive", for: "delete", to: ["public"], using: sql`true` }),
+	pgPolicy("flight_exceptions_允许公开更新", { as: "permissive", for: "update", to: ["public"] }),
+	pgPolicy("flight_exceptions_允许公开写入", { as: "permissive", for: "insert", to: ["public"] }),
+	pgPolicy("flight_exceptions_允许公开读取", { as: "permissive", for: "select", to: ["public"] }),
+]);
+

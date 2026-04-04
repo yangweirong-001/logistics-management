@@ -108,6 +108,22 @@ interface MainOrder {
   remark: string | null;
 }
 
+interface FlightException {
+  id: number;
+  depart_date: string;
+  flight_date: string;
+  flight_no: string;
+  main_no: string;
+  bills: number;
+  origin: string;
+  transfer: string | null;
+  dest: string;
+  exception_reason: string;
+  remark: string | null;
+  created_at: string;
+  updated_at: string | null;
+}
+
 // 工具函数
 const getWeekday = (dateStr: string) => {
   const weekdays = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'];
@@ -261,6 +277,7 @@ export default function LogisticsManagement() {
   const [routeConfigs, setRouteConfigs] = useState<RouteConfig[]>([]);
   const [volumeEstimates, setVolumeEstimates] = useState<VolumeEstimate[]>([]);
   const [mainOrders, setMainOrders] = useState<MainOrder[]>([]);
+  const [flightExceptions, setFlightExceptions] = useState<FlightException[]>([]);
   
   // 方数预估计算结果
   const [volumeResult, setVolumeResult] = useState<{
@@ -412,6 +429,8 @@ export default function LogisticsManagement() {
   // 主单查询条件
   const [orderQueryStartDate, setOrderQueryStartDate] = useState('');
   const [orderQueryEndDate, setOrderQueryEndDate] = useState('');
+  const [orderQueryDepartStartDate, setOrderQueryDepartStartDate] = useState('');
+  const [orderQueryDepartEndDate, setOrderQueryDepartEndDate] = useState('');
   const [orderQueryWarehouse, setOrderQueryWarehouse] = useState('全部');
   const [orderQueryOrigin, setOrderQueryOrigin] = useState('全部');
   const [orderQueryRouteType, setOrderQueryRouteType] = useState('全部');
@@ -479,13 +498,19 @@ export default function LogisticsManagement() {
     const data = await res.json();
     if (data.success) setMainOrders(data.data);
   };
+
+  const loadFlightExceptions = async () => {
+    const res = await fetch('/api/flight-exception');
+    const data = await res.json();
+    if (data.success) setFlightExceptions(data.data);
+  };
   
   // 主单查询
   const queryMainOrders = async () => {
     let url = '/api/main-order';
     const params = new URLSearchParams();
 
-    // 日期范围筛选
+    // 揽收日期范围筛选
     if (orderQueryStartDate && orderQueryEndDate) {
       params.append('startDate', orderQueryStartDate);
       params.append('endDate', orderQueryEndDate);
@@ -502,6 +527,16 @@ export default function LogisticsManagement() {
 
     if (data.success) {
       let results = data.data;
+
+      // 前端过滤预计起飞日期范围
+      if (orderQueryDepartStartDate && orderQueryDepartEndDate) {
+        results = results.filter((o: MainOrder) => {
+          if (!o.depart_date) return false;
+          return o.depart_date >= orderQueryDepartStartDate && o.depart_date <= orderQueryDepartEndDate;
+        });
+      } else if (orderQueryDepartStartDate) {
+        results = results.filter((o: MainOrder) => o.depart_date === orderQueryDepartStartDate);
+      }
 
       // 前端过滤仓库
       if (orderQueryWarehouse && orderQueryWarehouse !== '全部') {
@@ -547,7 +582,8 @@ export default function LogisticsManagement() {
     loadRouteConfigs();
     loadVolumeEstimates();
     loadMainOrders();
-   
+    loadFlightExceptions();
+
   }, []);
   
   // 监听volumeForm变化，自动计算（延迟执行避免频繁计算）
@@ -1610,6 +1646,12 @@ export default function LogisticsManagement() {
           >
             欠方余方查询
           </button>
+          <button
+            onClick={() => setActiveTab('flight-exception')}
+            className={`w-full px-5 py-3 text-left hover:bg-white/10 ${activeTab === 'flight-exception' ? 'bg-blue-500' : ''}`}
+          >
+            航班异常情况记录
+          </button>
         </nav>
         
         <div className="p-4 border-t border-white/10">
@@ -2522,16 +2564,26 @@ export default function LogisticsManagement() {
                 </Button>
               </CardHeader>
               <CardContent>
-                <div className="grid grid-cols-5 gap-4 mb-4">
-                  <div>
-                    <Label>开始日期</Label>
-                    <Input type="date" value={orderQueryStartDate}
-                      onChange={e => setOrderQueryStartDate(e.target.value)} />
+                <div className="grid grid-cols-4 gap-4 mb-4">
+                  <div className="col-span-2">
+                    <Label>揽收日期范围</Label>
+                    <div className="flex gap-2">
+                      <Input type="date" value={orderQueryStartDate}
+                        onChange={e => setOrderQueryStartDate(e.target.value)} placeholder="开始日期" />
+                      <span className="flex items-center">-</span>
+                      <Input type="date" value={orderQueryEndDate}
+                        onChange={e => setOrderQueryEndDate(e.target.value)} placeholder="结束日期" />
+                    </div>
                   </div>
-                  <div>
-                    <Label>结束日期</Label>
-                    <Input type="date" value={orderQueryEndDate}
-                      onChange={e => setOrderQueryEndDate(e.target.value)} />
+                  <div className="col-span-2">
+                    <Label>预计起飞日期范围</Label>
+                    <div className="flex gap-2">
+                      <Input type="date" value={orderQueryDepartStartDate}
+                        onChange={e => setOrderQueryDepartStartDate(e.target.value)} placeholder="开始日期" />
+                      <span className="flex items-center">-</span>
+                      <Input type="date" value={orderQueryDepartEndDate}
+                        onChange={e => setOrderQueryDepartEndDate(e.target.value)} placeholder="结束日期" />
+                    </div>
                   </div>
                   <div>
                     <Label>仓库</Label>
@@ -2585,6 +2637,8 @@ export default function LogisticsManagement() {
                   <Button variant="outline" onClick={() => {
                     setOrderQueryStartDate('');
                     setOrderQueryEndDate('');
+                    setOrderQueryDepartStartDate('');
+                    setOrderQueryDepartEndDate('');
                     setOrderQueryWarehouse('全部');
                     setOrderQueryOrigin('全部');
                     setOrderQueryRouteType('全部');
@@ -2799,6 +2853,172 @@ export default function LogisticsManagement() {
               </CardContent>
             </Card>
           </div>
+        )}
+
+        {/* 航班异常情况记录 */}
+        {activeTab === 'flight-exception' && (
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between">
+              <CardTitle>航班异常情况记录</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-5 gap-4 mb-4">
+                <div>
+                  <Label>主单号 <span className="text-red-500">*</span></Label>
+                  <Input
+                    type="text"
+                    placeholder="请输入主单号"
+                    value={orderForm.main_no}
+                    onChange={e => setOrderForm(prev => ({ ...prev, main_no: e.target.value }))}
+                  />
+                </div>
+                <div>
+                  <Label>异常原因 <span className="text-red-500">*</span></Label>
+                  <Input
+                    type="text"
+                    placeholder="请输入异常原因"
+                    value={orderForm.remark}
+                    onChange={e => setOrderForm(prev => ({ ...prev, remark: e.target.value }))}
+                  />
+                </div>
+                <div>
+                  <Label>备注</Label>
+                  <Input
+                    type="text"
+                    placeholder="请输入备注"
+                    value={orderForm.actual_flight_date}
+                    onChange={e => setOrderForm(prev => ({ ...prev, actual_flight_date: e.target.value }))}
+                  />
+                </div>
+                <div className="flex items-end">
+                  <Button onClick={async () => {
+                    if (!orderForm.main_no || !orderForm.remark) {
+                      alert('请填写主单号和异常原因');
+                      return;
+                    }
+                    try {
+                      const response = await fetch('/api/flight-exception', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                          mainNo: orderForm.main_no,
+                          exceptionReason: orderForm.remark,
+                          remark: orderForm.actual_flight_date,
+                        }),
+                      });
+                      const result = await response.json();
+                      if (!result.success) {
+                        alert('保存失败: ' + (result.error || '未知错误'));
+                        return;
+                      }
+                      alert('保存成功');
+                      // 清空表单
+                      setOrderForm({
+                        collect_date: '',
+                        depart_date: '',
+                        warehouse: '',
+                        cargo_type: '',
+                        port: '',
+                        status: '',
+                        pack_req: '',
+                        max_volume: '',
+                        route_type: '',
+                        actual_flight_date: '',
+                        main_no: '',
+                        flight_no: '',
+                        origin: '',
+                        transfer: '',
+                        dest: '',
+                        second_flight: '',
+                        depart_time: '',
+                        arrive_time: '',
+                        actual_pieces: '',
+                        actual_weight: '',
+                        actual_volume: '',
+                        actual_bills: '',
+                        remark: '',
+                      });
+                      // 重新加载数据
+                      loadFlightExceptions();
+                    } catch (error) {
+                      alert('保存失败: ' + (error instanceof Error ? error.message : '网络错误'));
+                    }
+                  }}>
+                    保存
+                  </Button>
+                </div>
+              </div>
+
+              {/* 航班异常列表 */}
+              <div className="border rounded-lg overflow-auto relative" style={{ maxHeight: '600px' }}>
+                <table className="w-full" style={{ tableLayout: 'fixed', minWidth: '1800px' }}>
+                  <thead className="sticky top-0 bg-gray-50 z-10" style={{ position: 'sticky', top: 0, zIndex: 10, backgroundColor: '#f9fafb' }}>
+                    <tr>
+                      <th className="px-2 py-2 text-left text-xs font-medium text-gray-700 border-b border-r border-gray-200" style={{ width: '120px', position: 'sticky', left: 0, zIndex: 20, backgroundColor: '#f9fafb' }}>发车日期</th>
+                      <th className="px-2 py-2 text-left text-xs font-medium text-gray-700 border-b border-r border-gray-200" style={{ width: '120px', position: 'sticky', left: '120px', zIndex: 20, backgroundColor: '#f9fafb' }}>航班日期</th>
+                      <th className="px-2 py-2 text-left text-xs font-medium text-gray-700 border-b border-r border-gray-200" style={{ width: '100px', position: 'sticky', left: '240px', zIndex: 20, backgroundColor: '#f9fafb' }}>航班号</th>
+                      <th className="px-2 py-2 text-left text-xs font-medium text-gray-700 border-b border-r border-gray-200" style={{ width: '150px', position: 'sticky', left: '340px', zIndex: 20, backgroundColor: '#f9fafb' }}>主单号</th>
+                      <th className="px-2 py-2 text-left text-xs font-medium text-gray-700 border-b border-r border-gray-200" style={{ width: '80px' }}>票数</th>
+                      <th className="px-2 py-2 text-left text-xs font-medium text-gray-700 border-b border-r border-gray-200" style={{ width: '80px' }}>始发港</th>
+                      <th className="px-2 py-2 text-left text-xs font-medium text-gray-700 border-b border-r border-gray-200" style={{ width: '80px' }}>中转站</th>
+                      <th className="px-2 py-2 text-left text-xs font-medium text-gray-700 border-b border-r border-gray-200" style={{ width: '80px' }}>目的港</th>
+                      <th className="px-2 py-2 text-left text-xs font-medium text-gray-700 border-b border-r border-gray-200" style={{ width: '200px' }}>异常原因</th>
+                      <th className="px-2 py-2 text-left text-xs font-medium text-gray-700 border-b border-r border-gray-200" style={{ width: '200px' }}>备注</th>
+                      <th className="px-2 py-2 text-left text-xs font-medium text-gray-700 border-b border-r border-gray-200" style={{ width: '80px' }}>操作</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {flightExceptions.length === 0 ? (
+                      <tr>
+                        <td colSpan={11} className="px-2 py-8 text-center text-gray-500">
+                          暂无航班异常记录
+                        </td>
+                      </tr>
+                    ) : (
+                      flightExceptions.map((item) => (
+                        <tr key={item.id}>
+                          <td className="px-2 py-1 text-sm border-b border-r border-gray-200" style={{ position: 'sticky', left: 0, zIndex: 10, backgroundColor: 'white' }}>{item.depart_date}</td>
+                          <td className="px-2 py-1 text-sm border-b border-r border-gray-200" style={{ position: 'sticky', left: '120px', zIndex: 10, backgroundColor: 'white' }}>{item.flight_date}</td>
+                          <td className="px-2 py-1 text-sm border-b border-r border-gray-200" style={{ position: 'sticky', left: '240px', zIndex: 10, backgroundColor: 'white' }}>{item.flight_no}</td>
+                          <td className="px-2 py-1 text-sm border-b border-r border-gray-200" style={{ position: 'sticky', left: '340px', zIndex: 10, backgroundColor: 'white' }}>{item.main_no}</td>
+                          <td className="px-2 py-1 text-sm border-b border-r border-gray-200">{item.bills}</td>
+                          <td className="px-2 py-1 text-sm border-b border-r border-gray-200">{item.origin}</td>
+                          <td className="px-2 py-1 text-sm border-b border-r border-gray-200">{item.transfer || '-'}</td>
+                          <td className="px-2 py-1 text-sm border-b border-r border-gray-200">{item.dest}</td>
+                          <td className="px-2 py-1 text-sm border-b border-r border-gray-200">{item.exception_reason}</td>
+                          <td className="px-2 py-1 text-sm border-b border-r border-gray-200">{item.remark || '-'}</td>
+                          <td className="px-2 py-1 text-sm border-b border-gray-200">
+                            <Button
+                              variant="destructive"
+                              size="sm"
+                              onClick={async () => {
+                                if (!confirm('确定要删除这条记录吗？')) return;
+                                try {
+                                  const response = await fetch(`/api/flight-exception?id=${item.id}`, {
+                                    method: 'DELETE',
+                                  });
+                                  const result = await response.json();
+                                  if (!result.success) {
+                                    alert('删除失败: ' + (result.error || '未知错误'));
+                                    return;
+                                  }
+                                  loadFlightExceptions();
+                                } catch (error) {
+                                  alert('删除失败: ' + (error instanceof Error ? error.message : '网络错误'));
+                                }
+                              }}
+                            >
+                              删除
+                            </Button>
+                          </td>
+                        </tr>
+                      ))
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </CardContent>
+          </Card>
         )}
       </main>
       
