@@ -273,6 +273,7 @@ export default function LogisticsManagement() {
     kansaiSpecial: number;
     airVolume: number;
     seaAirVolume: number;
+    unconfiguredVolume: number;
   } | null>(null);
   
   // 模态框状态
@@ -588,7 +589,10 @@ export default function LogisticsManagement() {
               if (flightConfig.kansai_special === '空运') airVolume += kansaiSpecial;
               else if (flightConfig.kansai_special === '海空') seaAirVolume += kansaiSpecial;
             }
-            
+
+            // 计算未配置方数：总方数 - 空运方数 - 海空方数
+            const unconfiguredVolume = totalVolume - airVolume - seaAirVolume;
+
             setVolumeResult({
               totalVolume,
               kantoTotal,
@@ -599,6 +603,7 @@ export default function LogisticsManagement() {
               kansaiSpecial,
               airVolume,
               seaAirVolume,
+              unconfiguredVolume,
             });
           } catch {
             setVolumeResult(null);
@@ -2001,7 +2006,7 @@ export default function LogisticsManagement() {
                       <div className="text-sm text-gray-600">关西特货</div>
                     </div>
                   </div>
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-3 gap-4">
                     <div className="bg-cyan-50 rounded-lg p-3 text-center">
                       <div className="text-xl font-bold text-cyan-600">{volumeResult ? volumeResult.airVolume.toFixed(3) : '0'}</div>
                       <div className="text-sm text-gray-600">空运方数</div>
@@ -2009,6 +2014,10 @@ export default function LogisticsManagement() {
                     <div className="bg-amber-50 rounded-lg p-3 text-center">
                       <div className="text-xl font-bold text-amber-600">{volumeResult ? volumeResult.seaAirVolume.toFixed(3) : '0'}</div>
                       <div className="text-sm text-gray-600">海空方数</div>
+                    </div>
+                    <div className="bg-gray-50 rounded-lg p-3 text-center">
+                      <div className="text-xl font-bold text-gray-600">{volumeResult ? volumeResult.unconfiguredVolume.toFixed(3) : '0'}</div>
+                      <div className="text-sm text-gray-600">未配置方数</div>
                     </div>
                   </div>
                 </div>
