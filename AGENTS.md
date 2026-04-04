@@ -10,6 +10,7 @@
 - **UI 组件**: shadcn/ui + Tailwind CSS 4
 - **数据库**: Supabase (PostgreSQL)
 - **ORM**: Drizzle Kit (仅用于 Schema 定义)
+- **部署**: Vercel 自动部署
 
 ### 核心功能
 
