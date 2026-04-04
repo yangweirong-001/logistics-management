@@ -1992,17 +1992,17 @@ export default function LogisticsManagement() {
                   <div className="mb-4">
                     <div className="text-base font-bold text-gray-700 mb-2 pl-2 border-l-4 border-blue-500">基础信息</div>
                     <div className="grid grid-cols-3 gap-4">
-                      <div className="bg-blue-50 rounded-lg p-4 text-center border border-blue-200">
-                        <div className="text-2xl font-bold text-blue-700">{volumeResult ? volumeResult.totalVolume.toFixed(3) : '0'}</div>
-                        <div className="text-sm text-gray-700">总方数</div>
+                      <div className="bg-white rounded-lg p-4 text-center border border-gray-200 shadow-sm">
+                        <div className="text-2xl font-bold text-gray-800">{volumeResult ? volumeResult.totalVolume.toFixed(3) : '0'}</div>
+                        <div className="text-sm text-gray-600 mt-1">总方数</div>
                       </div>
-                      <div className="bg-green-50 rounded-lg p-4 text-center border border-green-200">
-                        <div className="text-2xl font-bold text-green-700">{volumeResult ? volumeResult.kantoTotal.toFixed(3) : '0'}</div>
-                        <div className="text-sm text-gray-700">关东总方数</div>
+                      <div className="bg-white rounded-lg p-4 text-center border border-gray-200 shadow-sm">
+                        <div className="text-2xl font-bold text-gray-800">{volumeResult ? volumeResult.kantoTotal.toFixed(3) : '0'}</div>
+                        <div className="text-sm text-gray-600 mt-1">关东总方数</div>
                       </div>
-                      <div className="bg-purple-50 rounded-lg p-4 text-center border border-purple-200">
-                        <div className="text-2xl font-bold text-purple-700">{volumeResult ? volumeResult.kansaiTotal.toFixed(3) : '0'}</div>
-                        <div className="text-sm text-gray-700">关西总方数</div>
+                      <div className="bg-white rounded-lg p-4 text-center border border-gray-200 shadow-sm">
+                        <div className="text-2xl font-bold text-gray-800">{volumeResult ? volumeResult.kansaiTotal.toFixed(3) : '0'}</div>
+                        <div className="text-sm text-gray-600 mt-1">关西总方数</div>
                       </div>
                     </div>
                   </div>
@@ -2011,21 +2011,21 @@ export default function LogisticsManagement() {
                   <div className="mb-4">
                     <div className="text-base font-bold text-gray-700 mb-2 pl-2 border-l-4 border-orange-500">货物分类</div>
                     <div className="grid grid-cols-4 gap-4">
-                      <div className="bg-orange-50 rounded-lg p-3 text-center border border-orange-200">
-                        <div className="text-xl font-bold text-orange-700">{volumeResult ? volumeResult.kantoNormal.toFixed(3) : '0'}</div>
-                        <div className="text-sm text-gray-700">关东普货</div>
+                      <div className="bg-white rounded-lg p-3 text-center border border-gray-200 shadow-sm">
+                        <div className="text-xl font-bold text-gray-800">{volumeResult ? volumeResult.kantoNormal.toFixed(3) : '0'}</div>
+                        <div className="text-sm text-gray-600 mt-1">关东普货</div>
                       </div>
-                      <div className="bg-red-50 rounded-lg p-3 text-center border border-red-200">
-                        <div className="text-xl font-bold text-red-700">{volumeResult ? volumeResult.kantoSpecial.toFixed(3) : '0'}</div>
-                        <div className="text-sm text-gray-700">关东特货</div>
+                      <div className="bg-white rounded-lg p-3 text-center border border-gray-200 shadow-sm">
+                        <div className="text-xl font-bold text-gray-800">{volumeResult ? volumeResult.kantoSpecial.toFixed(3) : '0'}</div>
+                        <div className="text-sm text-gray-600 mt-1">关东特货</div>
                       </div>
-                      <div className="bg-teal-50 rounded-lg p-3 text-center border border-teal-200">
-                        <div className="text-xl font-bold text-teal-700">{volumeResult ? volumeResult.kansaiNormal.toFixed(3) : '0'}</div>
-                        <div className="text-sm text-gray-700">关西普货</div>
+                      <div className="bg-white rounded-lg p-3 text-center border border-gray-200 shadow-sm">
+                        <div className="text-xl font-bold text-gray-800">{volumeResult ? volumeResult.kansaiNormal.toFixed(3) : '0'}</div>
+                        <div className="text-sm text-gray-600 mt-1">关西普货</div>
                       </div>
-                      <div className="bg-indigo-50 rounded-lg p-3 text-center border border-indigo-200">
-                        <div className="text-xl font-bold text-indigo-700">{volumeResult ? volumeResult.kansaiSpecial.toFixed(3) : '0'}</div>
-                        <div className="text-sm text-gray-700">关西特货</div>
+                      <div className="bg-white rounded-lg p-3 text-center border border-gray-200 shadow-sm">
+                        <div className="text-xl font-bold text-gray-800">{volumeResult ? volumeResult.kansaiSpecial.toFixed(3) : '0'}</div>
+                        <div className="text-sm text-gray-600 mt-1">关西特货</div>
                       </div>
                     </div>
                   </div>
@@ -2034,13 +2034,13 @@ export default function LogisticsManagement() {
                   <div className="mb-4">
                     <div className="text-base font-bold text-gray-700 mb-2 pl-2 border-l-4 border-cyan-500">应配置</div>
                     <div className="grid grid-cols-2 gap-4">
-                      <div className="bg-cyan-50 rounded-lg p-4 text-center border border-cyan-200">
-                        <div className="text-xl font-bold text-cyan-700">{volumeResult ? volumeResult.airVolume.toFixed(3) : '0'}</div>
-                        <div className="text-sm text-gray-700">应配置空运方数</div>
+                      <div className="bg-white rounded-lg p-4 text-center border border-gray-200 shadow-sm">
+                        <div className="text-xl font-bold text-gray-800">{volumeResult ? volumeResult.airVolume.toFixed(3) : '0'}</div>
+                        <div className="text-sm text-gray-600 mt-1">应配置空运方数</div>
                       </div>
-                      <div className="bg-amber-50 rounded-lg p-4 text-center border border-amber-200">
-                        <div className="text-xl font-bold text-amber-700">{volumeResult ? volumeResult.seaAirVolume.toFixed(3) : '0'}</div>
-                        <div className="text-sm text-gray-700">应配置海空方数</div>
+                      <div className="bg-white rounded-lg p-4 text-center border border-gray-200 shadow-sm">
+                        <div className="text-xl font-bold text-gray-800">{volumeResult ? volumeResult.seaAirVolume.toFixed(3) : '0'}</div>
+                        <div className="text-sm text-gray-600 mt-1">应配置海空方数</div>
                       </div>
                     </div>
                   </div>
@@ -2049,17 +2049,17 @@ export default function LogisticsManagement() {
                   <div>
                     <div className="text-base font-bold text-gray-700 mb-2 pl-2 border-l-4 border-emerald-500">实际配置</div>
                     <div className="grid grid-cols-3 gap-4">
-                      <div className="bg-emerald-50 rounded-lg p-4 text-center border border-emerald-200">
-                        <div className="text-lg font-bold text-emerald-700">{volumeResult ? volumeResult.configuredAirVolume.toFixed(3) : '0'}</div>
-                        <div className="text-sm text-gray-700">空运主单<br/>已配置方数</div>
+                      <div className="bg-white rounded-lg p-4 text-center border border-gray-200 shadow-sm">
+                        <div className="text-lg font-bold text-gray-800">{volumeResult ? volumeResult.configuredAirVolume.toFixed(3) : '0'}</div>
+                        <div className="text-sm text-gray-600 mt-1">空运主单<br/>已配置方数</div>
                       </div>
-                      <div className="bg-blue-50 rounded-lg p-4 text-center border border-blue-200">
-                        <div className="text-lg font-bold text-blue-700">{volumeResult ? volumeResult.configuredSeaAirVolume.toFixed(3) : '0'}</div>
-                        <div className="text-sm text-gray-700">海空主单<br/>已配置方数</div>
+                      <div className="bg-white rounded-lg p-4 text-center border border-gray-200 shadow-sm">
+                        <div className="text-lg font-bold text-gray-800">{volumeResult ? volumeResult.configuredSeaAirVolume.toFixed(3) : '0'}</div>
+                        <div className="text-sm text-gray-600 mt-1">海空主单<br/>已配置方数</div>
                       </div>
-                      <div className="bg-gray-50 rounded-lg p-4 text-center border border-gray-300">
-                        <div className="text-lg font-bold text-gray-700">{volumeResult ? volumeResult.unconfiguredVolume.toFixed(3) : '0'}</div>
-                        <div className="text-sm text-gray-700">未配置<br/>方数</div>
+                      <div className="bg-white rounded-lg p-4 text-center border border-gray-200 shadow-sm">
+                        <div className="text-lg font-bold text-gray-800">{volumeResult ? volumeResult.unconfiguredVolume.toFixed(3) : '0'}</div>
+                        <div className="text-sm text-gray-600 mt-1">未配置<br/>方数</div>
                       </div>
                     </div>
                   </div>
