@@ -1987,64 +1987,84 @@ export default function LogisticsManagement() {
                 {/* 计算结果 */}
                 <div className="mb-5">
                   <h3 className="font-semibold text-lg mb-3">计算结果</h3>
-                  <div className="grid grid-cols-3 gap-4 mb-3">
-                    <div className="bg-blue-50 rounded-lg p-4 text-center">
-                      <div className="text-2xl font-bold text-blue-600">{volumeResult ? volumeResult.totalVolume.toFixed(3) : '0'}</div>
-                      <div className="text-sm text-gray-600">总方数</div>
-                    </div>
-                    <div className="bg-green-50 rounded-lg p-4 text-center">
-                      <div className="text-2xl font-bold text-green-600">{volumeResult ? volumeResult.kantoTotal.toFixed(3) : '0'}</div>
-                      <div className="text-sm text-gray-600">关东总方数</div>
-                    </div>
-                    <div className="bg-purple-50 rounded-lg p-4 text-center">
-                      <div className="text-2xl font-bold text-purple-600">{volumeResult ? volumeResult.kansaiTotal.toFixed(3) : '0'}</div>
-                      <div className="text-sm text-gray-600">关西总方数</div>
-                    </div>
-                  </div>
-                  <div className="grid grid-cols-4 gap-4 mb-3">
-                    <div className="bg-orange-50 rounded-lg p-3 text-center">
-                      <div className="text-xl font-bold text-orange-600">{volumeResult ? volumeResult.kantoNormal.toFixed(3) : '0'}</div>
-                      <div className="text-sm text-gray-600">关东普货</div>
-                    </div>
-                    <div className="bg-red-50 rounded-lg p-3 text-center">
-                      <div className="text-xl font-bold text-red-600">{volumeResult ? volumeResult.kantoSpecial.toFixed(3) : '0'}</div>
-                      <div className="text-sm text-gray-600">关东特货</div>
-                    </div>
-                    <div className="bg-teal-50 rounded-lg p-3 text-center">
-                      <div className="text-xl font-bold text-teal-600">{volumeResult ? volumeResult.kansaiNormal.toFixed(3) : '0'}</div>
-                      <div className="text-sm text-gray-600">关西普货</div>
-                    </div>
-                    <div className="bg-indigo-50 rounded-lg p-3 text-center">
-                      <div className="text-xl font-bold text-indigo-600">{volumeResult ? volumeResult.kansaiSpecial.toFixed(3) : '0'}</div>
-                      <div className="text-sm text-gray-600">关西特货</div>
+
+                  {/* 基础信息 */}
+                  <div className="mb-4">
+                    <div className="text-sm font-medium text-gray-700 mb-2 pl-2 border-l-4 border-blue-500">基础信息</div>
+                    <div className="grid grid-cols-3 gap-4">
+                      <div className="bg-blue-50 rounded-lg p-4 text-center border-2 border-blue-100">
+                        <div className="text-2xl font-bold text-blue-700">{volumeResult ? volumeResult.totalVolume.toFixed(3) : '0'}</div>
+                        <div className="text-sm text-gray-700 font-medium">总方数</div>
+                      </div>
+                      <div className="bg-green-50 rounded-lg p-4 text-center border-2 border-green-100">
+                        <div className="text-2xl font-bold text-green-700">{volumeResult ? volumeResult.kantoTotal.toFixed(3) : '0'}</div>
+                        <div className="text-sm text-gray-700 font-medium">关东总方数</div>
+                      </div>
+                      <div className="bg-purple-50 rounded-lg p-4 text-center border-2 border-purple-100">
+                        <div className="text-2xl font-bold text-purple-700">{volumeResult ? volumeResult.kansaiTotal.toFixed(3) : '0'}</div>
+                        <div className="text-sm text-gray-700 font-medium">关西总方数</div>
+                      </div>
                     </div>
                   </div>
-                  <div className="grid grid-cols-2 gap-4 mb-3">
-                    <div className="bg-cyan-50 rounded-lg p-3 text-center">
-                      <div className="text-xl font-bold text-cyan-600">{volumeResult ? volumeResult.airVolume.toFixed(3) : '0'}</div>
-                      <div className="text-sm text-gray-600">应配置空运方数</div>
-                    </div>
-                    <div className="bg-amber-50 rounded-lg p-3 text-center">
-                      <div className="text-xl font-bold text-amber-600">{volumeResult ? volumeResult.seaAirVolume.toFixed(3) : '0'}</div>
-                      <div className="text-sm text-gray-600">应配置海空方数</div>
+
+                  {/* 货物分类 */}
+                  <div className="mb-4">
+                    <div className="text-sm font-medium text-gray-700 mb-2 pl-2 border-l-4 border-orange-500">货物分类</div>
+                    <div className="grid grid-cols-4 gap-4">
+                      <div className="bg-orange-50 rounded-lg p-3 text-center border-2 border-orange-100">
+                        <div className="text-xl font-bold text-orange-700">{volumeResult ? volumeResult.kantoNormal.toFixed(3) : '0'}</div>
+                        <div className="text-sm text-gray-700 font-medium">关东普货</div>
+                      </div>
+                      <div className="bg-red-50 rounded-lg p-3 text-center border-2 border-red-100">
+                        <div className="text-xl font-bold text-red-700">{volumeResult ? volumeResult.kantoSpecial.toFixed(3) : '0'}</div>
+                        <div className="text-sm text-gray-700 font-medium">关东特货</div>
+                      </div>
+                      <div className="bg-teal-50 rounded-lg p-3 text-center border-2 border-teal-100">
+                        <div className="text-xl font-bold text-teal-700">{volumeResult ? volumeResult.kansaiNormal.toFixed(3) : '0'}</div>
+                        <div className="text-sm text-gray-700 font-medium">关西普货</div>
+                      </div>
+                      <div className="bg-indigo-50 rounded-lg p-3 text-center border-2 border-indigo-100">
+                        <div className="text-xl font-bold text-indigo-700">{volumeResult ? volumeResult.kansaiSpecial.toFixed(3) : '0'}</div>
+                        <div className="text-sm text-gray-700 font-medium">关西特货</div>
+                      </div>
                     </div>
                   </div>
-                  <div className="grid grid-cols-4 gap-4">
-                    <div className="bg-green-50 rounded-lg p-3 text-center">
-                      <div className="text-xl font-bold text-green-600">{volumeResult ? volumeResult.configuredAirVolume.toFixed(3) : '0'}</div>
-                      <div className="text-sm text-gray-600">空运主单已配置方数</div>
+
+                  {/* 应配置 */}
+                  <div className="mb-4">
+                    <div className="text-sm font-medium text-gray-700 mb-2 pl-2 border-l-4 border-cyan-500">应配置</div>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="bg-gradient-to-br from-cyan-50 to-cyan-100 rounded-lg p-4 text-center border-2 border-cyan-200 shadow-sm">
+                        <div className="text-xl font-bold text-cyan-700">{volumeResult ? volumeResult.airVolume.toFixed(3) : '0'}</div>
+                        <div className="text-sm text-gray-800 font-medium">应配置空运方数</div>
+                      </div>
+                      <div className="bg-gradient-to-br from-amber-50 to-amber-100 rounded-lg p-4 text-center border-2 border-amber-200 shadow-sm">
+                        <div className="text-xl font-bold text-amber-700">{volumeResult ? volumeResult.seaAirVolume.toFixed(3) : '0'}</div>
+                        <div className="text-sm text-gray-800 font-medium">应配置海空方数</div>
+                      </div>
                     </div>
-                    <div className="bg-blue-50 rounded-lg p-3 text-center">
-                      <div className="text-xl font-bold text-blue-600">{volumeResult ? volumeResult.configuredSeaAirVolume.toFixed(3) : '0'}</div>
-                      <div className="text-sm text-gray-600">海空主单已配置方数</div>
-                    </div>
-                    <div className="bg-gray-50 rounded-lg p-3 text-center">
-                      <div className="text-xl font-bold text-gray-600">{volumeResult ? volumeResult.unconfiguredVolume.toFixed(3) : '0'}</div>
-                      <div className="text-sm text-gray-600">未配置方数</div>
-                    </div>
-                    <div className="bg-purple-50 rounded-lg p-3 text-center">
-                      <div className="text-xl font-bold text-purple-600">{volumeResult ? (volumeResult.configuredAirVolume + volumeResult.configuredSeaAirVolume).toFixed(3) : '0'}</div>
-                      <div className="text-sm text-gray-600">已配置总方数</div>
+                  </div>
+
+                  {/* 实际配置 */}
+                  <div>
+                    <div className="text-sm font-medium text-gray-700 mb-2 pl-2 border-l-4 border-emerald-500">实际配置</div>
+                    <div className="grid grid-cols-4 gap-4">
+                      <div className="bg-gradient-to-br from-emerald-50 to-emerald-100 rounded-lg p-3 text-center border-2 border-emerald-300 shadow-sm">
+                        <div className="text-lg font-bold text-emerald-700">{volumeResult ? volumeResult.configuredAirVolume.toFixed(3) : '0'}</div>
+                        <div className="text-xs text-gray-800 font-medium">空运主单<br/>已配置方数</div>
+                      </div>
+                      <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg p-3 text-center border-2 border-blue-300 shadow-sm">
+                        <div className="text-lg font-bold text-blue-700">{volumeResult ? volumeResult.configuredSeaAirVolume.toFixed(3) : '0'}</div>
+                        <div className="text-xs text-gray-800 font-medium">海空主单<br/>已配置方数</div>
+                      </div>
+                      <div className="bg-gradient-to-br from-gray-100 to-gray-200 rounded-lg p-3 text-center border-2 border-gray-300 shadow-sm">
+                        <div className="text-lg font-bold text-gray-700">{volumeResult ? volumeResult.unconfiguredVolume.toFixed(3) : '0'}</div>
+                        <div className="text-xs text-gray-800 font-medium">未配置<br/>方数</div>
+                      </div>
+                      <div className="bg-gradient-to-br from-purple-100 to-purple-200 rounded-lg p-3 text-center border-2 border-purple-300 shadow-sm">
+                        <div className="text-lg font-bold text-purple-700">{volumeResult ? (volumeResult.configuredAirVolume + volumeResult.configuredSeaAirVolume).toFixed(3) : '0'}</div>
+                        <div className="text-xs text-gray-800 font-medium">已配置<br/>总方数</div>
+                      </div>
                     </div>
                   </div>
                 </div>
