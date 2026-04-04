@@ -2013,19 +2013,19 @@ export default function LogisticsManagement() {
                     <div className="grid grid-cols-4 gap-4">
                       <div className="bg-white rounded-lg p-3 text-center border border-gray-200 shadow-sm">
                         <div className="text-xl font-bold text-gray-800">{volumeResult ? volumeResult.kantoNormal.toFixed(3) : '0'}</div>
-                        <div className="text-sm font-bold text-orange-700 mt-1">关东普货</div>
+                        <div className="text-sm font-bold text-green-700 mt-1">关东普货</div>
                       </div>
                       <div className="bg-white rounded-lg p-3 text-center border border-gray-200 shadow-sm">
                         <div className="text-xl font-bold text-gray-800">{volumeResult ? volumeResult.kantoSpecial.toFixed(3) : '0'}</div>
-                        <div className="text-sm font-bold text-red-700 mt-1">关东特货</div>
+                        <div className="text-sm font-bold text-indigo-800 mt-1">关东特货</div>
                       </div>
                       <div className="bg-white rounded-lg p-3 text-center border border-gray-200 shadow-sm">
                         <div className="text-xl font-bold text-gray-800">{volumeResult ? volumeResult.kansaiNormal.toFixed(3) : '0'}</div>
-                        <div className="text-sm font-bold text-teal-700 mt-1">关西普货</div>
+                        <div className="text-sm font-bold text-green-700 mt-1">关西普货</div>
                       </div>
                       <div className="bg-white rounded-lg p-3 text-center border border-gray-200 shadow-sm">
                         <div className="text-xl font-bold text-gray-800">{volumeResult ? volumeResult.kansaiSpecial.toFixed(3) : '0'}</div>
-                        <div className="text-sm font-bold text-indigo-700 mt-1">关西特货</div>
+                        <div className="text-sm font-bold text-indigo-800 mt-1">关西特货</div>
                       </div>
                     </div>
                   </div>
@@ -2049,17 +2049,17 @@ export default function LogisticsManagement() {
                   <div>
                     <div className="text-base font-bold text-gray-700 mb-2 pl-2 border-l-4 border-emerald-500">实际配置</div>
                     <div className="grid grid-cols-3 gap-4">
-                      <div className="bg-white rounded-lg p-4 text-center border border-gray-200 shadow-sm">
+                      <div className="bg-emerald-50 rounded-lg p-4 text-center border border-emerald-200 shadow-sm">
                         <div className="text-lg font-bold text-gray-800">{volumeResult ? volumeResult.configuredAirVolume.toFixed(3) : '0'}</div>
-                        <div className="text-sm font-bold text-emerald-700 mt-1">空运主单<br/>已配置方数</div>
+                        <div className="text-sm font-bold text-black mt-1">空运主单<br/>已配置方数</div>
                       </div>
-                      <div className="bg-white rounded-lg p-4 text-center border border-gray-200 shadow-sm">
+                      <div className="bg-blue-50 rounded-lg p-4 text-center border border-blue-200 shadow-sm">
                         <div className="text-lg font-bold text-gray-800">{volumeResult ? volumeResult.configuredSeaAirVolume.toFixed(3) : '0'}</div>
-                        <div className="text-sm font-bold text-blue-700 mt-1">海空主单<br/>已配置方数</div>
+                        <div className="text-sm font-bold text-black mt-1">海空主单<br/>已配置方数</div>
                       </div>
-                      <div className="bg-white rounded-lg p-4 text-center border border-gray-200 shadow-sm">
+                      <div className="bg-gray-100 rounded-lg p-4 text-center border border-gray-200 shadow-sm">
                         <div className="text-lg font-bold text-gray-800">{volumeResult ? volumeResult.unconfiguredVolume.toFixed(3) : '0'}</div>
-                        <div className="text-sm font-bold text-gray-700 mt-1">未配置<br/>方数</div>
+                        <div className="text-sm font-bold text-black mt-1">未配置<br/>方数</div>
                       </div>
                     </div>
                   </div>
