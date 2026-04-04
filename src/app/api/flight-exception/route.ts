@@ -67,14 +67,14 @@ export async function POST(request: NextRequest) {
 
     // 创建航班异常记录
     const newRecord = {
-      depart_date: mainOrder.depart_date || '',
-      flight_date: mainOrder.actual_flight_date || '',
-      flight_no: mainOrder.flight_no || '',
+      depart_date: mainOrder.depart_date || new Date().toISOString().split('T')[0],
+      flight_date: mainOrder.actual_flight_date || mainOrder.depart_date || new Date().toISOString().split('T')[0],
+      flight_no: mainOrder.flight_no || '未分配',
       main_no: mainNo,
       bills: mainOrder.actual_bills || 0,
-      origin: mainOrder.origin || '',
-      transfer: mainOrder.transfer || '',
-      dest: mainOrder.dest || '',
+      origin: mainOrder.origin || '未指定',
+      transfer: mainOrder.transfer || null,
+      dest: mainOrder.dest || '未指定',
       exception_reason: exceptionReason,
       remark: remark || '',
     };
