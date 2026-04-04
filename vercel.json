@@ -6,8 +6,6 @@
   "framework": "nextjs",
   "regions": ["hkg1"],
   "env": {
-    "COZE_SUPABASE_URL": "@supabase-url",
-    "COZE_SUPABASE_ANON_KEY": "@supabase-anon-key",
     "NODE_ENV": "production"
   }
 }
