@@ -145,6 +145,25 @@ const formatTime = (timeStr: string | null | undefined): string => {
   return cleanTime;
 };
 
+// 计算预计落地时间（考虑隔天）
+const formatArrivalDateTime = (
+  flightDate: string | null | undefined,
+  departTime: string | null | undefined,
+  arriveTime: string | null | undefined
+): string => {
+  if (!flightDate) return formatTime(arriveTime);
+  if (!arriveTime) return flightDate;
+
+  // 判断是否隔天：如果落地时间小于起飞时间，说明是隔天
+  let isNextDay = false;
+  if (departTime && arriveTime) {
+    isNextDay = departTime > arriveTime;
+  }
+
+  const arrivalDate = isNextDay ? addDays(flightDate, 1) : flightDate;
+  return `${arrivalDate} ${formatTime(arriveTime)}`;
+};
+
 // 导出Excel功能
 const exportToExcel = (data: MainOrder[], filename: string) => {
   // 定义列标题和对应的字段
@@ -315,25 +334,6 @@ export default function LogisticsManagement() {
     if (!dateStr) return formatTime(timeStr);
     if (!timeStr) return dateStr;
     return `${dateStr} ${formatTime(timeStr)}`;
-  };
-
-  // 计算预计落地时间（考虑隔天）
-  const formatArrivalDateTime = (
-    flightDate: string | null | undefined,
-    departTime: string | null | undefined,
-    arriveTime: string | null | undefined
-  ): string => {
-    if (!flightDate) return formatTime(arriveTime);
-    if (!arriveTime) return flightDate;
-
-    // 判断是否隔天：如果落地时间小于起飞时间，说明是隔天
-    let isNextDay = false;
-    if (departTime && arriveTime) {
-      isNextDay = departTime > arriveTime;
-    }
-
-    const arrivalDate = isNextDay ? addDays(flightDate, 1) : flightDate;
-    return `${arrivalDate} ${formatTime(arriveTime)}`;
   };
 
   // 主单查询条件
