@@ -2760,23 +2760,23 @@ export default function LogisticsManagement() {
                 <table style={{ borderCollapse: 'separate', borderSpacing: 0, minWidth: '2200px' }}>
                   <thead>
                     <tr>
-                      <th style={{ position: 'sticky', left: 0, top: 0, zIndex: 40, backgroundColor: '#fff', minWidth: '100px', borderRight: '3px solid #f97316', borderBottom: '2px solid #e5e7eb' }} className="text-center px-2 py-2">揽收日期</th>
-                      <th style={{ position: 'sticky', left: '100px', top: 0, zIndex: 40, backgroundColor: '#fff', minWidth: '60px', borderRight: '3px solid #f97316', borderBottom: '2px solid #e5e7eb' }} className="text-center px-2 py-2">仓库</th>
-                      <th style={{ position: 'sticky', left: '160px', top: 0, zIndex: 40, backgroundColor: '#fff', minWidth: '60px', borderRight: '3px solid #f97316', borderBottom: '2px solid #e5e7eb' }} className="text-center px-2 py-2">口岸</th>
-                      <th style={{ position: 'sticky', left: '220px', top: 0, zIndex: 40, backgroundColor: '#fff', minWidth: '60px', borderRight: '3px solid #f97316', borderBottom: '2px solid #e5e7eb' }} className="text-center px-2 py-2">货物属性</th>
-                      <th style={{ position: 'sticky', left: '280px', top: 0, zIndex: 40, backgroundColor: '#fff', minWidth: '80px', borderRight: '3px solid #f97316', borderBottom: '2px solid #e5e7eb' }} className="text-center px-2 py-2">路由类型</th>
-                      <th style={{ position: 'sticky', top: 0, zIndex: 30, backgroundColor: '#f3f4f6', minWidth: '120px', borderBottom: '2px solid #e5e7eb' }} className="text-center px-2 py-2">主单号</th>
-                      <th style={{ position: 'sticky', top: 0, zIndex: 30, backgroundColor: '#f3f4f6', minWidth: '90px', borderBottom: '2px solid #e5e7eb' }} className="text-center px-2 py-2">航班号</th>
-                      <th style={{ position: 'sticky', top: 0, zIndex: 30, backgroundColor: '#f3f4f6', minWidth: '60px', borderBottom: '2px solid #e5e7eb' }} className="text-center px-2 py-2">始发</th>
-                      <th style={{ position: 'sticky', top: 0, zIndex: 30, backgroundColor: '#f3f4f6', minWidth: '60px', borderBottom: '2px solid #e5e7eb' }} className="text-center px-2 py-2">中转</th>
-                      <th style={{ position: 'sticky', top: 0, zIndex: 30, backgroundColor: '#f3f4f6', minWidth: '60px', borderBottom: '2px solid #e5e7eb' }} className="text-center px-2 py-2">目的</th>
-                      <th style={{ position: 'sticky', top: 0, zIndex: 30, backgroundColor: '#f3f4f6', minWidth: '160px', borderBottom: '2px solid #e5e7eb' }} className="text-center px-2 py-2">预计起飞</th>
-                      <th style={{ position: 'sticky', top: 0, zIndex: 30, backgroundColor: '#f3f4f6', minWidth: '160px', borderBottom: '2px solid #e5e7eb' }} className="text-center px-2 py-2">预计落地</th>
-                      <th style={{ position: 'sticky', top: 0, zIndex: 30, backgroundColor: '#f3f4f6', minWidth: '90px', borderBottom: '2px solid #e5e7eb' }} className="text-center px-2 py-2">打货上限(方)</th>
-                      <th style={{ position: 'sticky', top: 0, zIndex: 30, backgroundColor: '#f3f4f6', minWidth: '90px', borderBottom: '2px solid #e5e7eb' }} className="text-center px-2 py-2">打货上限(件)</th>
-                      <th style={{ position: 'sticky', top: 0, zIndex: 30, backgroundColor: '#f3f4f6', minWidth: '90px', borderBottom: '2px solid #e5e7eb' }} className="text-center px-2 py-2">实际件数</th>
-                      <th style={{ position: 'sticky', top: 0, zIndex: 30, backgroundColor: '#f3f4f6', minWidth: '90px', borderBottom: '2px solid #e5e7eb' }} className="text-center px-2 py-2">实际方数</th>
-                      <th style={{ position: 'sticky', top: 0, zIndex: 30, backgroundColor: '#f3f4f6', minWidth: '80px', borderBottom: '2px solid #e5e7eb' }} className="text-center px-2 py-2">操作</th>
+                      <th style={{ position: 'sticky', left: 0, top: 0, zIndex: 50, backgroundColor: '#fff', minWidth: '100px', borderRight: '3px solid #f97316', borderBottom: '2px solid #e5e7eb' }} className="text-center px-2 py-2">揽收日期</th>
+                      <th style={{ position: 'sticky', left: '100px', top: 0, zIndex: 50, backgroundColor: '#fff', minWidth: '60px', borderRight: '3px solid #f97316', borderBottom: '2px solid #e5e7eb' }} className="text-center px-2 py-2">仓库</th>
+                      <th style={{ position: 'sticky', left: '160px', top: 0, zIndex: 50, backgroundColor: '#fff', minWidth: '60px', borderRight: '3px solid #f97316', borderBottom: '2px solid #e5e7eb' }} className="text-center px-2 py-2">口岸</th>
+                      <th style={{ position: 'sticky', left: '220px', top: 0, zIndex: 50, backgroundColor: '#fff', minWidth: '60px', borderRight: '3px solid #f97316', borderBottom: '2px solid #e5e7eb' }} className="text-center px-2 py-2">货物属性</th>
+                      <th style={{ position: 'sticky', left: '280px', top: 0, zIndex: 50, backgroundColor: '#fff', minWidth: '80px', borderRight: '3px solid #f97316', borderBottom: '2px solid #e5e7eb' }} className="text-center px-2 py-2">路由类型</th>
+                      <th style={{ position: 'sticky', top: 0, zIndex: 40, backgroundColor: '#f3f4f6', minWidth: '120px', borderBottom: '2px solid #e5e7eb' }} className="text-center px-2 py-2">主单号</th>
+                      <th style={{ position: 'sticky', top: 0, zIndex: 40, backgroundColor: '#f3f4f6', minWidth: '90px', borderBottom: '2px solid #e5e7eb' }} className="text-center px-2 py-2">航班号</th>
+                      <th style={{ position: 'sticky', top: 0, zIndex: 40, backgroundColor: '#f3f4f6', minWidth: '60px', borderBottom: '2px solid #e5e7eb' }} className="text-center px-2 py-2">始发</th>
+                      <th style={{ position: 'sticky', top: 0, zIndex: 40, backgroundColor: '#f3f4f6', minWidth: '60px', borderBottom: '2px solid #e5e7eb' }} className="text-center px-2 py-2">中转</th>
+                      <th style={{ position: 'sticky', top: 0, zIndex: 40, backgroundColor: '#f3f4f6', minWidth: '60px', borderBottom: '2px solid #e5e7eb' }} className="text-center px-2 py-2">目的</th>
+                      <th style={{ position: 'sticky', top: 0, zIndex: 40, backgroundColor: '#f3f4f6', minWidth: '160px', borderBottom: '2px solid #e5e7eb' }} className="text-center px-2 py-2">预计起飞</th>
+                      <th style={{ position: 'sticky', top: 0, zIndex: 40, backgroundColor: '#f3f4f6', minWidth: '160px', borderBottom: '2px solid #e5e7eb' }} className="text-center px-2 py-2">预计落地</th>
+                      <th style={{ position: 'sticky', top: 0, zIndex: 40, backgroundColor: '#f3f4f6', minWidth: '90px', borderBottom: '2px solid #e5e7eb' }} className="text-center px-2 py-2">打货上限(方)</th>
+                      <th style={{ position: 'sticky', top: 0, zIndex: 40, backgroundColor: '#f3f4f6', minWidth: '90px', borderBottom: '2px solid #e5e7eb' }} className="text-center px-2 py-2">打货上限(件)</th>
+                      <th style={{ position: 'sticky', top: 0, zIndex: 40, backgroundColor: '#f3f4f6', minWidth: '90px', borderBottom: '2px solid #e5e7eb' }} className="text-center px-2 py-2">实际件数</th>
+                      <th style={{ position: 'sticky', top: 0, zIndex: 40, backgroundColor: '#f3f4f6', minWidth: '90px', borderBottom: '2px solid #e5e7eb' }} className="text-center px-2 py-2">实际方数</th>
+                      <th style={{ position: 'sticky', top: 0, zIndex: 40, backgroundColor: '#f3f4f6', minWidth: '80px', borderBottom: '2px solid #e5e7eb' }} className="text-center px-2 py-2">操作</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -3460,7 +3460,7 @@ export default function LogisticsManagement() {
           </div>
           <div className="flex-1 overflow-auto border rounded-lg" style={{ maxHeight: 'calc(90vh - 200px)' }}>
             <Table style={{ tableLayout: 'fixed', minWidth: '1800px' }} className="w-full text-base">
-              <TableHeader className="sticky top-0 bg-white z-10">
+              <TableHeader className="sticky top-0 bg-white z-50">
                 <TableRow>
                   <TableHead className="bg-gray-50 text-center px-1 py-1" style={{ width: '100px' }}>揽收日期</TableHead>
                   <TableHead className="bg-gray-50 text-center px-1 py-1" style={{ width: '70px' }}>仓库</TableHead>
