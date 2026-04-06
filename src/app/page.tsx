@@ -197,10 +197,13 @@ const exportToExcel = (data: MainOrder[], filename: string, routeConfigs: RouteC
     return cleanTime;
   };
 
-  // 格式化起飞时间（日期 + 时间）- 修复：确保显示日期
+  // 格式化起飞时间（日期 + 时间）
   const formatDepartureDateTime = (dateStr: string | null | undefined, timeStr: string | null | undefined): string => {
-    if (!dateStr) return formatTime(timeStr);
-    if (!timeStr) return dateStr;
+    // 如果日期为空（包括空字符串），只返回时间
+    if (!dateStr || dateStr === '') return formatTime(timeStr);
+    // 如果时间为空（包括空字符串），只返回日期
+    if (!timeStr || timeStr === '') return dateStr;
+    // 否则返回 日期 + 时间
     return `${dateStr} ${formatTime(timeStr)}`;
   };
 
