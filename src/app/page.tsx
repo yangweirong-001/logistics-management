@@ -2741,14 +2741,14 @@ export default function LogisticsManagement() {
                 <span className="text-sm text-gray-500">共 {mainOrders.length} 条记录</span>
               </div>
               <div style={{ overflow: 'auto', maxHeight: '800px', position: 'relative' }}>
-                <table style={{ borderCollapse: 'separate', borderSpacing: 0, minWidth: '2200px' }}>
+                <table style={{ borderCollapse: 'separate', borderSpacing: 0, minWidth: '2300px' }}>
                   <thead>
                     <tr>
-                      <th style={{ position: 'sticky', left: 0, top: 0, zIndex: 50, backgroundColor: '#fff', minWidth: '100px', borderRight: '3px solid #f97316', borderBottom: '2px solid #e5e7eb' }} className="text-center px-2 py-2">揽收日期</th>
-                      <th style={{ position: 'sticky', left: '100px', top: 0, zIndex: 50, backgroundColor: '#fff', minWidth: '60px', borderRight: '3px solid #f97316', borderBottom: '2px solid #e5e7eb' }} className="text-center px-2 py-2">仓库</th>
-                      <th style={{ position: 'sticky', left: '160px', top: 0, zIndex: 50, backgroundColor: '#fff', minWidth: '60px', borderRight: '3px solid #f97316', borderBottom: '2px solid #e5e7eb' }} className="text-center px-2 py-2">口岸</th>
-                      <th style={{ position: 'sticky', left: '220px', top: 0, zIndex: 50, backgroundColor: '#fff', minWidth: '60px', borderRight: '3px solid #f97316', borderBottom: '2px solid #e5e7eb' }} className="text-center px-2 py-2">货物属性</th>
-                      <th style={{ position: 'sticky', left: '280px', top: 0, zIndex: 50, backgroundColor: '#fff', minWidth: '80px', borderRight: '3px solid #f97316', borderBottom: '2px solid #e5e7eb' }} className="text-center px-2 py-2">路由类型</th>
+                      <th style={{ position: 'sticky', left: 0, top: 0, zIndex: 50, backgroundColor: '#fff', minWidth: '120px', borderRight: '3px solid #f97316', borderBottom: '2px solid #e5e7eb' }} className="text-center px-2 py-2">揽收日期</th>
+                      <th style={{ position: 'sticky', left: '120px', top: 0, zIndex: 50, backgroundColor: '#fff', minWidth: '80px', borderRight: '3px solid #f97316', borderBottom: '2px solid #e5e7eb' }} className="text-center px-2 py-2">仓库</th>
+                      <th style={{ position: 'sticky', left: '200px', top: 0, zIndex: 50, backgroundColor: '#fff', minWidth: '80px', borderRight: '3px solid #f97316', borderBottom: '2px solid #e5e7eb' }} className="text-center px-2 py-2">口岸</th>
+                      <th style={{ position: 'sticky', left: '280px', top: 0, zIndex: 50, backgroundColor: '#fff', minWidth: '80px', borderRight: '3px solid #f97316', borderBottom: '2px solid #e5e7eb' }} className="text-center px-2 py-2">货物属性</th>
+                      <th style={{ position: 'sticky', left: '360px', top: 0, zIndex: 50, backgroundColor: '#fff', minWidth: '90px', borderRight: '3px solid #f97316', borderBottom: '2px solid #e5e7eb' }} className="text-center px-2 py-2">路由类型</th>
                       <th style={{ position: 'sticky', top: 0, zIndex: 40, backgroundColor: '#f3f4f6', minWidth: '120px', borderBottom: '2px solid #e5e7eb' }} className="text-center px-2 py-2">主单号</th>
                       <th style={{ position: 'sticky', top: 0, zIndex: 40, backgroundColor: '#f3f4f6', minWidth: '90px', borderBottom: '2px solid #e5e7eb' }} className="text-center px-2 py-2">航班号</th>
                       <th style={{ position: 'sticky', top: 0, zIndex: 40, backgroundColor: '#f3f4f6', minWidth: '60px', borderBottom: '2px solid #e5e7eb' }} className="text-center px-2 py-2">始发</th>
@@ -2766,11 +2766,11 @@ export default function LogisticsManagement() {
                   <tbody>
                     {mainOrders.slice(0, 50).map(order => (
                       <tr key={order.id} style={{ borderBottom: '1px solid #e5e7eb' }}>
-                        <td style={{ position: 'sticky', left: 0, zIndex: 15, backgroundColor: '#fff', minWidth: '100px', borderRight: '3px solid #f97316' }} className="text-center px-2 py-2">{order.collect_date}</td>
-                        <td style={{ position: 'sticky', left: '100px', zIndex: 15, backgroundColor: '#fff', minWidth: '60px', borderRight: '3px solid #f97316' }} className="text-center px-2 py-2">{order.warehouse}</td>
-                        <td style={{ position: 'sticky', left: '160px', zIndex: 15, backgroundColor: '#fff', minWidth: '60px', borderRight: '3px solid #f97316' }} className="text-center px-2 py-2">{order.port}</td>
-                        <td style={{ position: 'sticky', left: '220px', zIndex: 15, backgroundColor: '#fff', minWidth: '60px', borderRight: '3px solid #f97316' }} className="text-center px-2 py-2">{order.cargo_type}</td>
-                        <td style={{ position: 'sticky', left: '280px', zIndex: 15, backgroundColor: '#fff', minWidth: '80px', borderRight: '3px solid #f97316' }} className="text-center px-2 py-2">
+                        <td style={{ position: 'sticky', left: 0, zIndex: 15, backgroundColor: '#fff', minWidth: '120px', borderRight: '3px solid #f97316' }} className="text-center px-2 py-2">{order.collect_date}</td>
+                        <td style={{ position: 'sticky', left: '120px', zIndex: 15, backgroundColor: '#fff', minWidth: '80px', borderRight: '3px solid #f97316' }} className="text-center px-2 py-2">{order.warehouse}</td>
+                        <td style={{ position: 'sticky', left: '200px', zIndex: 15, backgroundColor: '#fff', minWidth: '80px', borderRight: '3px solid #f97316' }} className="text-center px-2 py-2">{order.port}</td>
+                        <td style={{ position: 'sticky', left: '280px', zIndex: 15, backgroundColor: '#fff', minWidth: '80px', borderRight: '3px solid #f97316' }} className="text-center px-2 py-2">{order.cargo_type}</td>
+                        <td style={{ position: 'sticky', left: '360px', zIndex: 15, backgroundColor: '#fff', minWidth: '90px', borderRight: '3px solid #f97316' }} className="text-center px-2 py-2">
                           {order.route_type ? (
                             <Badge variant={order.route_type === '空运' ? 'default' : 'secondary'}>
                               {order.route_type}
