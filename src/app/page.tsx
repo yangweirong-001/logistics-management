@@ -549,18 +549,21 @@ export default function LogisticsManagement() {
       // 前端过滤预计起飞日期范围
       if (orderQueryDepartStartDate && orderQueryDepartEndDate) {
         results = results.filter((o: MainOrder) => {
-          if (!o.depart_date) return false;
-          // 将数据库时间字符串转换为 Date 对象
-          const departDate = new Date(o.depart_date.replace(/-/g, '/'));
-          return departDate >= orderQueryDepartStartDate && departDate <= orderQueryDepartEndDate;
+          if (!o.actual_flight_date) return false;
+
+          // 提取日期部分进行比较（忽略时间）
+          const actualFlightDateStr = o.actual_flight_date.split(' ')[0];
+          const startDateStr = orderQueryDepartStartDate.toISOString().split('T')[0];
+          const endDateStr = orderQueryDepartEndDate.toISOString().split('T')[0];
+
+          return actualFlightDateStr >= startDateStr && actualFlightDateStr <= endDateStr;
         });
       } else if (orderQueryDepartStartDate) {
         // 只选择了开始日期，筛选该日期的所有数据
         const startDateStr = orderQueryDepartStartDate.toISOString().split('T')[0];
         results = results.filter((o: MainOrder) => {
-          if (!o.depart_date) return false;
-          const departDateStr = o.depart_date.split(' ')[0];
-          return departDateStr === startDateStr;
+          if (!o.actual_flight_date) return false;
+          return o.actual_flight_date === startDateStr;
         });
       }
 
