@@ -982,6 +982,7 @@ export default function LogisticsManagement() {
           const weekday = getWeekday(volumeForm.collect_date);
 
           warehouses.forEach(wh => {
+            const areaConfig = areaConfigs.find(a => a.warehouse === wh);
             if (areaConfig) {
               try {
                 const packageVolume = parseFloat(areaConfig.package_volume) || 0;
