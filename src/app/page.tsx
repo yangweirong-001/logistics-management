@@ -2797,6 +2797,7 @@ export default function LogisticsManagement() {
                     setOrderQueryCargoType('全部');
                     setOrderQueryOrigin('全部');
                     setOrderQueryRouteType('全部');
+                    setOrderQueryIssueCard('全部');
                     setOrderQueryMainOrderNo('');
                   }}>重置筛选</Button>
                 </div>
