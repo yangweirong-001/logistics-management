@@ -11,9 +11,10 @@ interface DateTimeRangePickerProps {
   value?: { start: Date | null; end: Date | null };
   onChange?: (value: { start: Date | null; end: Date | null }) => void;
   placeholder?: string;
+  showTime?: boolean; // 是否显示时间选择器
 }
 
-export default function DateTimeRangePicker({ value, onChange, placeholder = '选择日期时间范围' }: DateTimeRangePickerProps) {
+export default function DateTimeRangePicker({ value, onChange, placeholder = '选择日期时间范围', showTime = true }: DateTimeRangePickerProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [internalStart, setInternalStart] = useState<Date | null>(value?.start || null);
   const [internalEnd, setInternalEnd] = useState<Date | null>(value?.end || null);
@@ -100,8 +101,12 @@ export default function DateTimeRangePicker({ value, onChange, placeholder = '�
 
   const formatDateRange = () => {
     if (!internalStart && !internalEnd) return placeholder;
-    const startStr = internalStart ? format(internalStart, 'yyyy-MM-dd HH:mm:ss') : '未选择';
-    const endStr = internalEnd ? format(internalEnd, 'yyyy-MM-dd HH:mm:ss') : '未选择';
+    const dateFormat = 'yyyy-MM-dd';
+    const timeFormat = ' HH:mm:ss';
+    const formatStr = showTime ? dateFormat + timeFormat : dateFormat;
+
+    const startStr = internalStart ? format(internalStart, formatStr) : '未选择';
+    const endStr = internalEnd ? format(internalEnd, formatStr) : '未选择';
     return `${startStr} 至 ${endStr}`;
   };
 
@@ -186,9 +191,11 @@ export default function DateTimeRangePicker({ value, onChange, placeholder = '�
               />
 
               {/* 时间选择器 */}
-              <div className="border border-gray-200 rounded p-3 bg-gray-50">
-                <TimePicker date={internalStart} field="start" />
-              </div>
+              {showTime && (
+                <div className="border border-gray-200 rounded p-3 bg-gray-50">
+                  <TimePicker date={internalStart} field="start" />
+                </div>
+              )}
             </div>
 
             {/* 右侧：结束时间 */}
@@ -205,9 +212,11 @@ export default function DateTimeRangePicker({ value, onChange, placeholder = '�
               />
 
               {/* 时间选择器 */}
-              <div className="border border-gray-200 rounded p-3 bg-gray-50">
-                <TimePicker date={internalEnd} field="end" />
-              </div>
+              {showTime && (
+                <div className="border border-gray-200 rounded p-3 bg-gray-50">
+                  <TimePicker date={internalEnd} field="end" />
+                </div>
+              )}
             </div>
           </div>
 

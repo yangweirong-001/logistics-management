@@ -2613,7 +2613,8 @@ export default function LogisticsManagement() {
                         setOrderQueryStartDate(value.start);
                         setOrderQueryEndDate(value.end);
                       }}
-                      placeholder="选择揽收日期时间范围"
+                      placeholder="选择揽收日期范围"
+                      showTime={false}
                     />
                   </div>
                   <div className="col-span-2 flex flex-col gap-1">
@@ -2625,6 +2626,7 @@ export default function LogisticsManagement() {
                         setOrderQueryDepartEndDate(value.end);
                       }}
                       placeholder="选择预计起飞日期时间范围"
+                      showTime={true}
                     />
                   </div>
                   <div>
