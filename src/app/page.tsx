@@ -2617,18 +2617,6 @@ export default function LogisticsManagement() {
                       showTime={false}
                     />
                   </div>
-                  <div className="col-span-2 flex flex-col gap-1">
-                    <Label className="mb-0.5">预计起飞日期范围</Label>
-                    <DateTimeRangePicker
-                      value={{ start: orderQueryDepartStartDate, end: orderQueryDepartEndDate }}
-                      onChange={(value) => {
-                        setOrderQueryDepartStartDate(value.start);
-                        setOrderQueryDepartEndDate(value.end);
-                      }}
-                      placeholder="选择预计起飞日期时间范围"
-                      showTime={true}
-                    />
-                  </div>
                   <div className="flex flex-col gap-1">
                     <Label className="mb-0.5">仓库</Label>
                     <Select value={orderQueryWarehouse} onValueChange={v => setOrderQueryWarehouse(v)}>
@@ -2643,6 +2631,20 @@ export default function LogisticsManagement() {
                         <SelectItem value="加工区">加工区</SelectItem>
                       </SelectContent>
                     </Select>
+                  </div>
+                </div>
+                <div className="grid grid-cols-4 gap-3 mb-3">
+                  <div className="col-span-2 flex flex-col gap-1">
+                    <Label className="mb-0.5">预计起飞日期范围</Label>
+                    <DateTimeRangePicker
+                      value={{ start: orderQueryDepartStartDate, end: orderQueryDepartEndDate }}
+                      onChange={(value) => {
+                        setOrderQueryDepartStartDate(value.start);
+                        setOrderQueryDepartEndDate(value.end);
+                      }}
+                      placeholder="选择预计起飞日期时间范围"
+                      showTime={true}
+                    />
                   </div>
                   <div className="flex flex-col gap-1">
                     <Label className="mb-0.5">始发</Label>
