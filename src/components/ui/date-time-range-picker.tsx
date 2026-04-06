@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { DayPicker } from 'react-day-picker';
 import 'react-day-picker/dist/style.css';
-import { Calendar, X, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Calendar, X } from 'lucide-react';
 import { format } from 'date-fns';
 import { zhCN } from 'date-fns/locale';
 
@@ -17,7 +17,8 @@ export default function DateTimeRangePicker({ value, onChange, placeholder = '�
   const [isOpen, setIsOpen] = useState(false);
   const [internalStart, setInternalStart] = useState<Date | null>(value?.start || null);
   const [internalEnd, setInternalEnd] = useState<Date | null>(value?.end || null);
-  const [currentMonth, setCurrentMonth] = useState(new Date());
+  const [startMonth, setStartMonth] = useState(new Date());
+  const [endMonth, setEndMonth] = useState(new Date());
 
   // 同步外部 value 到内部状态
   useEffect(() => {
@@ -153,43 +154,15 @@ export default function DateTimeRangePicker({ value, onChange, placeholder = '�
           <div className="grid grid-cols-2 gap-6">
             {/* 左侧：起始时间 */}
             <div>
-              <div className="flex items-center justify-between mb-2">
-                <h3 className="font-semibold text-gray-700">起始时间</h3>
-                <div className="flex items-center gap-1">
-                  <button
-                    onClick={() => setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1))}
-                    className="p-1 hover:bg-gray-100 rounded"
-                  >
-                    <ChevronLeft className="w-4 h-4" />
-                  </button>
-                  <span className="text-sm font-medium">
-                    {format(currentMonth, 'yyyy年 MM月')}
-                  </span>
-                  <button
-                    onClick={() => setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1))}
-                    className="p-1 hover:bg-gray-100 rounded"
-                  >
-                    <ChevronRight className="w-4 h-4" />
-                  </button>
-                </div>
-              </div>
-
               {/* 日历 */}
               <DayPicker
                 mode="single"
                 selected={internalStart || undefined}
                 onSelect={handleDateSelectStart}
-                month={currentMonth}
-                onMonthChange={setCurrentMonth}
+                month={startMonth}
+                onMonthChange={setStartMonth}
                 locale={zhCN}
                 className="border border-gray-200 rounded mb-3"
-                styles={{
-                  caption: { justifyContent: 'space-between' },
-                  head_row: { display: 'flex' },
-                  head_cell: { flex: '1', textAlign: 'center', fontWeight: '600' },
-                  row: { display: 'flex' },
-                  cell: { flex: '1', textAlign: 'center' },
-                }}
               />
 
               {/* 时间选择器 */}
@@ -200,43 +173,15 @@ export default function DateTimeRangePicker({ value, onChange, placeholder = '�
 
             {/* 右侧：结束时间 */}
             <div>
-              <div className="flex items-center justify-between mb-2">
-                <h3 className="font-semibold text-gray-700">结束时间</h3>
-                <div className="flex items-center gap-1">
-                  <button
-                    onClick={() => setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1))}
-                    className="p-1 hover:bg-gray-100 rounded"
-                  >
-                    <ChevronLeft className="w-4 h-4" />
-                  </button>
-                  <span className="text-sm font-medium">
-                    {format(currentMonth, 'yyyy年 MM月')}
-                  </span>
-                  <button
-                    onClick={() => setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1))}
-                    className="p-1 hover:bg-gray-100 rounded"
-                  >
-                    <ChevronRight className="w-4 h-4" />
-                  </button>
-                </div>
-              </div>
-
               {/* 日历 */}
               <DayPicker
                 mode="single"
                 selected={internalEnd || undefined}
                 onSelect={handleDateSelectEnd}
-                month={currentMonth}
-                onMonthChange={setCurrentMonth}
+                month={endMonth}
+                onMonthChange={setEndMonth}
                 locale={zhCN}
                 className="border border-gray-200 rounded mb-3"
-                styles={{
-                  caption: { justifyContent: 'space-between' },
-                  head_row: { display: 'flex' },
-                  head_cell: { flex: '1', textAlign: 'center', fontWeight: '600' },
-                  row: { display: 'flex' },
-                  cell: { flex: '1', textAlign: 'center' },
-                }}
               />
 
               {/* 时间选择器 */}
