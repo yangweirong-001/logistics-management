@@ -173,6 +173,44 @@ const exportToExcel = (data: MainOrder[], filename: string, routeConfigs: RouteC
     '实际票数', '备注'
   ];
 
+  // 格式化时间为 HH:mm
+  const formatTime = (timeStr: string | null | undefined): string => {
+    if (!timeStr) return '';
+    const cleanTime = timeStr.trim();
+
+    // 尝试解析 HH:mm:ss 格式，只取 HH:mm
+    const timeMatch = cleanTime.match(/^(\d{1,2}):(\d{1,2})(?::(\d{1,2}(?:\.\d+)?))?$/);
+    if (timeMatch) {
+      const hours = String(parseInt(timeMatch[1])).padStart(2, '0');
+      const minutes = String(parseInt(timeMatch[2])).padStart(2, '0');
+      return `${hours}:${minutes}`;
+    }
+
+    // 尝试解析纯数字时间（Excel 时间格式，如 20.37）
+    const numMatch = cleanTime.match(/^(\d{1,2})\.(\d{2})$/);
+    if (numMatch) {
+      const hours = String(parseInt(numMatch[1])).padStart(2, '0');
+      const minutes = String(parseInt(numMatch[2])).padStart(2, '0');
+      return `${hours}:${minutes}`;
+    }
+
+    return cleanTime;
+  };
+
+  // 格式化起飞时间（日期 + 时间）
+  const formatDepartureDateTime = (dateStr: string | null | undefined, timeStr: string | null | undefined): string => {
+    if (!dateStr) return formatTime(timeStr);
+    if (!timeStr) return dateStr;
+    return `${dateStr} ${formatTime(timeStr)}`;
+  };
+
+  // 添加天数
+  const addDays = (dateStr: string, days: number) => {
+    const date = new Date(dateStr);
+    date.setDate(date.getDate() + days);
+    return date.toISOString().split('T')[0];
+  };
+
   // 计算预计落地时间的辅助函数（用于Excel导出）
   const formatArrivalDateTimeForExport = (
     order: MainOrder
@@ -241,7 +279,7 @@ const exportToExcel = (data: MainOrder[], filename: string, routeConfigs: RouteC
     order.origin || '',
     order.transfer || '',
     order.dest || '',
-    formatTime(order.depart_time),
+    formatDepartureDateTime(order.actual_flight_date, order.depart_time),
     formatArrivalDateTimeForExport(order),
     order.actual_pieces?.toString() || '',
     order.actual_weight || '',
