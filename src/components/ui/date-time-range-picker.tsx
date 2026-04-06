@@ -167,8 +167,8 @@ export default function DateTimeRangePicker({ value, onChange, placeholder = '�
       {/* 弹出面板 */}
       {isOpen && (
         <div
-          className="fixed z-50 bg-white border border-gray-200 rounded-lg shadow-xl p-6 w-[800px]"
-          style={{ top: `${panelPosition.top}px`, left: `${panelPosition.left}px` }}
+          className="fixed bg-white border border-gray-200 rounded-lg shadow-xl p-6 w-[800px]"
+          style={{ top: `${panelPosition.top}px`, left: `${panelPosition.left}px`, zIndex: 100 }}
         >
           {/* 顶部：显示当前选择的时间 */}
           <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded">
@@ -243,7 +243,8 @@ export default function DateTimeRangePicker({ value, onChange, placeholder = '�
       {/* 遮罩层 */}
       {isOpen && (
         <div
-          className="fixed inset-0 bg-black bg-opacity-30 z-40"
+          className="fixed inset-0 bg-black bg-opacity-30"
+          style={{ zIndex: 60 }}
           onClick={handleClose}
         />
       )}
