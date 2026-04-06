@@ -2622,9 +2622,9 @@ export default function LogisticsManagement() {
                 </Button>
               </CardHeader>
               <CardContent>
-                <div className="flex gap-0 mb-3" style={{ width: '360px' }}>
-                  <div className="flex flex-col" style={{ width: '100px' }}>
-                    <Label className="text-xs mb-1">揽收日期范围</Label>
+                <div className="grid grid-cols-2 gap-4 mb-4">
+                  <div className="flex flex-col gap-1">
+                    <Label>揽收日期范围</Label>
                     <DateTimeRangePicker
                       value={{ start: orderQueryStartDate, end: orderQueryEndDate }}
                       onChange={(value) => {
@@ -2633,13 +2633,26 @@ export default function LogisticsManagement() {
                       }}
                       placeholder="选择日期"
                       showTime={false}
-                      width="100%"
                     />
                   </div>
-                  <div className="flex flex-col" style={{ width: '60px' }}>
-                    <Label className="text-xs mb-1">仓库</Label>
+                  <div className="flex flex-col gap-1">
+                    <Label>预计起飞日期范围</Label>
+                    <DateTimeRangePicker
+                      value={{ start: orderQueryDepartStartDate, end: orderQueryDepartEndDate }}
+                      onChange={(value) => {
+                        setOrderQueryDepartStartDate(value.start);
+                        setOrderQueryDepartEndDate(value.end);
+                      }}
+                      placeholder="选择日期时间"
+                      showTime={true}
+                    />
+                  </div>
+                </div>
+                <div className="grid grid-cols-6 gap-3 mb-4">
+                  <div className="flex flex-col gap-1">
+                    <Label>仓库</Label>
                     <Select value={orderQueryWarehouse} onValueChange={v => setOrderQueryWarehouse(v)}>
-                      <SelectTrigger className="h-9">
+                      <SelectTrigger>
                         <SelectValue placeholder="全部">
                           {orderQueryWarehouse === '全部' ? '全部' : orderQueryWarehouse}
                         </SelectValue>
@@ -2651,70 +2664,10 @@ export default function LogisticsManagement() {
                       </SelectContent>
                     </Select>
                   </div>
-                  <div className="flex flex-col" style={{ width: '60px' }}>
-                    <Label className="text-xs mb-1">口岸</Label>
-                    <Select value={orderQueryPort} onValueChange={v => setOrderQueryPort(v)}>
-                      <SelectTrigger className="h-9">
-                        <SelectValue placeholder="全部">
-                          {orderQueryPort === '全部' ? '全部' : orderQueryPort}
-                        </SelectValue>
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="全部">全部</SelectItem>
-                        <SelectItem value="ZGGG">ZGGG</SelectItem>
-                        <SelectItem value="ZSPD">ZSPD</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div className="flex flex-col" style={{ width: '60px' }}>
-                    <Label className="text-xs mb-1">货物属性</Label>
-                    <Select value={orderQueryCargoType} onValueChange={v => setOrderQueryCargoType(v)}>
-                      <SelectTrigger className="h-9">
-                        <SelectValue placeholder="全部">
-                          {orderQueryCargoType === '全部' ? '全部' : orderQueryCargoType}
-                        </SelectValue>
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="全部">全部</SelectItem>
-                        <SelectItem value="普货">普货</SelectItem>
-                        <SelectItem value="特货">特货</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div className="flex flex-col" style={{ width: '80px' }}>
-                    <Label className="text-xs mb-1">路由类型</Label>
-                    <Select value={orderQueryRouteType} onValueChange={v => setOrderQueryRouteType(v)}>
-                      <SelectTrigger className="h-9">
-                        <SelectValue placeholder="全部">
-                          {orderQueryRouteType === '全部' ? '全部' : orderQueryRouteType}
-                        </SelectValue>
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="全部">全部</SelectItem>
-                        <SelectItem value="空运">空运</SelectItem>
-                        <SelectItem value="海空">海空</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-                <div className="flex gap-2 mb-3">
-                  <div className="flex flex-col" style={{ width: '280px' }}>
-                    <Label className="text-xs mb-1">预计起飞日期范围</Label>
-                    <DateTimeRangePicker
-                      value={{ start: orderQueryDepartStartDate, end: orderQueryDepartEndDate }}
-                      onChange={(value) => {
-                        setOrderQueryDepartStartDate(value.start);
-                        setOrderQueryDepartEndDate(value.end);
-                      }}
-                      placeholder="选择日期时间"
-                      showTime={true}
-                      width="100%"
-                    />
-                  </div>
-                  <div className="flex flex-col" style={{ width: '60px' }}>
-                    <Label className="text-xs mb-1">始发</Label>
+                  <div className="flex flex-col gap-1">
+                    <Label>始发</Label>
                     <Select value={orderQueryOrigin} onValueChange={v => setOrderQueryOrigin(v)}>
-                      <SelectTrigger className="h-9">
+                      <SelectTrigger>
                         <SelectValue placeholder="全部">
                           {orderQueryOrigin === '全部' ? '全部' : orderQueryOrigin}
                         </SelectValue>
@@ -2727,10 +2680,54 @@ export default function LogisticsManagement() {
                       </SelectContent>
                     </Select>
                   </div>
-                  <div className="flex flex-col" style={{ width: '120px' }}>
-                    <Label className="text-xs mb-1">主单号</Label>
+                  <div className="flex flex-col gap-1">
+                    <Label>路由类型</Label>
+                    <Select value={orderQueryRouteType} onValueChange={v => setOrderQueryRouteType(v)}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="全部">
+                          {orderQueryRouteType === '全部' ? '全部' : orderQueryRouteType}
+                        </SelectValue>
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="全部">全部</SelectItem>
+                        <SelectItem value="空运">空运</SelectItem>
+                        <SelectItem value="海空">海空</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="flex flex-col gap-1">
+                    <Label>口岸</Label>
+                    <Select value={orderQueryPort} onValueChange={v => setOrderQueryPort(v)}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="全部">
+                          {orderQueryPort === '全部' ? '全部' : orderQueryPort}
+                        </SelectValue>
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="全部">全部</SelectItem>
+                        <SelectItem value="ZGGG">ZGGG</SelectItem>
+                        <SelectItem value="ZSPD">ZSPD</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="flex flex-col gap-1">
+                    <Label>货物属性</Label>
+                    <Select value={orderQueryCargoType} onValueChange={v => setOrderQueryCargoType(v)}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="全部">
+                          {orderQueryCargoType === '全部' ? '全部' : orderQueryCargoType}
+                        </SelectValue>
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="全部">全部</SelectItem>
+                        <SelectItem value="普货">普货</SelectItem>
+                        <SelectItem value="特货">特货</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="flex flex-col gap-1">
+                    <Label>主单号</Label>
                     <Input
-                      className="h-9"
                       placeholder="搜索"
                       value={orderQueryMainOrderNo}
                       onChange={(e) => setOrderQueryMainOrderNo(e.target.value)}
