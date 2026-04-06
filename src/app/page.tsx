@@ -680,85 +680,184 @@ export default function LogisticsManagement() {
   useEffect(() => {
     const timer = setTimeout(() => {
       if (volumeForm.warehouse && volumeForm.package_count > 0 && volumeForm.collect_date && areaConfigs.length > 0) {
-        const areaConfig = areaConfigs.find(a => a.warehouse === volumeForm.warehouse);
-        if (areaConfig) {
-          try {
-            const packageVolume = parseFloat(areaConfig.package_volume) || 0;
-            const packageCount = volumeForm.package_count || 0;
-            const totalVolume = packageVolume * packageCount;
-            
-            const kantoRatio = (parseFloat(areaConfig.kanto_ratio) || 0) / 100;
-            const kansaiRatio = (parseFloat(areaConfig.kansai_ratio) || 0) / 100;
-            const kantoNormalRatio = (parseFloat(areaConfig.kanto_normal_ratio) || 0) / 100;
-            const kantoSpecialRatio = (parseFloat(areaConfig.kanto_special_ratio) || 0) / 100;
-            const kansaiNormalRatio = (parseFloat(areaConfig.kansai_normal_ratio) || 0) / 100;
-            const kansaiSpecialRatio = (parseFloat(areaConfig.kansai_special_ratio) || 0) / 100;
-            
-            const kantoTotal = totalVolume * kantoRatio;
-            const kansaiTotal = totalVolume * kansaiRatio;
-            const kantoNormal = kantoTotal * kantoNormalRatio;
-            const kantoSpecial = kantoTotal * kantoSpecialRatio;
-            const kansaiNormal = kansaiTotal * kansaiNormalRatio;
-            const kansaiSpecial = kansaiTotal * kansaiSpecialRatio;
-            
-            const weekday = getWeekday(volumeForm.collect_date);
-            const flightConfig = flightConfigs.find(f => f.warehouse === volumeForm.warehouse && f.weekday === weekday);
 
-            let airVolume = 0;
-            let seaAirVolume = 0;
+        // 判断是否为"全部"仓库
+        if (volumeForm.warehouse === '全部') {
+          // 汇总所有仓库的数据
+          const warehouses = ['东莞', '加工区'];
+          let totalVolume = 0;
+          let kantoTotal = 0;
+          let kansaiTotal = 0;
+          let kantoNormal = 0;
+          let kantoSpecial = 0;
+          let kansaiNormal = 0;
+          let kansaiSpecial = 0;
+          let airVolume = 0;
+          let seaAirVolume = 0;
+          let configuredAirVolume = 0;
+          let configuredSeaAirVolume = 0;
 
-            if (flightConfig) {
-              if (flightConfig.kanto_normal === '空运') airVolume += kantoNormal;
-              else if (flightConfig.kanto_normal === '海空') seaAirVolume += kantoNormal;
-              if (flightConfig.kanto_special === '空运') airVolume += kantoSpecial;
-              else if (flightConfig.kanto_special === '海空') seaAirVolume += kantoSpecial;
-              if (flightConfig.kansai_normal === '空运') airVolume += kansaiNormal;
-              else if (flightConfig.kansai_normal === '海空') seaAirVolume += kansaiNormal;
-              if (flightConfig.kansai_special === '空运') airVolume += kansaiSpecial;
-              else if (flightConfig.kansai_special === '海空') seaAirVolume += kansaiSpecial;
+          const weekday = getWeekday(volumeForm.collect_date);
+
+          warehouses.forEach(wh => {
+            const areaConfig = areaConfigs.find(a => a.warehouse === wh);
+            if (areaConfig) {
+              try {
+                const packageVolume = parseFloat(areaConfig.package_volume) || 0;
+                // 汇总所有仓库的 package_count
+                const packageCount = volumeEstimates
+                  .filter(e => e.collect_date === volumeForm.collect_date && e.warehouse === wh)
+                  .reduce((sum, e) => sum + (e.package_count || 0), 0);
+
+                const whTotalVolume = packageVolume * packageCount;
+
+                const kantoRatio = (parseFloat(areaConfig.kanto_ratio) || 0) / 100;
+                const kansaiRatio = (parseFloat(areaConfig.kansai_ratio) || 0) / 100;
+                const kantoNormalRatio = (parseFloat(areaConfig.kanto_normal_ratio) || 0) / 100;
+                const kantoSpecialRatio = (parseFloat(areaConfig.kanto_special_ratio) || 0) / 100;
+                const kansaiNormalRatio = (parseFloat(areaConfig.kansai_normal_ratio) || 0) / 100;
+                const kansaiSpecialRatio = (parseFloat(areaConfig.kansai_special_ratio) || 0) / 100;
+
+                const whKantoTotal = whTotalVolume * kantoRatio;
+                const whKansaiTotal = whTotalVolume * kansaiRatio;
+                const whKantoNormal = whKantoTotal * kantoNormalRatio;
+                const whKantoSpecial = whKantoTotal * kantoSpecialRatio;
+                const whKansaiNormal = whKansaiTotal * kansaiNormalRatio;
+                const whKansaiSpecial = whKansaiTotal * kansaiSpecialRatio;
+
+                // 汇总
+                totalVolume += whTotalVolume;
+                kantoTotal += whKantoTotal;
+                kansaiTotal += whKansaiTotal;
+                kantoNormal += whKantoNormal;
+                kantoSpecial += whKantoSpecial;
+                kansaiNormal += whKansaiNormal;
+                kansaiSpecial += whKansaiSpecial;
+
+                // 查找该仓库的航班配置
+                const flightConfig = flightConfigs.find(f => f.warehouse === wh && f.weekday === weekday);
+                if (flightConfig) {
+                  if (flightConfig.kanto_normal === '空运') airVolume += whKantoNormal;
+                  else if (flightConfig.kanto_normal === '海空') seaAirVolume += whKantoNormal;
+                  if (flightConfig.kanto_special === '空运') airVolume += whKantoSpecial;
+                  else if (flightConfig.kanto_special === '海空') seaAirVolume += whKantoSpecial;
+                  if (flightConfig.kansai_normal === '空运') airVolume += whKansaiNormal;
+                  else if (flightConfig.kansai_normal === '海空') seaAirVolume += whKansaiNormal;
+                  if (flightConfig.kansai_special === '空运') airVolume += whKansaiSpecial;
+                  else if (flightConfig.kansai_special === '海空') seaAirVolume += whKansaiSpecial;
+                }
+              } catch (err) {
+                console.error(`计算仓库 ${wh} 时出错:`, err);
+              }
             }
 
-            // 计算主单已配置方数：从主单发放中筛选
-            const configuredAirVolume = mainOrders
-              .filter(o => o.collect_date === volumeForm.collect_date && o.warehouse === volumeForm.warehouse && o.route_type === '空运')
+            // 汇总主单已配置方数
+            configuredAirVolume += mainOrders
+              .filter(o => o.collect_date === volumeForm.collect_date && o.warehouse === wh && o.route_type === '空运')
               .reduce((sum, o) => sum + (parseFloat(o.actual_volume || '0') || 0), 0);
 
-            const configuredSeaAirVolume = mainOrders
-              .filter(o => o.collect_date === volumeForm.collect_date && o.warehouse === volumeForm.warehouse && o.route_type === '海空')
+            configuredSeaAirVolume += mainOrders
+              .filter(o => o.collect_date === volumeForm.collect_date && o.warehouse === wh && o.route_type === '海空')
               .reduce((sum, o) => sum + (parseFloat(o.actual_volume || '0') || 0), 0);
+          });
 
-            // 计算未配置方数：总方数 - 空运主单已配置方数 - 海空主单已配置方数
-            const unconfiguredVolume = totalVolume - configuredAirVolume - configuredSeaAirVolume;
+          // 计算未配置方数
+          const unconfiguredVolume = totalVolume - configuredAirVolume - configuredSeaAirVolume;
 
-            setVolumeResult({
-              totalVolume,
-              kantoTotal,
-              kansaiTotal,
-              kantoNormal,
-              kantoSpecial,
-              kansaiNormal,
-              kansaiSpecial,
-              airVolume,
-              seaAirVolume,
-              configuredAirVolume,
-              configuredSeaAirVolume,
-              unconfiguredVolume,
-            });
-          } catch {
+          setVolumeResult({
+            totalVolume,
+            kantoTotal,
+            kansaiTotal,
+            kantoNormal,
+            kantoSpecial,
+            kansaiNormal,
+            kansaiSpecial,
+            airVolume,
+            seaAirVolume,
+            configuredAirVolume,
+            configuredSeaAirVolume,
+            unconfiguredVolume,
+          });
+
+        } else {
+          // 单个仓库的计算逻辑（原有逻辑）
+          const areaConfig = areaConfigs.find(a => a.warehouse === volumeForm.warehouse);
+          if (areaConfig) {
+            try {
+              const packageVolume = parseFloat(areaConfig.package_volume) || 0;
+              const packageCount = volumeForm.package_count || 0;
+              const totalVolume = packageVolume * packageCount;
+
+              const kantoRatio = (parseFloat(areaConfig.kanto_ratio) || 0) / 100;
+              const kansaiRatio = (parseFloat(areaConfig.kansai_ratio) || 0) / 100;
+              const kantoNormalRatio = (parseFloat(areaConfig.kanto_normal_ratio) || 0) / 100;
+              const kantoSpecialRatio = (parseFloat(areaConfig.kanto_special_ratio) || 0) / 100;
+              const kansaiNormalRatio = (parseFloat(areaConfig.kansai_normal_ratio) || 0) / 100;
+              const kansaiSpecialRatio = (parseFloat(areaConfig.kansai_special_ratio) || 0) / 100;
+
+              const kantoTotal = totalVolume * kantoRatio;
+              const kansaiTotal = totalVolume * kansaiRatio;
+              const kantoNormal = kantoTotal * kantoNormalRatio;
+              const kantoSpecial = kantoTotal * kantoSpecialRatio;
+              const kansaiNormal = kansaiTotal * kansaiNormalRatio;
+              const kansaiSpecial = kansaiTotal * kansaiSpecialRatio;
+
+              const weekday = getWeekday(volumeForm.collect_date);
+              const flightConfig = flightConfigs.find(f => f.warehouse === volumeForm.warehouse && f.weekday === weekday);
+
+              let airVolume = 0;
+              let seaAirVolume = 0;
+
+              if (flightConfig) {
+                if (flightConfig.kanto_normal === '空运') airVolume += kantoNormal;
+                else if (flightConfig.kanto_normal === '海空') seaAirVolume += kantoNormal;
+                if (flightConfig.kanto_special === '空运') airVolume += kantoSpecial;
+                else if (flightConfig.kanto_special === '海空') seaAirVolume += kantoSpecial;
+                if (flightConfig.kansai_normal === '空运') airVolume += kansaiNormal;
+                else if (flightConfig.kansai_normal === '海空') seaAirVolume += kansaiNormal;
+                if (flightConfig.kansai_special === '空运') airVolume += kansaiSpecial;
+                else if (flightConfig.kansai_special === '海空') seaAirVolume += kansaiSpecial;
+              }
+
+              // 计算主单已配置方数：从主单发放中筛选
+              const configuredAirVolume = mainOrders
+                .filter(o => o.collect_date === volumeForm.collect_date && o.warehouse === volumeForm.warehouse && o.route_type === '空运')
+                .reduce((sum, o) => sum + (parseFloat(o.actual_volume || '0') || 0), 0);
+
+              const configuredSeaAirVolume = mainOrders
+                .filter(o => o.collect_date === volumeForm.collect_date && o.warehouse === volumeForm.warehouse && o.route_type === '海空')
+                .reduce((sum, o) => sum + (parseFloat(o.actual_volume || '0') || 0), 0);
+
+              // 计算未配置方数：总方数 - 空运主单已配置方数 - 海空主单已配置方数
+              const unconfiguredVolume = totalVolume - configuredAirVolume - configuredSeaAirVolume;
+
+              setVolumeResult({
+                totalVolume,
+                kantoTotal,
+                kansaiTotal,
+                kantoNormal,
+                kantoSpecial,
+                kansaiNormal,
+                kansaiSpecial,
+                airVolume,
+                seaAirVolume,
+                configuredAirVolume,
+                configuredSeaAirVolume,
+                unconfiguredVolume,
+              });
+            } catch {
+              setVolumeResult(null);
+            }
+          } else {
             setVolumeResult(null);
           }
-        } else {
-          setVolumeResult(null);
         }
-      } else {
-        setVolumeResult(null);
       }
     }, 100);
-    
+
     return () => clearTimeout(timer);
 
-  }, [volumeForm.collect_date, volumeForm.warehouse, volumeForm.package_count, areaConfigs, flightConfigs, mainOrders]);
-  
+  }, [volumeForm.collect_date, volumeForm.warehouse, volumeForm.package_count, areaConfigs, flightConfigs, mainOrders, volumeEstimates]);
   // 监听主单表单航班信息变化，自动匹配路由填充时间
   useEffect(() => {
     const { flight_no, origin, dest } = orderForm;
@@ -1300,20 +1399,57 @@ export default function LogisticsManagement() {
   const loadVolumeEstimateByDateAndWarehouse = (collectDate: string, warehouse: string) => {
     if (!collectDate || !warehouse) return;
 
-    const record = volumeEstimates.find(
-      e => e.collect_date === collectDate && e.warehouse === warehouse
-    );
+    if (warehouse === '全部') {
+      // 汇总所有仓库的数据
+      const records = volumeEstimates.filter(e => e.collect_date === collectDate);
+      if (records.length > 0) {
+        // 汇总所有字段
+        const summarizedRecord: VolumeEstimate = {
+          id: 0, // 汇总记录没有ID
+          collect_date: collectDate,
+          warehouse: '全部',
+          weekday: records[0].weekday || null,
+          package_count: records.reduce((sum, r) => sum + (r.package_count || 0), 0),
+          weight: records.reduce((sum, r) => sum + (r.weight || 0), 0),
+          total_volume: records.reduce((sum, r) => sum + (r.total_volume || 0), 0),
+          kanto_total: records.reduce((sum, r) => sum + (r.kanto_total || 0), 0),
+          kansai_total: records.reduce((sum, r) => sum + (r.kansai_total || 0), 0),
+          kanto_normal: records.reduce((sum, r) => sum + (r.kanto_normal || 0), 0),
+          kanto_special: records.reduce((sum, r) => sum + (r.kanto_special || 0), 0),
+          kansai_normal: records.reduce((sum, r) => sum + (r.kansai_normal || 0), 0),
+          kansai_special: records.reduce((sum, r) => sum + (r.kansai_special || 0), 0),
+          air_volume: records.reduce((sum, r) => sum + (r.air_volume || 0), 0),
+          sea_air_volume: records.reduce((sum, r) => sum + (r.sea_air_volume || 0), 0),
+          is_complete: records.every(r => r.is_complete === '是') ? '是' : '否',
+        };
 
-    if (record) {
-      // 找到记录，填充表单
-      setEditingVolume(record);
-      setVolumeForm({
-        collect_date: record.collect_date,
-        warehouse: record.warehouse,
-        package_count: record.package_count,
-        weight: record.weight || 0,
-        is_complete: record.is_complete || '是',
-      });
+        // 填充表单
+        setEditingVolume(summarizedRecord);
+        setVolumeForm({
+          collect_date: collectDate,
+          warehouse: '全部',
+          package_count: summarizedRecord.package_count,
+          weight: summarizedRecord.weight || 0,
+          is_complete: summarizedRecord.is_complete || '是',
+        });
+      }
+    } else {
+      // 加载单个仓库的记录
+      const record = volumeEstimates.find(
+        e => e.collect_date === collectDate && e.warehouse === warehouse
+      );
+
+      if (record) {
+        // 找到记录，填充表单
+        setEditingVolume(record);
+        setVolumeForm({
+          collect_date: record.collect_date,
+          warehouse: record.warehouse,
+          package_count: record.package_count,
+          weight: record.weight || 0,
+          is_complete: record.is_complete || '是',
+        });
+      }
     }
   };
   
@@ -2125,13 +2261,8 @@ export default function LogisticsManagement() {
                     <Select value={volumeForm.warehouse}
                       onValueChange={v => {
                         setVolumeForm(prev => ({ ...prev, warehouse: v }));
-                        // 自动查找并加载对应的记录（只有选择具体仓库时才加载）
-                        if (v !== '全部') {
-                          loadVolumeEstimateByDateAndWarehouse(volumeForm.collect_date, v);
-                        } else {
-                          // 选择"全部"时，清空编辑状态，准备汇总计算
-                          setEditingVolume(null);
-                        }
+                        // 自动查找并加载对应的记录（包括"全部"）
+                        loadVolumeEstimateByDateAndWarehouse(volumeForm.collect_date, v);
                       }}>
                       <SelectTrigger><SelectValue placeholder="请选择" /></SelectTrigger>
                       <SelectContent>
