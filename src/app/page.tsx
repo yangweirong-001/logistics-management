@@ -11,6 +11,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
+import DateTimeRangePicker from '@/components/ui/date-time-range-picker';
 
 // 类型定义
 interface AreaConfig {
@@ -427,10 +428,10 @@ export default function LogisticsManagement() {
   };
 
   // 主单查询条件
-  const [orderQueryStartDate, setOrderQueryStartDate] = useState('');
-  const [orderQueryEndDate, setOrderQueryEndDate] = useState('');
-  const [orderQueryDepartStartDate, setOrderQueryDepartStartDate] = useState('');
-  const [orderQueryDepartEndDate, setOrderQueryDepartEndDate] = useState('');
+  const [orderQueryStartDate, setOrderQueryStartDate] = useState<Date | null>(null);
+  const [orderQueryEndDate, setOrderQueryEndDate] = useState<Date | null>(null);
+  const [orderQueryDepartStartDate, setOrderQueryDepartStartDate] = useState<Date | null>(null);
+  const [orderQueryDepartEndDate, setOrderQueryDepartEndDate] = useState<Date | null>(null);
   const [orderQueryWarehouse, setOrderQueryWarehouse] = useState('全部');
   const [orderQueryOrigin, setOrderQueryOrigin] = useState('全部');
   const [orderQueryRouteType, setOrderQueryRouteType] = useState('全部');
@@ -512,10 +513,22 @@ export default function LogisticsManagement() {
 
     // 揽收日期范围筛选
     if (orderQueryStartDate && orderQueryEndDate) {
-      params.append('startDate', orderQueryStartDate);
-      params.append('endDate', orderQueryEndDate);
+      const formatDate = (date: Date) => {
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+      };
+      params.append('startDate', formatDate(orderQueryStartDate));
+      params.append('endDate', formatDate(orderQueryEndDate));
     } else if (orderQueryStartDate) {
-      params.append('collectDate', orderQueryStartDate);
+      const formatDate = (date: Date) => {
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+      };
+      params.append('collectDate', formatDate(orderQueryStartDate));
     }
 
     if (params.toString()) {
@@ -530,12 +543,38 @@ export default function LogisticsManagement() {
 
       // 前端过滤预计起飞日期范围
       if (orderQueryDepartStartDate && orderQueryDepartEndDate) {
+        const formatDateTime = (date: Date) => {
+          const year = date.getFullYear();
+          const month = String(date.getMonth() + 1).padStart(2, '0');
+          const day = String(date.getDate()).padStart(2, '0');
+          const hours = String(date.getHours()).padStart(2, '0');
+          const minutes = String(date.getMinutes()).padStart(2, '0');
+          const seconds = String(date.getSeconds()).padStart(2, '0');
+          return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+        };
+        const startDateTime = formatDateTime(orderQueryDepartStartDate);
+        const endDateTime = formatDateTime(orderQueryDepartEndDate);
         results = results.filter((o: MainOrder) => {
           if (!o.depart_date) return false;
-          return o.depart_date >= orderQueryDepartStartDate && o.depart_date <= orderQueryDepartEndDate;
+          return o.depart_date >= startDateTime && o.depart_date <= endDateTime;
         });
       } else if (orderQueryDepartStartDate) {
-        results = results.filter((o: MainOrder) => o.depart_date === orderQueryDepartStartDate);
+        const formatDateTime = (date: Date) => {
+          const year = date.getFullYear();
+          const month = String(date.getMonth() + 1).padStart(2, '0');
+          const day = String(date.getDate()).padStart(2, '0');
+          const hours = String(date.getHours()).padStart(2, '0');
+          const minutes = String(date.getMinutes()).padStart(2, '0');
+          const seconds = String(date.getSeconds()).padStart(2, '0');
+          return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+        };
+        const startDateTime = formatDateTime(orderQueryDepartStartDate);
+        results = results.filter((o: MainOrder) => {
+          if (!o.depart_date) return false;
+          const departDateStr = o.depart_date.split(' ')[0];
+          const startDateStr = startDateTime.split(' ')[0];
+          return departDateStr === startDateStr;
+        });
       }
 
       // 前端过滤仓库
@@ -2567,23 +2606,25 @@ export default function LogisticsManagement() {
                 <div className="grid grid-cols-4 gap-4 mb-4">
                   <div className="col-span-2">
                     <Label>揽收日期范围</Label>
-                    <div className="flex gap-2">
-                      <Input type="date" value={orderQueryStartDate}
-                        onChange={e => setOrderQueryStartDate(e.target.value)} placeholder="开始日期" />
-                      <span className="flex items-center">-</span>
-                      <Input type="date" value={orderQueryEndDate}
-                        onChange={e => setOrderQueryEndDate(e.target.value)} placeholder="结束日期" />
-                    </div>
+                    <DateTimeRangePicker
+                      value={{ start: orderQueryStartDate, end: orderQueryEndDate }}
+                      onChange={(value) => {
+                        setOrderQueryStartDate(value.start);
+                        setOrderQueryEndDate(value.end);
+                      }}
+                      placeholder="选择揽收日期时间范围"
+                    />
                   </div>
                   <div className="col-span-2">
                     <Label>预计起飞日期范围</Label>
-                    <div className="flex gap-2">
-                      <Input type="date" value={orderQueryDepartStartDate}
-                        onChange={e => setOrderQueryDepartStartDate(e.target.value)} placeholder="开始日期" />
-                      <span className="flex items-center">-</span>
-                      <Input type="date" value={orderQueryDepartEndDate}
-                        onChange={e => setOrderQueryDepartEndDate(e.target.value)} placeholder="结束日期" />
-                    </div>
+                    <DateTimeRangePicker
+                      value={{ start: orderQueryDepartStartDate, end: orderQueryDepartEndDate }}
+                      onChange={(value) => {
+                        setOrderQueryDepartStartDate(value.start);
+                        setOrderQueryDepartEndDate(value.end);
+                      }}
+                      placeholder="选择预计起飞日期时间范围"
+                    />
                   </div>
                   <div>
                     <Label>仓库</Label>
@@ -2635,10 +2676,10 @@ export default function LogisticsManagement() {
                 <div className="flex gap-3">
                   <Button onClick={queryMainOrders}>查询</Button>
                   <Button variant="outline" onClick={() => {
-                    setOrderQueryStartDate('');
-                    setOrderQueryEndDate('');
-                    setOrderQueryDepartStartDate('');
-                    setOrderQueryDepartEndDate('');
+                    setOrderQueryStartDate(null);
+                    setOrderQueryEndDate(null);
+                    setOrderQueryDepartStartDate(null);
+                    setOrderQueryDepartEndDate(null);
                     setOrderQueryWarehouse('全部');
                     setOrderQueryOrigin('全部');
                     setOrderQueryRouteType('全部');
