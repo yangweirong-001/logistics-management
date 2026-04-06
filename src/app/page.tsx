@@ -349,7 +349,9 @@ export default function LogisticsManagement() {
   const [routeModalOpen, setRouteModalOpen] = useState(false);
   const [volumeHistoryOpen, setVolumeHistoryOpen] = useState(false);
   const [orderListOpen, setOrderListOpen] = useState(false);
-  
+  const [remarkDetailOpen, setRemarkDetailOpen] = useState(false);
+  const [currentRemark, setCurrentRemark] = useState('');
+
   // 搜索状态
   const [flightSearchQuery, setFlightSearchQuery] = useState('');
   const [routeSearchQuery, setRouteSearchQuery] = useState('');
@@ -3287,7 +3289,7 @@ export default function LogisticsManagement() {
                 <span className="text-sm text-gray-500">共 {mainOrders.length} 条记录</span>
               </div>
               <div style={{ overflow: 'auto', maxHeight: '800px', position: 'relative' }}>
-                <table style={{ borderCollapse: 'separate', borderSpacing: 0, minWidth: '2605px' }}>
+                <table style={{ borderCollapse: 'separate', borderSpacing: 0, minWidth: '2505px' }}>
                   <thead>
                     <tr>
                       <th style={{ position: 'sticky', left: 0, top: 0, zIndex: 50, backgroundColor: '#fff', minWidth: '125px', borderRight: '3px solid #f97316', borderBottom: '2px solid #e5e7eb', visibility: datePickerOpen ? 'hidden' : 'visible' }} className="text-center px-1 py-2 text-sm">揽收日期</th>
@@ -3307,7 +3309,7 @@ export default function LogisticsManagement() {
                       <th style={{ position: 'sticky', top: 0, zIndex: 40, backgroundColor: '#f3f4f6', minWidth: '90px', borderBottom: '2px solid #e5e7eb' }} className="text-center px-2 py-2">实际件数</th>
                       <th style={{ position: 'sticky', top: 0, zIndex: 40, backgroundColor: '#f3f4f6', minWidth: '90px', borderBottom: '2px solid #e5e7eb' }} className="text-center px-2 py-2">实际方数</th>
                       <th style={{ position: 'sticky', top: 0, zIndex: 40, backgroundColor: '#f3f4f6', minWidth: '100px', borderBottom: '2px solid #e5e7eb' }} className="text-center px-2 py-2">是否开具售卡</th>
-                      <th style={{ position: 'sticky', top: 0, zIndex: 40, backgroundColor: '#f3f4f6', minWidth: '200px', borderBottom: '2px solid #e5e7eb' }} className="text-center px-2 py-2">备注</th>
+                      <th style={{ position: 'sticky', top: 0, zIndex: 40, backgroundColor: '#f3f4f6', minWidth: '100px', borderBottom: '2px solid #e5e7eb' }} className="text-center px-2 py-2">备注</th>
                       <th style={{ position: 'sticky', top: 0, zIndex: 40, backgroundColor: '#f3f4f6', minWidth: '80px', borderBottom: '2px solid #e5e7eb' }} className="text-center px-2 py-2">操作</th>
                     </tr>
                   </thead>
@@ -3347,7 +3349,23 @@ export default function LogisticsManagement() {
                             </Badge>
                           ) : '-'}
                         </td>
-                        <td style={{ minWidth: '200px', backgroundColor: '#fff' }} className="text-center px-2 py-2 whitespace-normal break-words" title={order.remark || ''}>{order.remark || '-'}</td>
+                        <td style={{ minWidth: '100px', backgroundColor: '#fff' }} className="text-center px-2 py-2">
+                          <div className="flex items-center justify-center gap-1">
+                            <span className="truncate" style={{ maxWidth: '60px' }} title={order.remark || ''}>
+                              {order.remark ? (order.remark.length > 10 ? order.remark.substring(0, 10) + '...' : order.remark) : '-'}
+                            </span>
+                            {order.remark && (
+                              <Button size="sm" variant="ghost" className="h-6 px-1 text-xs"
+                                onClick={() => {
+                                  setCurrentRemark(order.remark || '');
+                                  setRemarkDetailOpen(true);
+                                }}
+                              >
+                                详情
+                              </Button>
+                            )}
+                          </div>
+                        </td>
                         <td style={{ minWidth: '80px', backgroundColor: '#fff' }} className="text-center px-2 py-2">
                           <Button size="sm" variant="outline" className="mr-2"
                             onClick={() => {
@@ -4142,7 +4160,7 @@ ${markdownToHtml(data.content)}
                   <TableHead className="bg-gray-50 text-center px-1 py-1" style={{ width: '90px' }}>实际重量</TableHead>
                   <TableHead className="bg-gray-50 text-center px-1 py-1" style={{ width: '90px' }}>实际体积</TableHead>
                   <TableHead className="bg-gray-50 text-center px-1 py-1" style={{ width: '90px' }}>实际票数</TableHead>
-                  <TableHead className="bg-gray-50 text-center px-1 py-1" style={{ width: '100px' }}>备注</TableHead>
+                  <TableHead className="bg-gray-50 text-center px-1 py-1" style={{ width: '80px' }}>备注</TableHead>
                   <TableHead className="bg-gray-50 text-center px-1 py-1" style={{ width: '100px' }}>是否开具售卡</TableHead>
                   <TableHead className="bg-gray-50 text-center px-1 py-1 sticky right-0" style={{ width: '120px' }}>操作</TableHead>
                 </TableRow>
@@ -4176,7 +4194,23 @@ ${markdownToHtml(data.content)}
                     <TableCell className="text-center px-1 py-2">{order.actual_weight || '-'}</TableCell>
                     <TableCell className="text-center px-1 py-2">{order.actual_volume || '-'}</TableCell>
                     <TableCell className="text-center px-1 py-2">{order.actual_bills || '-'}</TableCell>
-                    <TableCell className="text-center px-1 py-2 whitespace-normal break-words" style={{ minWidth: '200px', maxWidth: '200px' }} title={order.remark || ''}>{order.remark || '-'}</TableCell>
+                    <TableCell className="text-center px-1 py-2" style={{ minWidth: '80px', maxWidth: '80px' }}>
+                      <div className="flex items-center justify-center gap-1">
+                        <span className="truncate" style={{ maxWidth: '60px' }} title={order.remark || ''}>
+                          {order.remark ? (order.remark.length > 10 ? order.remark.substring(0, 10) + '...' : order.remark) : '-'}
+                        </span>
+                        {order.remark && (
+                          <Button size="sm" variant="ghost" className="h-6 px-1 text-xs"
+                            onClick={() => {
+                              setCurrentRemark(order.remark || '');
+                              setRemarkDetailOpen(true);
+                            }}
+                          >
+                            详情
+                          </Button>
+                        )}
+                      </div>
+                    </TableCell>
                     <TableCell className="text-center px-1 py-2">
                       {order.issue_card ? (
                         <Badge variant={order.issue_card === '是' ? 'default' : 'secondary'}>
@@ -4237,6 +4271,21 @@ ${markdownToHtml(data.content)}
           <DialogFooter className="mt-4">
             <div className="text-sm text-gray-500 mr-auto">共 {mainOrders.length} 条记录</div>
             <Button variant="secondary" onClick={() => setOrderListOpen(false)}>关闭</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* 备注详情弹窗 */}
+      <Dialog open={remarkDetailOpen} onOpenChange={setRemarkDetailOpen}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>备注详情</DialogTitle>
+          </DialogHeader>
+          <div className="p-4 bg-gray-50 rounded-lg min-h-[100px] max-h-[400px] overflow-y-auto">
+            <p className="whitespace-pre-wrap break-words">{currentRemark}</p>
+          </div>
+          <DialogFooter>
+            <Button onClick={() => setRemarkDetailOpen(false)}>关闭</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
