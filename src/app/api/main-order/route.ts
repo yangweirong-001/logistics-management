@@ -30,14 +30,8 @@ export async function GET(request: NextRequest) {
     const departStartDate = searchParams.get('departStartDate');
     const departEndDate = searchParams.get('departEndDate');
 
-    // 支持日期范围查询
-    if (startDate && endDate) {
-      const data = await mainOrderApi.getByDateRange(startDate, endDate);
-      return NextResponse.json({ success: true, data });
-    }
-
-    // 支持单条件或多条件查询
-    if (collectDate || warehouse || port || cargoType || issueCard || origin || routeType || mainOrderNo || departStartDate || departEndDate) {
+    // 支持单条件或多条件查询（包括日期范围）
+    if (collectDate || warehouse || port || cargoType || issueCard || origin || routeType || mainOrderNo || departStartDate || departEndDate || (startDate && endDate)) {
       const data = await mainOrderApi.query({
         collectDate: collectDate || undefined,
         warehouse: warehouse || undefined,
@@ -49,6 +43,8 @@ export async function GET(request: NextRequest) {
         mainOrderNo: mainOrderNo || undefined,
         departStartDate: departStartDate || undefined,
         departEndDate: departEndDate || undefined,
+        startDate: startDate || undefined,
+        endDate: endDate || undefined,
       });
       return NextResponse.json({ success: true, data });
     }

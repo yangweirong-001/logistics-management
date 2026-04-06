@@ -230,10 +230,16 @@ export const mainOrderApi = {
     mainOrderNo?: string;
     departStartDate?: string;
     departEndDate?: string;
+    startDate?: string;
+    endDate?: string;
   }) {
     let query = client.from('main_orders').select('*');
     if (params.collectDate) {
       query = query.eq('collect_date', params.collectDate);
+    }
+    // 日期范围筛选（揽收日期）
+    if (params.startDate && params.endDate) {
+      query = query.gte('collect_date', params.startDate).lte('collect_date', params.endDate);
     }
     if (params.warehouse) {
       query = query.eq('warehouse', params.warehouse);
@@ -262,6 +268,7 @@ export const mainOrderApi = {
     if (params.mainOrderNo) {
       query = query.ilike('main_no', `%${params.mainOrderNo}%`);
     }
+    // 预计起飞日期范围筛选
     if (params.departStartDate && params.departEndDate) {
       query = query.gte('actual_flight_date', params.departStartDate).lte('actual_flight_date', params.departEndDate);
     }
