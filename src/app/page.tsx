@@ -433,7 +433,6 @@ export default function LogisticsManagement() {
   const [orderQueryDepartStartDate, setOrderQueryDepartStartDate] = useState<Date | null>(null);
   const [orderQueryDepartEndDate, setOrderQueryDepartEndDate] = useState<Date | null>(null);
   const [orderQueryWarehouse, setOrderQueryWarehouse] = useState('全部');
-  const [orderQueryPort, setOrderQueryPort] = useState('全部');
   const [orderQueryCargoType, setOrderQueryCargoType] = useState('全部');
   const [orderQueryOrigin, setOrderQueryOrigin] = useState('全部');
   const [orderQueryRouteType, setOrderQueryRouteType] = useState('全部');
@@ -593,11 +592,6 @@ export default function LogisticsManagement() {
       // 前端过滤路由类型
       if (orderQueryRouteType && orderQueryRouteType !== '全部') {
         results = results.filter((o: MainOrder) => o.route_type === orderQueryRouteType);
-      }
-
-      // 前端过滤口岸
-      if (orderQueryPort && orderQueryPort !== '全部') {
-        results = results.filter((o: MainOrder) => o.port === orderQueryPort);
       }
 
       // 前端过滤货物属性
@@ -2652,7 +2646,7 @@ export default function LogisticsManagement() {
                 {/* 分隔线 */}
                 <div className="border-t border-gray-200 mb-5"></div>
                 {/* 第二行：筛选项 */}
-                <div className="flex gap-3 mb-5">
+                <div className="flex gap-6 mb-5">
                   <div className="flex flex-col gap-2" style={{ width: '100px' }}>
                     <Label>仓库</Label>
                     <Select value={orderQueryWarehouse} onValueChange={v => setOrderQueryWarehouse(v)}>
@@ -2700,21 +2694,6 @@ export default function LogisticsManagement() {
                     </Select>
                   </div>
                   <div className="flex flex-col gap-2" style={{ width: '100px' }}>
-                    <Label>口岸</Label>
-                    <Select value={orderQueryPort} onValueChange={v => setOrderQueryPort(v)}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="全部">
-                          {orderQueryPort === '全部' ? '全部' : orderQueryPort}
-                        </SelectValue>
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="全部">全部</SelectItem>
-                        <SelectItem value="ZGGG">ZGGG</SelectItem>
-                        <SelectItem value="ZSPD">ZSPD</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div className="flex flex-col gap-2" style={{ width: '100px' }}>
                     <Label>货物属性</Label>
                     <Select value={orderQueryCargoType} onValueChange={v => setOrderQueryCargoType(v)}>
                       <SelectTrigger>
@@ -2747,7 +2726,6 @@ export default function LogisticsManagement() {
                     setOrderQueryDepartStartDate(null);
                     setOrderQueryDepartEndDate(null);
                     setOrderQueryWarehouse('全部');
-                    setOrderQueryPort('全部');
                     setOrderQueryCargoType('全部');
                     setOrderQueryOrigin('全部');
                     setOrderQueryRouteType('全部');
