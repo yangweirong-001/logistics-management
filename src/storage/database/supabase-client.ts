@@ -101,11 +101,6 @@ function getSupabaseCredentials(): SupabaseCredentials {
 }
 
 function getSupabaseClient(token?: string): SupabaseClient {
-  // 使用单例模式，避免重复创建客户端
-  if (supabaseClient && !token) {
-    return supabaseClient;
-  }
-
   const { url, anonKey } = getSupabaseCredentials();
 
   if (token) {
@@ -123,7 +118,8 @@ function getSupabaseClient(token?: string): SupabaseClient {
     });
   }
 
-  supabaseClient = createClient(url, anonKey, {
+  // 每次都创建新的客户端实例，避免 schema cache 问题
+  return createClient(url, anonKey, {
     db: {
       timeout: 10000, // 减少到10秒
     },
@@ -132,8 +128,6 @@ function getSupabaseClient(token?: string): SupabaseClient {
       persistSession: false,
     },
   });
-
-  return supabaseClient;
 }
 
 export { loadEnv, getSupabaseCredentials, getSupabaseClient };
