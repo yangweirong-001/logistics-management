@@ -3508,7 +3508,7 @@ export default function LogisticsManagement() {
                   <TableHead className="bg-gray-50 text-center px-1 py-1" style={{ width: '70px' }}>目的港</TableHead>
                   <TableHead className="bg-gray-50 text-center px-1 py-1" style={{ width: '100px' }}>打货上限</TableHead>
                   <TableHead className="bg-gray-50 text-center px-1 py-1" style={{ width: '140px' }}>起飞时间</TableHead>
-                  <TableHead className="bg-gray-50 text-center px-1 py-1" style={{ width: '100px' }}>二程航班</TableHead>
+                  <TableHead className="bg-gray-50 text-center px-1 py-1" style={{ width: '150px', minWidth: '150px' }}>二程航班</TableHead>
                   <TableHead className="bg-gray-50 text-center px-1 py-1" style={{ width: '140px' }}>到港时间</TableHead>
                   <TableHead className="bg-gray-50 text-center px-1 py-1" style={{ width: '90px' }}>实际件数</TableHead>
                   <TableHead className="bg-gray-50 text-center px-1 py-1" style={{ width: '90px' }}>实际重量</TableHead>
@@ -3520,35 +3520,35 @@ export default function LogisticsManagement() {
               </TableHeader>
               <TableBody>
                 {mainOrders.slice(0, 100).map(order => (
-                  <TableRow key={order.id} className="h-10">
-                    <TableCell className="text-center px-1 py-1">{order.collect_date}</TableCell>
-                    <TableCell className="text-center px-1 py-1">{order.warehouse}</TableCell>
-                    <TableCell className="text-center px-1 py-1">{order.port}</TableCell>
-                    <TableCell className="text-center px-1 py-1">{order.cargo_type}</TableCell>
-                    <TableCell className="text-center px-1 py-1">
+                  <TableRow key={order.id} style={{ height: 'auto' }}>
+                    <TableCell className="text-center px-1 py-2">{order.collect_date}</TableCell>
+                    <TableCell className="text-center px-1 py-2">{order.warehouse}</TableCell>
+                    <TableCell className="text-center px-1 py-2">{order.port}</TableCell>
+                    <TableCell className="text-center px-1 py-2">{order.cargo_type}</TableCell>
+                    <TableCell className="text-center px-1 py-2">
                       {order.route_type ? (
                         <Badge variant={order.route_type === '空运' ? 'default' : 'secondary'}>
                           {order.route_type}
                         </Badge>
                       ) : '-'}
                     </TableCell>
-                    <TableCell className="text-center px-1 py-1">{order.main_no || '-'}</TableCell>
-                    <TableCell className="text-center px-1 py-1">{order.flight_no || '-'}</TableCell>
-                    <TableCell className="text-center px-1 py-1">{order.dest || '-'}</TableCell>
-                    <TableCell className="text-center px-1 py-1">{order.max_volume || '-'}</TableCell>
-                    <TableCell className="text-center px-1 py-1">
+                    <TableCell className="text-center px-1 py-2">{order.main_no || '-'}</TableCell>
+                    <TableCell className="text-center px-1 py-2">{order.flight_no || '-'}</TableCell>
+                    <TableCell className="text-center px-1 py-2">{order.dest || '-'}</TableCell>
+                    <TableCell className="text-center px-1 py-2">{order.max_volume || '-'}</TableCell>
+                    <TableCell className="text-center px-1 py-2">
                       {formatDateTime(order.actual_flight_date, order.depart_time) || '-'}
                     </TableCell>
-                    <TableCell className="text-center px-1 py-1">{order.second_flight || '-'}</TableCell>
-                    <TableCell className="text-center px-1 py-1">
+                    <TableCell className="text-center px-1 py-2 whitespace-normal break-words" style={{ minWidth: '150px' }}>{order.second_flight || '-'}</TableCell>
+                    <TableCell className="text-center px-1 py-2">
                       {formatArrivalDateTime(order) || '-'}
                     </TableCell>
-                    <TableCell className="text-center px-1 py-1">{order.actual_pieces || '-'}</TableCell>
-                    <TableCell className="text-center px-1 py-1">{order.actual_weight || '-'}</TableCell>
-                    <TableCell className="text-center px-1 py-1">{order.actual_volume || '-'}</TableCell>
-                    <TableCell className="text-center px-1 py-1">{order.actual_bills || '-'}</TableCell>
-                    <TableCell className="text-center px-1 py-1 truncate max-w-[100px]" title={order.remark || ''}>{order.remark || '-'}</TableCell>
-                    <TableCell className="text-center px-1 py-1 sticky right-0 bg-white">
+                    <TableCell className="text-center px-1 py-2">{order.actual_pieces || '-'}</TableCell>
+                    <TableCell className="text-center px-1 py-2">{order.actual_weight || '-'}</TableCell>
+                    <TableCell className="text-center px-1 py-2">{order.actual_volume || '-'}</TableCell>
+                    <TableCell className="text-center px-1 py-2">{order.actual_bills || '-'}</TableCell>
+                    <TableCell className="text-center px-1 py-2 truncate max-w-[100px]" title={order.remark || ''}>{order.remark || '-'}</TableCell>
+                    <TableCell className="text-center px-1 py-2 sticky right-0 bg-white">
                       <Button size="sm" className="bg-blue-600 hover:bg-blue-700 text-white mr-1"
                         onClick={() => {
                           setEditingOrder(order);
