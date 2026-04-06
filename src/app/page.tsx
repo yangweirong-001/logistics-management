@@ -1719,7 +1719,7 @@ export default function LogisticsManagement() {
       </aside>
       
       {/* 主内容区 - 添加左边距避免被侧边栏遮挡 */}
-      <main className="ml-64 flex-1 p-6">
+      <main className="ml-[256px] flex-1 p-6 min-w-0">
         {/* 区域参数配置 */}
         {activeTab === 'config-area' && (
           <div>
@@ -2604,7 +2604,7 @@ export default function LogisticsManagement() {
         {activeTab === 'order-query' && (
           <div>
             {/* 筛选器区域 - 固定不滚动 */}
-            <Card className="mb-4" style={{ position: 'sticky', top: saving ? '32px' : '0', zIndex: 50, backgroundColor: 'white' }}>
+            <Card className="mb-4" style={{ position: 'sticky', top: saving ? '32px' : '0', zIndex: 50, backgroundColor: 'white', overflow: 'visible' }}>
               <CardHeader className="flex flex-row items-center justify-between">
                 <CardTitle>主单查询</CardTitle>
                 <Button
@@ -2617,8 +2617,8 @@ export default function LogisticsManagement() {
               </CardHeader>
               <CardContent>
                 {/* 第一行：日期范围 */}
-                <div className="flex gap-3 mb-5">
-                  <div className="flex flex-col gap-2 flex-1">
+                <div className="flex gap-2 mb-5">
+                  <div className="flex flex-col gap-2 flex-[2]">
                     <Label>揽收日期范围</Label>
                     <DateTimeRangePicker
                       value={{ start: orderQueryStartDate, end: orderQueryEndDate }}
@@ -2630,7 +2630,7 @@ export default function LogisticsManagement() {
                       showTime={false}
                     />
                   </div>
-                  <div className="flex flex-col gap-2 flex-1">
+                  <div className="flex flex-col gap-2 flex-[1]">
                     <Label>预计起飞日期范围</Label>
                     <DateTimeRangePicker
                       value={{ start: orderQueryDepartStartDate, end: orderQueryDepartEndDate }}
