@@ -548,36 +548,18 @@ export default function LogisticsManagement() {
 
       // 前端过滤预计起飞日期范围
       if (orderQueryDepartStartDate && orderQueryDepartEndDate) {
-        const formatDateTime = (date: Date) => {
-          const year = date.getFullYear();
-          const month = String(date.getMonth() + 1).padStart(2, '0');
-          const day = String(date.getDate()).padStart(2, '0');
-          const hours = String(date.getHours()).padStart(2, '0');
-          const minutes = String(date.getMinutes()).padStart(2, '0');
-          const seconds = String(date.getSeconds()).padStart(2, '0');
-          return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
-        };
-        const startDateTime = formatDateTime(orderQueryDepartStartDate);
-        const endDateTime = formatDateTime(orderQueryDepartEndDate);
         results = results.filter((o: MainOrder) => {
           if (!o.depart_date) return false;
-          return o.depart_date >= startDateTime && o.depart_date <= endDateTime;
+          // 将数据库时间字符串转换为 Date 对象
+          const departDate = new Date(o.depart_date.replace(/-/g, '/'));
+          return departDate >= orderQueryDepartStartDate && departDate <= orderQueryDepartEndDate;
         });
       } else if (orderQueryDepartStartDate) {
-        const formatDateTime = (date: Date) => {
-          const year = date.getFullYear();
-          const month = String(date.getMonth() + 1).padStart(2, '0');
-          const day = String(date.getDate()).padStart(2, '0');
-          const hours = String(date.getHours()).padStart(2, '0');
-          const minutes = String(date.getMinutes()).padStart(2, '0');
-          const seconds = String(date.getSeconds()).padStart(2, '0');
-          return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
-        };
-        const startDateTime = formatDateTime(orderQueryDepartStartDate);
+        // 只选择了开始日期，筛选该日期的所有数据
+        const startDateStr = orderQueryDepartStartDate.toISOString().split('T')[0];
         results = results.filter((o: MainOrder) => {
           if (!o.depart_date) return false;
           const departDateStr = o.depart_date.split(' ')[0];
-          const startDateStr = startDateTime.split(' ')[0];
           return departDateStr === startDateStr;
         });
       }
