@@ -2074,7 +2074,7 @@ export default function LogisticsManagement() {
 
                   {/* 应配置 */}
                   <div className="mb-4">
-                    <div className="text-base font-bold text-gray-700 mb-2 pl-2 border-l-4 border-emerald-500">应配置</div>
+                    <div className="text-base font-bold text-gray-700 mb-2 pl-2 border-l-4 border-emerald-500">应配置（当天按照配舱规则应该配置的空运、海空汇总）</div>
                     <div className="grid grid-cols-2 gap-4">
                       <div className="bg-emerald-50 rounded-lg p-4 text-center border border-emerald-200 shadow-sm">
                         <div className="text-xl font-bold text-black">{volumeResult ? volumeResult.airVolume.toFixed(3) : '0'}</div>
@@ -2089,7 +2089,7 @@ export default function LogisticsManagement() {
 
                   {/* 实际配置 */}
                   <div>
-                    <div className="text-base font-bold text-gray-700 mb-2 pl-2 border-l-4 border-violet-500">实际配置</div>
+                    <div className="text-base font-bold text-gray-700 mb-2 pl-2 border-l-4 border-violet-500">实际配置（当天航线已发放的空运、海空汇总）</div>
                     <div className="grid grid-cols-3 gap-4">
                       <div className="bg-violet-50 rounded-lg p-4 text-center border border-violet-200 shadow-sm">
                         <div className="text-lg font-bold text-black">{volumeResult ? volumeResult.configuredAirVolume.toFixed(3) : '0'}</div>
