@@ -3287,7 +3287,7 @@ export default function LogisticsManagement() {
                 <span className="text-sm text-gray-500">共 {mainOrders.length} 条记录</span>
               </div>
               <div style={{ overflow: 'auto', maxHeight: '800px', position: 'relative' }}>
-                <table style={{ borderCollapse: 'separate', borderSpacing: 0, minWidth: '2405px' }}>
+                <table style={{ borderCollapse: 'separate', borderSpacing: 0, minWidth: '2605px' }}>
                   <thead>
                     <tr>
                       <th style={{ position: 'sticky', left: 0, top: 0, zIndex: 50, backgroundColor: '#fff', minWidth: '125px', borderRight: '3px solid #f97316', borderBottom: '2px solid #e5e7eb', visibility: datePickerOpen ? 'hidden' : 'visible' }} className="text-center px-1 py-2 text-sm">揽收日期</th>
@@ -3307,6 +3307,7 @@ export default function LogisticsManagement() {
                       <th style={{ position: 'sticky', top: 0, zIndex: 40, backgroundColor: '#f3f4f6', minWidth: '90px', borderBottom: '2px solid #e5e7eb' }} className="text-center px-2 py-2">实际件数</th>
                       <th style={{ position: 'sticky', top: 0, zIndex: 40, backgroundColor: '#f3f4f6', minWidth: '90px', borderBottom: '2px solid #e5e7eb' }} className="text-center px-2 py-2">实际方数</th>
                       <th style={{ position: 'sticky', top: 0, zIndex: 40, backgroundColor: '#f3f4f6', minWidth: '100px', borderBottom: '2px solid #e5e7eb' }} className="text-center px-2 py-2">是否开具售卡</th>
+                      <th style={{ position: 'sticky', top: 0, zIndex: 40, backgroundColor: '#f3f4f6', minWidth: '200px', borderBottom: '2px solid #e5e7eb' }} className="text-center px-2 py-2">备注</th>
                       <th style={{ position: 'sticky', top: 0, zIndex: 40, backgroundColor: '#f3f4f6', minWidth: '80px', borderBottom: '2px solid #e5e7eb' }} className="text-center px-2 py-2">操作</th>
                     </tr>
                   </thead>
@@ -3346,6 +3347,7 @@ export default function LogisticsManagement() {
                             </Badge>
                           ) : '-'}
                         </td>
+                        <td style={{ minWidth: '200px', backgroundColor: '#fff' }} className="text-center px-2 py-2 whitespace-normal break-words" title={order.remark || ''}>{order.remark || '-'}</td>
                         <td style={{ minWidth: '80px', backgroundColor: '#fff' }} className="text-center px-2 py-2">
                           <Button size="sm" variant="outline" className="mr-2"
                             onClick={() => {
@@ -4174,7 +4176,7 @@ ${markdownToHtml(data.content)}
                     <TableCell className="text-center px-1 py-2">{order.actual_weight || '-'}</TableCell>
                     <TableCell className="text-center px-1 py-2">{order.actual_volume || '-'}</TableCell>
                     <TableCell className="text-center px-1 py-2">{order.actual_bills || '-'}</TableCell>
-                    <TableCell className="text-center px-1 py-2 truncate max-w-[100px]" title={order.remark || ''}>{order.remark || '-'}</TableCell>
+                    <TableCell className="text-center px-1 py-2 whitespace-normal break-words" style={{ minWidth: '200px', maxWidth: '200px' }} title={order.remark || ''}>{order.remark || '-'}</TableCell>
                     <TableCell className="text-center px-1 py-2">
                       {order.issue_card ? (
                         <Badge variant={order.issue_card === '是' ? 'default' : 'secondary'}>
