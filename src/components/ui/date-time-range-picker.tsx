@@ -12,9 +12,10 @@ interface DateTimeRangePickerProps {
   onChange?: (value: { start: Date | null; end: Date | null }) => void;
   placeholder?: string;
   showTime?: boolean; // 是否显示时间选择器
+  width?: string; // 自定义宽度
 }
 
-export default function DateTimeRangePicker({ value, onChange, placeholder = '选择日期时间范围', showTime = true }: DateTimeRangePickerProps) {
+export default function DateTimeRangePicker({ value, onChange, placeholder = '选择日期时间范围', showTime = true, width = '280px' }: DateTimeRangePickerProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [internalStart, setInternalStart] = useState<Date | null>(value?.start || null);
   const [internalEnd, setInternalEnd] = useState<Date | null>(value?.end || null);
@@ -145,7 +146,8 @@ export default function DateTimeRangePicker({ value, onChange, placeholder = '�
       <div
         ref={triggerRef}
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-2 px-3 py-2 border border-gray-300 rounded-md cursor-pointer hover:bg-gray-50 w-[280px] overflow-hidden"
+        className="flex items-center gap-2 px-3 border border-gray-300 rounded-md cursor-pointer hover:bg-gray-50 overflow-hidden h-9"
+        style={{ width }}
       >
         <Calendar className="w-4 h-4 text-gray-500" />
         <span className="flex-1 text-sm whitespace-nowrap overflow-hidden">
