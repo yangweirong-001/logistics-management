@@ -754,11 +754,11 @@ export default function LogisticsManagement() {
             // 汇总主单已配置方数
             configuredAirVolume += mainOrders
               .filter(o => o.collect_date === volumeForm.collect_date && o.warehouse === wh && o.route_type === '空运')
-              .reduce((sum, o) => sum + (parseFloat(o.actual_volume || '0') || 0), 0);
+              .reduce((sum, o) => sum + getEffectiveVolume(o), 0);
 
             configuredSeaAirVolume += mainOrders
               .filter(o => o.collect_date === volumeForm.collect_date && o.warehouse === wh && o.route_type === '海空')
-              .reduce((sum, o) => sum + (parseFloat(o.actual_volume || '0') || 0), 0);
+              .reduce((sum, o) => sum + getEffectiveVolume(o), 0);
           });
 
           // 计算未配置方数
@@ -822,11 +822,11 @@ export default function LogisticsManagement() {
               // 计算主单已配置方数：从主单发放中筛选
               const configuredAirVolume = mainOrders
                 .filter(o => o.collect_date === volumeForm.collect_date && o.warehouse === volumeForm.warehouse && o.route_type === '空运')
-                .reduce((sum, o) => sum + (parseFloat(o.actual_volume || '0') || 0), 0);
+                .reduce((sum, o) => sum + getEffectiveVolume(o), 0);
 
               const configuredSeaAirVolume = mainOrders
                 .filter(o => o.collect_date === volumeForm.collect_date && o.warehouse === volumeForm.warehouse && o.route_type === '海空')
-                .reduce((sum, o) => sum + (parseFloat(o.actual_volume || '0') || 0), 0);
+                .reduce((sum, o) => sum + getEffectiveVolume(o), 0);
 
               // 计算未配置方数：总方数 - 空运主单已配置方数 - 海空主单已配置方数
               const unconfiguredVolume = totalVolume - configuredAirVolume - configuredSeaAirVolume;
@@ -1464,6 +1464,26 @@ export default function LogisticsManagement() {
       }
       loadVolumeEstimates();
     }
+  };
+
+  // 获取主单的有效方数（优先级：实际方数 > 打货上限 > 预估方数）
+  const getEffectiveVolume = (order: MainOrder): number => {
+    // 1. 优先使用实际方数
+    if (order.actual_volume && parseFloat(order.actual_volume) > 0) {
+      return parseFloat(order.actual_volume);
+    }
+
+    // 2. 其次使用打货上限
+    if (order.max_volume && parseFloat(order.max_volume) > 0) {
+      return parseFloat(order.max_volume);
+    }
+
+    // 3. 最后使用预估方数
+    if (order.est_volume && parseFloat(order.est_volume) > 0) {
+      return parseFloat(order.est_volume);
+    }
+
+    return 0;
   };
   
   // 主单操作

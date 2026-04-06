@@ -111,7 +111,7 @@ export async function GET(request: Request) {
       },
 
       // 诊断建议
-      recommendations: [],
+      recommendations: [] as string[],
     };
 
     // 生成诊断建议
