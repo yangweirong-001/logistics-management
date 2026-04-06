@@ -1719,7 +1719,7 @@ export default function LogisticsManagement() {
       </aside>
       
       {/* 主内容区 - 添加左边距避免被侧边栏遮挡 */}
-      <main className="ml-60 flex-1 p-5">
+      <main className="ml-64 flex-1 p-6">
         {/* 区域参数配置 */}
         {activeTab === 'config-area' && (
           <div>
