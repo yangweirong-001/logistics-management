@@ -1439,7 +1439,7 @@ export default function LogisticsManagement() {
           collect_date: '', depart_date: '', warehouse: '', cargo_type: '', port: '',
           status: '', pack_req: '', max_volume: '', route_type: '', actual_flight_date: '', main_no: '',
           flight_no: '', origin: '', transfer: '', dest: '', second_flight: '', depart_time: '', arrive_time: '',
-          actual_pieces: '', actual_weight: '', actual_volume: '', actual_bills: '', remark: '',
+          actual_pieces: '', actual_weight: '', actual_volume: '', actual_bills: '', remark: '', issue_card: '否',
         });
       } else {
         alert('保存失败: ' + (result.error || '未知错误'));
@@ -3101,6 +3101,7 @@ export default function LogisticsManagement() {
                         actual_volume: '',
                         actual_bills: '',
                         remark: '',
+                        issue_card: '否',
                       });
                       // 重新加载数据
                       loadFlightExceptions();
