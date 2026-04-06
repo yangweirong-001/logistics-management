@@ -75,6 +75,12 @@ export default function DateTimeRangePicker({ value, onChange, placeholder = '�
     setIsOpen(false);
   };
 
+  const handleClose = () => {
+    // 关闭时自动应用当前选择的值
+    onChange?.({ start: internalStart, end: internalEnd });
+    setIsOpen(false);
+  };
+
   const formatDateRange = () => {
     if (!internalStart && !internalEnd) return placeholder;
     const startStr = internalStart ? format(internalStart, 'yyyy-MM-dd HH:mm:ss') : '未选择';
@@ -116,7 +122,7 @@ export default function DateTimeRangePicker({ value, onChange, placeholder = '�
       {/* 触发器 */}
       <div
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-2 px-3 py-2 border border-gray-300 rounded-md cursor-pointer hover:bg-gray-50 min-w-[400px]"
+        className="flex items-center gap-2 px-3 py-2 border border-gray-300 rounded-md cursor-pointer hover:bg-gray-50 w-[280px] overflow-hidden"
       >
         <Calendar className="w-4 h-4 text-gray-500" />
         <span className="flex-1 text-sm">
@@ -177,6 +183,13 @@ export default function DateTimeRangePicker({ value, onChange, placeholder = '�
                 onMonthChange={setCurrentMonth}
                 locale={zhCN}
                 className="border border-gray-200 rounded mb-3"
+                styles={{
+                  caption: { justifyContent: 'space-between' },
+                  head_row: { display: 'flex' },
+                  head_cell: { flex: '1', textAlign: 'center', fontWeight: '600' },
+                  row: { display: 'flex' },
+                  cell: { flex: '1', textAlign: 'center' },
+                }}
               />
 
               {/* 时间选择器 */}
@@ -217,6 +230,13 @@ export default function DateTimeRangePicker({ value, onChange, placeholder = '�
                 onMonthChange={setCurrentMonth}
                 locale={zhCN}
                 className="border border-gray-200 rounded mb-3"
+                styles={{
+                  caption: { justifyContent: 'space-between' },
+                  head_row: { display: 'flex' },
+                  head_cell: { flex: '1', textAlign: 'center', fontWeight: '600' },
+                  row: { display: 'flex' },
+                  cell: { flex: '1', textAlign: 'center' },
+                }}
               />
 
               {/* 时间选择器 */}
@@ -248,7 +268,7 @@ export default function DateTimeRangePicker({ value, onChange, placeholder = '�
       {isOpen && (
         <div
           className="fixed inset-0 bg-black bg-opacity-30 z-40"
-          onClick={() => setIsOpen(false)}
+          onClick={handleClose}
         />
       )}
     </div>

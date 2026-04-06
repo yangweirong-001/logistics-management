@@ -2604,8 +2604,8 @@ export default function LogisticsManagement() {
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-4 gap-4 mb-4">
-                  <div className="col-span-2">
-                    <Label>揽收日期范围</Label>
+                  <div className="col-span-2 flex flex-col gap-1">
+                    <Label className="mb-1">揽收日期范围</Label>
                     <DateTimeRangePicker
                       value={{ start: orderQueryStartDate, end: orderQueryEndDate }}
                       onChange={(value) => {
@@ -2615,8 +2615,8 @@ export default function LogisticsManagement() {
                       placeholder="选择揽收日期时间范围"
                     />
                   </div>
-                  <div className="col-span-2">
-                    <Label>预计起飞日期范围</Label>
+                  <div className="col-span-2 flex flex-col gap-1">
+                    <Label className="mb-1">预计起飞日期范围</Label>
                     <DateTimeRangePicker
                       value={{ start: orderQueryDepartStartDate, end: orderQueryDepartEndDate }}
                       onChange={(value) => {
