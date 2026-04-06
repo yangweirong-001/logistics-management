@@ -2604,9 +2604,9 @@ export default function LogisticsManagement() {
                 </Button>
               </CardHeader>
               <CardContent>
-                <div className="grid grid-cols-4 gap-4 mb-4">
+                <div className="grid grid-cols-4 gap-3 mb-3">
                   <div className="col-span-2 flex flex-col gap-1">
-                    <Label className="mb-1">揽收日期范围</Label>
+                    <Label className="mb-0.5">揽收日期范围</Label>
                     <DateTimeRangePicker
                       value={{ start: orderQueryStartDate, end: orderQueryEndDate }}
                       onChange={(value) => {
@@ -2618,7 +2618,7 @@ export default function LogisticsManagement() {
                     />
                   </div>
                   <div className="col-span-2 flex flex-col gap-1">
-                    <Label className="mb-1">预计起飞日期范围</Label>
+                    <Label className="mb-0.5">预计起飞日期范围</Label>
                     <DateTimeRangePicker
                       value={{ start: orderQueryDepartStartDate, end: orderQueryDepartEndDate }}
                       onChange={(value) => {
@@ -2629,8 +2629,8 @@ export default function LogisticsManagement() {
                       showTime={true}
                     />
                   </div>
-                  <div>
-                    <Label>仓库</Label>
+                  <div className="flex flex-col gap-1">
+                    <Label className="mb-0.5">仓库</Label>
                     <Select value={orderQueryWarehouse} onValueChange={v => setOrderQueryWarehouse(v)}>
                       <SelectTrigger>
                         <SelectValue placeholder="全部">
@@ -2644,8 +2644,8 @@ export default function LogisticsManagement() {
                       </SelectContent>
                     </Select>
                   </div>
-                  <div>
-                    <Label>始发</Label>
+                  <div className="flex flex-col gap-1">
+                    <Label className="mb-0.5">始发</Label>
                     <Select value={orderQueryOrigin} onValueChange={v => setOrderQueryOrigin(v)}>
                       <SelectTrigger>
                         <SelectValue placeholder="全部">
@@ -2660,8 +2660,8 @@ export default function LogisticsManagement() {
                       </SelectContent>
                     </Select>
                   </div>
-                  <div>
-                    <Label>路由类型</Label>
+                  <div className="flex flex-col gap-1">
+                    <Label className="mb-0.5">路由类型</Label>
                     <Select value={orderQueryRouteType} onValueChange={v => setOrderQueryRouteType(v)}>
                       <SelectTrigger>
                         <SelectValue placeholder="全部">
@@ -2676,7 +2676,7 @@ export default function LogisticsManagement() {
                     </Select>
                   </div>
                 </div>
-                <div className="flex gap-3">
+                <div className="flex gap-2">
                   <Button onClick={queryMainOrders}>查询</Button>
                   <Button variant="outline" onClick={() => {
                     setOrderQueryStartDate(null);
