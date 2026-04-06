@@ -433,8 +433,11 @@ export default function LogisticsManagement() {
   const [orderQueryDepartStartDate, setOrderQueryDepartStartDate] = useState<Date | null>(null);
   const [orderQueryDepartEndDate, setOrderQueryDepartEndDate] = useState<Date | null>(null);
   const [orderQueryWarehouse, setOrderQueryWarehouse] = useState('全部');
+  const [orderQueryPort, setOrderQueryPort] = useState('全部');
+  const [orderQueryCargoType, setOrderQueryCargoType] = useState('全部');
   const [orderQueryOrigin, setOrderQueryOrigin] = useState('全部');
   const [orderQueryRouteType, setOrderQueryRouteType] = useState('全部');
+  const [orderQueryMainOrderNo, setOrderQueryMainOrderNo] = useState('');
   const [uniqueOrigins, setUniqueOrigins] = useState<string[]>([]);
 
   // 方数预估筛选条件
@@ -590,6 +593,21 @@ export default function LogisticsManagement() {
       // 前端过滤路由类型
       if (orderQueryRouteType && orderQueryRouteType !== '全部') {
         results = results.filter((o: MainOrder) => o.route_type === orderQueryRouteType);
+      }
+
+      // 前端过滤口岸
+      if (orderQueryPort && orderQueryPort !== '全部') {
+        results = results.filter((o: MainOrder) => o.port === orderQueryPort);
+      }
+
+      // 前端过滤货物属性
+      if (orderQueryCargoType && orderQueryCargoType !== '全部') {
+        results = results.filter((o: MainOrder) => o.cargo_type === orderQueryCargoType);
+      }
+
+      // 前端过滤主单号
+      if (orderQueryMainOrderNo) {
+        results = results.filter((o: MainOrder) => (o.main_no || '').includes(orderQueryMainOrderNo));
       }
 
       setMainOrders(results);
@@ -2724,8 +2742,11 @@ export default function LogisticsManagement() {
                     setOrderQueryDepartStartDate(null);
                     setOrderQueryDepartEndDate(null);
                     setOrderQueryWarehouse('全部');
+                    setOrderQueryPort('全部');
+                    setOrderQueryCargoType('全部');
                     setOrderQueryOrigin('全部');
                     setOrderQueryRouteType('全部');
+                    setOrderQueryMainOrderNo('');
                   }}>重置筛选</Button>
                 </div>
               </CardContent>
