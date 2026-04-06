@@ -137,6 +137,8 @@ export const mainOrders = pgTable("main_orders", {
 	dest: varchar({ length: 10 }),
 	departTime: varchar("depart_time", { length: 20 }),
 	arriveTime: varchar("arrive_time", { length: 20 }),
+	secondFlight: varchar("second_flight", { length: 20 }),
+	routeType: varchar("route_type", { length: 20 }),
 	actualPieces: integer("actual_pieces"),
 	actualWeight: numeric("actual_weight", { precision: 15, scale: 3 }),
 	actualVolume: numeric("actual_volume", { precision: 15, scale: 3 }),
