@@ -21,6 +21,8 @@ export async function GET(request: NextRequest) {
     const startDate = searchParams.get('startDate');
     const endDate = searchParams.get('endDate');
     const warehouse = searchParams.get('warehouse');
+    const port = searchParams.get('port');
+    const cargoType = searchParams.get('cargoType');
 
     // 支持日期范围查询
     if (startDate && endDate) {
@@ -28,11 +30,13 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ success: true, data });
     }
 
-    // 支持单日期查询
-    if (collectDate || warehouse) {
+    // 支持单条件或多条件查询
+    if (collectDate || warehouse || port || cargoType) {
       const data = await mainOrderApi.query({
         collectDate: collectDate || undefined,
         warehouse: warehouse || undefined,
+        port: port || undefined,
+        cargoType: cargoType || undefined,
       });
       return NextResponse.json({ success: true, data });
     }

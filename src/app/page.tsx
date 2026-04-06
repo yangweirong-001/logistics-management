@@ -485,6 +485,12 @@ export default function LogisticsManagement() {
   const [volumeFilterEndDate, setVolumeFilterEndDate] = useState('');
   const [volumeFilterWarehouse, setVolumeFilterWarehouse] = useState('全部');
 
+  // 主单列表筛选条件
+  const [orderListFilterDate, setOrderListFilterDate] = useState('');
+  const [orderListFilterWarehouse, setOrderListFilterWarehouse] = useState('全部');
+  const [orderListFilterPort, setOrderListFilterPort] = useState('全部');
+  const [orderListFilterCargoType, setOrderListFilterCargoType] = useState('全部');
+
   // 全局保存加载状态
   const [saving, setSaving] = useState(false);
   
@@ -533,11 +539,14 @@ export default function LogisticsManagement() {
     if (data.success) setMainOrders(data.data);
   };
   
-  const loadMainOrdersWithFilter = async (collectDate?: string) => {
-    let url = '/api/main-order';
-    if (collectDate) {
-      url += `?collectDate=${collectDate}`;
-    }
+  const loadMainOrdersWithFilter = async (collectDate?: string, warehouse?: string, port?: string, cargoType?: string) => {
+    const params = new URLSearchParams();
+    if (collectDate) params.append('collectDate', collectDate);
+    if (warehouse && warehouse !== '全部') params.append('warehouse', warehouse);
+    if (port && port !== '全部') params.append('port', port);
+    if (cargoType && cargoType !== '全部') params.append('cargoType', cargoType);
+
+    const url = `/api/main-order${params.toString() ? '?' + params.toString() : ''}`;
     const res = await fetch(url);
     const data = await res.json();
     if (data.success) setMainOrders(data.data);
@@ -3440,8 +3449,8 @@ export default function LogisticsManagement() {
             <DialogTitle className="text-xl">主单列表</DialogTitle>
           </DialogHeader>
           <div className="mb-4 grid grid-cols-5 gap-3">
-            <Input type="date" id="filter-order-date" placeholder="揽收日期" />
-            <Select defaultValue="全部">
+            <Input type="date" id="filter-order-date" placeholder="揽收日期" value={orderListFilterDate} onChange={e => setOrderListFilterDate(e.target.value)} />
+            <Select value={orderListFilterWarehouse} onValueChange={setOrderListFilterWarehouse}>
               <SelectTrigger><SelectValue placeholder="仓库" /></SelectTrigger>
               <SelectContent>
                 <SelectItem value="全部">全部</SelectItem>
@@ -3449,7 +3458,7 @@ export default function LogisticsManagement() {
                 <SelectItem value="加工区">加工区</SelectItem>
               </SelectContent>
             </Select>
-            <Select defaultValue="全部">
+            <Select value={orderListFilterPort} onValueChange={setOrderListFilterPort}>
               <SelectTrigger><SelectValue placeholder="口岸" /></SelectTrigger>
               <SelectContent>
                 <SelectItem value="全部">全部</SelectItem>
@@ -3457,7 +3466,7 @@ export default function LogisticsManagement() {
                 <SelectItem value="关西">关西</SelectItem>
               </SelectContent>
             </Select>
-            <Select defaultValue="全部">
+            <Select value={orderListFilterCargoType} onValueChange={setOrderListFilterCargoType}>
               <SelectTrigger><SelectValue placeholder="货物属性" /></SelectTrigger>
               <SelectContent>
                 <SelectItem value="全部">全部</SelectItem>
@@ -3466,8 +3475,7 @@ export default function LogisticsManagement() {
               </SelectContent>
             </Select>
             <Button onClick={() => {
-              const date = (document.getElementById('filter-order-date') as HTMLInputElement).value;
-              loadMainOrdersWithFilter(date);
+              loadMainOrdersWithFilter(orderListFilterDate, orderListFilterWarehouse, orderListFilterPort, orderListFilterCargoType);
             }}>查询</Button>
           </div>
           <div className="flex-1 overflow-auto border rounded-lg" style={{ maxHeight: 'calc(90vh - 200px)' }}>

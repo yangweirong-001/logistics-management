@@ -219,13 +219,19 @@ export const mainOrderApi = {
     if (error) throw new Error(`删除失败: ${error.message}`);
   },
 
-  async query(params: { collectDate?: string; warehouse?: string }) {
+  async query(params: { collectDate?: string; warehouse?: string; port?: string; cargoType?: string }) {
     let query = client.from('main_orders').select('*');
     if (params.collectDate) {
       query = query.eq('collect_date', params.collectDate);
     }
     if (params.warehouse) {
       query = query.eq('warehouse', params.warehouse);
+    }
+    if (params.port) {
+      query = query.eq('port', params.port);
+    }
+    if (params.cargoType) {
+      query = query.eq('cargo_type', params.cargoType);
     }
     const { data, error } = await query.order('collect_date', { ascending: false });
     if (error) throw new Error(`查询失败: ${error.message}`);
