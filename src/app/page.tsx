@@ -279,7 +279,11 @@ const exportToExcel = (data: MainOrder[], filename: string, routeConfigs: RouteC
     order.origin || '',
     order.transfer || '',
     order.dest || '',
-    formatDepartureDateTime(order.actual_flight_date, order.depart_time),
+    (() => {
+      const result = formatDepartureDateTime(order.actual_flight_date, order.depart_time);
+      console.log('导出起飞时间 - ID:', order.id, 'actual_flight_date:', order.actual_flight_date, 'depart_time:', order.depart_time, 'result:', result);
+      return result;
+    })(),
     formatArrivalDateTimeForExport(order),
     order.actual_pieces?.toString() || '',
     order.actual_weight || '',
