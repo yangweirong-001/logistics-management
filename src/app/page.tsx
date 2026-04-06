@@ -1410,6 +1410,7 @@ export default function LogisticsManagement() {
       actual_volume: toNumberOrNull(orderForm.actual_volume),
       actual_bills: toIntOrNull(orderForm.actual_bills),
       remark: toNull(orderForm.remark),
+      issue_card: toNull(orderForm.issue_card),
     };
     
     try {
