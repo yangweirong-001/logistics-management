@@ -1920,6 +1920,14 @@ export default function LogisticsManagement() {
           >
             航班异常情况记录
           </button>
+
+          <div className="px-4 py-2 text-xs text-white/50 uppercase mt-4">系统文档</div>
+          <button
+            onClick={() => setActiveTab('config-docs')}
+            className={`w-full px-5 py-3 text-left hover:bg-white/10 ${activeTab === 'config-docs' ? 'bg-blue-500' : ''}`}
+          >
+            📄 配置文档
+          </button>
         </nav>
         
         <div className="p-4 border-t border-white/10">
@@ -3370,6 +3378,59 @@ export default function LogisticsManagement() {
                     )}
                   </tbody>
                 </table>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* 配置文档 */}
+        {activeTab === 'config-docs' && (
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between">
+              <CardTitle>📄 配置逻辑文档</CardTitle>
+              <Button onClick={async () => {
+                try {
+                  const response = await fetch('/配置逻辑文档.md');
+                  const content = await response.text();
+                  const blob = new Blob([content], { type: 'text/markdown;charset=utf-8' });
+                  const url = URL.createObjectURL(blob);
+                  const link = document.createElement('a');
+                  link.href = url;
+                  link.download = '配置逻辑文档.md';
+                  document.body.appendChild(link);
+                  link.click();
+                  document.body.removeChild(link);
+                  URL.revokeObjectURL(url);
+                } catch (error) {
+                  alert('下载失败: ' + (error instanceof Error ? error.message : '网络错误'));
+                }
+              }}>
+                📥 下载完整文档
+              </Button>
+            </CardHeader>
+            <CardContent>
+              <div className="text-center py-12">
+                <div className="text-6xl mb-4">📋</div>
+                <h2 className="text-2xl font-bold mb-4">配置逻辑文档</h2>
+                <p className="text-gray-600 mb-6 max-w-lg mx-auto">
+                  本文档包含物流管理系统的所有配置逻辑说明，包括区域参数配置、航班配置、目的港配置、航空路由配置、方数预估、主单发放、主单查询、欠方余方查询等模块的详细说明。
+                </p>
+                <div className="space-y-3 max-w-2xl mx-auto text-left bg-gray-50 p-6 rounded-lg">
+                  <h3 className="font-semibold mb-3">文档目录：</h3>
+                  <ul className="space-y-2 text-sm text-gray-700">
+                    <li>1. 区域参数配置</li>
+                    <li>2. 航班配置</li>
+                    <li>3. 目的港配置</li>
+                    <li>4. 航空路由配置</li>
+                    <li>5. 方数预估</li>
+                    <li>6. 主单发放</li>
+                    <li>7. 主单查询</li>
+                    <li>8. 欠方余方查询</li>
+                  </ul>
+                </div>
+                <p className="text-gray-500 mt-6 text-sm">
+                  点击右上角的"下载完整文档"按钮，可以下载 Markdown 格式的完整文档文件。
+                </p>
               </div>
             </CardContent>
           </Card>
