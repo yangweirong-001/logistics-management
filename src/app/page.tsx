@@ -1295,6 +1295,27 @@ export default function LogisticsManagement() {
       is_complete: record.is_complete || '是',
     });
   };
+
+  // 根据揽收日期和仓库自动加载记录
+  const loadVolumeEstimateByDateAndWarehouse = (collectDate: string, warehouse: string) => {
+    if (!collectDate || !warehouse) return;
+
+    const record = volumeEstimates.find(
+      e => e.collect_date === collectDate && e.warehouse === warehouse
+    );
+
+    if (record) {
+      // 找到记录，填充表单
+      setEditingVolume(record);
+      setVolumeForm({
+        collect_date: record.collect_date,
+        warehouse: record.warehouse,
+        package_count: record.package_count,
+        weight: record.weight || 0,
+        is_complete: record.is_complete || '是',
+      });
+    }
+  };
   
   // 删除方数预估记录
   const deleteVolumeEstimate = async (id: number) => {
@@ -2087,7 +2108,12 @@ export default function LogisticsManagement() {
                   <div>
                     <Label>揽收日期</Label>
                     <Input type="date" value={volumeForm.collect_date}
-                      onChange={e => setVolumeForm(prev => ({ ...prev, collect_date: e.target.value }))} />
+                      onChange={e => {
+                        const newDate = e.target.value;
+                        setVolumeForm(prev => ({ ...prev, collect_date: newDate }));
+                        // 自动查找并加载对应的记录
+                        loadVolumeEstimateByDateAndWarehouse(newDate, volumeForm.warehouse);
+                      }} />
                   </div>
                   <div>
                     <Label>星期</Label>
@@ -2097,7 +2123,11 @@ export default function LogisticsManagement() {
                   <div>
                     <Label>仓库</Label>
                     <Select value={volumeForm.warehouse}
-                      onValueChange={v => setVolumeForm(prev => ({ ...prev, warehouse: v }))}>
+                      onValueChange={v => {
+                        setVolumeForm(prev => ({ ...prev, warehouse: v }));
+                        // 自动查找并加载对应的记录
+                        loadVolumeEstimateByDateAndWarehouse(volumeForm.collect_date, v);
+                      }}>
                       <SelectTrigger><SelectValue placeholder="请选择" /></SelectTrigger>
                       <SelectContent>
                         <SelectItem value="东莞">东莞</SelectItem>
