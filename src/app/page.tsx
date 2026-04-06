@@ -2623,8 +2623,8 @@ export default function LogisticsManagement() {
               </CardHeader>
               <CardContent>
                 {/* 第一行：日期范围 */}
-                <div className="flex gap-3 mb-3">
-                  <div className="flex flex-col gap-1 flex-1">
+                <div className="flex gap-3 mb-5">
+                  <div className="flex flex-col gap-2 flex-1">
                     <Label>揽收日期范围</Label>
                     <DateTimeRangePicker
                       value={{ start: orderQueryStartDate, end: orderQueryEndDate }}
@@ -2636,7 +2636,7 @@ export default function LogisticsManagement() {
                       showTime={false}
                     />
                   </div>
-                  <div className="flex flex-col gap-1 flex-1">
+                  <div className="flex flex-col gap-2 flex-1">
                     <Label>预计起飞日期范围</Label>
                     <DateTimeRangePicker
                       value={{ start: orderQueryDepartStartDate, end: orderQueryDepartEndDate }}
@@ -2649,9 +2649,11 @@ export default function LogisticsManagement() {
                     />
                   </div>
                 </div>
+                {/* 分隔线 */}
+                <div className="border-t border-gray-200 mb-5"></div>
                 {/* 第二行：筛选项 */}
-                <div className="flex gap-2 mb-3">
-                  <div className="flex flex-col gap-1" style={{ width: '100px' }}>
+                <div className="flex gap-3 mb-5">
+                  <div className="flex flex-col gap-2" style={{ width: '100px' }}>
                     <Label>仓库</Label>
                     <Select value={orderQueryWarehouse} onValueChange={v => setOrderQueryWarehouse(v)}>
                       <SelectTrigger>
@@ -2666,7 +2668,7 @@ export default function LogisticsManagement() {
                       </SelectContent>
                     </Select>
                   </div>
-                  <div className="flex flex-col gap-1" style={{ width: '100px' }}>
+                  <div className="flex flex-col gap-2" style={{ width: '100px' }}>
                     <Label>始发</Label>
                     <Select value={orderQueryOrigin} onValueChange={v => setOrderQueryOrigin(v)}>
                       <SelectTrigger>
@@ -2682,7 +2684,7 @@ export default function LogisticsManagement() {
                       </SelectContent>
                     </Select>
                   </div>
-                  <div className="flex flex-col gap-1" style={{ width: '100px' }}>
+                  <div className="flex flex-col gap-2" style={{ width: '100px' }}>
                     <Label>路由类型</Label>
                     <Select value={orderQueryRouteType} onValueChange={v => setOrderQueryRouteType(v)}>
                       <SelectTrigger>
@@ -2697,7 +2699,7 @@ export default function LogisticsManagement() {
                       </SelectContent>
                     </Select>
                   </div>
-                  <div className="flex flex-col gap-1" style={{ width: '100px' }}>
+                  <div className="flex flex-col gap-2" style={{ width: '100px' }}>
                     <Label>口岸</Label>
                     <Select value={orderQueryPort} onValueChange={v => setOrderQueryPort(v)}>
                       <SelectTrigger>
@@ -2712,7 +2714,7 @@ export default function LogisticsManagement() {
                       </SelectContent>
                     </Select>
                   </div>
-                  <div className="flex flex-col gap-1" style={{ width: '100px' }}>
+                  <div className="flex flex-col gap-2" style={{ width: '100px' }}>
                     <Label>货物属性</Label>
                     <Select value={orderQueryCargoType} onValueChange={v => setOrderQueryCargoType(v)}>
                       <SelectTrigger>
@@ -2727,7 +2729,7 @@ export default function LogisticsManagement() {
                       </SelectContent>
                     </Select>
                   </div>
-                  <div className="flex flex-col gap-1" style={{ width: '150px' }}>
+                  <div className="flex flex-col gap-2" style={{ width: '150px' }}>
                     <Label>主单号</Label>
                     <Input
                       placeholder="搜索"
@@ -2737,7 +2739,7 @@ export default function LogisticsManagement() {
                   </div>
                 </div>
                 {/* 第三行：按钮 */}
-                <div className="flex gap-2">
+                <div className="flex gap-3">
                   <Button onClick={queryMainOrders}>查询</Button>
                   <Button variant="outline" onClick={() => {
                     setOrderQueryStartDate(null);
