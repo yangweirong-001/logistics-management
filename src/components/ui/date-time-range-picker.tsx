@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { DayPicker } from 'react-day-picker';
 import 'react-day-picker/dist/style.css';
 import { Calendar, X } from 'lucide-react';
@@ -19,6 +19,8 @@ export default function DateTimeRangePicker({ value, onChange, placeholder = '�
   const [internalEnd, setInternalEnd] = useState<Date | null>(value?.end || null);
   const [startMonth, setStartMonth] = useState(new Date());
   const [endMonth, setEndMonth] = useState(new Date());
+  const [panelPosition, setPanelPosition] = useState({ top: 0, left: 0 });
+  const triggerRef = useRef<HTMLDivElement>(null);
 
   // 同步外部 value 到内部状态
   useEffect(() => {
@@ -27,6 +29,20 @@ export default function DateTimeRangePicker({ value, onChange, placeholder = '�
       setInternalEnd(value.end);
     }
   }, [value]);
+
+  // 计算弹出面板位置
+  useEffect(() => {
+    if (isOpen && triggerRef.current) {
+      const rect = triggerRef.current.getBoundingClientRect();
+      const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+      const scrollLeft = window.pageXOffset || document.documentElement.scrollLeft;
+
+      setPanelPosition({
+        top: rect.bottom + scrollTop + 8,
+        left: Math.max(8, Math.min(rect.left + scrollLeft, window.innerWidth - 816)),
+      });
+    }
+  }, [isOpen]);
 
   const handleDateSelectStart = (date: Date | undefined) => {
     if (date) {
@@ -122,16 +138,17 @@ export default function DateTimeRangePicker({ value, onChange, placeholder = '�
     <div className="relative">
       {/* 触发器 */}
       <div
+        ref={triggerRef}
         onClick={() => setIsOpen(!isOpen)}
         className="flex items-center gap-2 px-3 py-2 border border-gray-300 rounded-md cursor-pointer hover:bg-gray-50 w-[280px] overflow-hidden"
       >
         <Calendar className="w-4 h-4 text-gray-500" />
-        <span className="flex-1 text-sm">
+        <span className="flex-1 text-sm whitespace-nowrap overflow-hidden">
           {formatDateRange()}
         </span>
         {internalStart && internalEnd && (
           <X
-            className="w-4 h-4 text-gray-500 cursor-pointer hover:text-gray-700"
+            className="w-4 h-4 text-gray-500 cursor-pointer hover:text-gray-700 flex-shrink-0"
             onClick={(e) => {
               e.stopPropagation();
               handleClear();
@@ -142,7 +159,10 @@ export default function DateTimeRangePicker({ value, onChange, placeholder = '�
 
       {/* 弹出面板 */}
       {isOpen && (
-        <div className="absolute z-50 mt-2 bg-white border border-gray-200 rounded-lg shadow-xl p-6 w-[800px]">
+        <div
+          className="fixed z-50 bg-white border border-gray-200 rounded-lg shadow-xl p-6 w-[800px]"
+          style={{ top: `${panelPosition.top}px`, left: `${panelPosition.left}px` }}
+        >
           {/* 顶部：显示当前选择的时间 */}
           <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded">
             <div className="text-sm font-semibold text-blue-700">
