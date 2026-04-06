@@ -2622,9 +2622,9 @@ export default function LogisticsManagement() {
                 </Button>
               </CardHeader>
               <CardContent>
-                <div className="grid grid-cols-2 gap-4 mb-4">
-                  <div className="flex flex-col gap-1">
-                    <Label>揽收日期范围</Label>
+                <div className="flex flex-wrap gap-2 mb-3">
+                  <div className="flex flex-col gap-0.5" style={{ minWidth: '180px', flex: '1' }}>
+                    <Label className="text-sm">揽收日期范围</Label>
                     <DateTimeRangePicker
                       value={{ start: orderQueryStartDate, end: orderQueryEndDate }}
                       onChange={(value) => {
@@ -2635,8 +2635,8 @@ export default function LogisticsManagement() {
                       showTime={false}
                     />
                   </div>
-                  <div className="flex flex-col gap-1">
-                    <Label>预计起飞日期范围</Label>
+                  <div className="flex flex-col gap-0.5" style={{ minWidth: '180px', flex: '1' }}>
+                    <Label className="text-sm">预计起飞日期范围</Label>
                     <DateTimeRangePicker
                       value={{ start: orderQueryDepartStartDate, end: orderQueryDepartEndDate }}
                       onChange={(value) => {
@@ -2647,12 +2647,10 @@ export default function LogisticsManagement() {
                       showTime={true}
                     />
                   </div>
-                </div>
-                <div className="grid grid-cols-6 gap-3 mb-4">
-                  <div className="flex flex-col gap-1">
-                    <Label>仓库</Label>
+                  <div className="flex flex-col gap-0.5" style={{ minWidth: '100px', flex: '0 0 auto' }}>
+                    <Label className="text-sm">仓库</Label>
                     <Select value={orderQueryWarehouse} onValueChange={v => setOrderQueryWarehouse(v)}>
-                      <SelectTrigger>
+                      <SelectTrigger className="h-9">
                         <SelectValue placeholder="全部">
                           {orderQueryWarehouse === '全部' ? '全部' : orderQueryWarehouse}
                         </SelectValue>
@@ -2664,10 +2662,10 @@ export default function LogisticsManagement() {
                       </SelectContent>
                     </Select>
                   </div>
-                  <div className="flex flex-col gap-1">
-                    <Label>始发</Label>
+                  <div className="flex flex-col gap-0.5" style={{ minWidth: '100px', flex: '0 0 auto' }}>
+                    <Label className="text-sm">始发</Label>
                     <Select value={orderQueryOrigin} onValueChange={v => setOrderQueryOrigin(v)}>
-                      <SelectTrigger>
+                      <SelectTrigger className="h-9">
                         <SelectValue placeholder="全部">
                           {orderQueryOrigin === '全部' ? '全部' : orderQueryOrigin}
                         </SelectValue>
@@ -2680,10 +2678,10 @@ export default function LogisticsManagement() {
                       </SelectContent>
                     </Select>
                   </div>
-                  <div className="flex flex-col gap-1">
-                    <Label>路由类型</Label>
+                  <div className="flex flex-col gap-0.5" style={{ minWidth: '100px', flex: '0 0 auto' }}>
+                    <Label className="text-sm">路由类型</Label>
                     <Select value={orderQueryRouteType} onValueChange={v => setOrderQueryRouteType(v)}>
-                      <SelectTrigger>
+                      <SelectTrigger className="h-9">
                         <SelectValue placeholder="全部">
                           {orderQueryRouteType === '全部' ? '全部' : orderQueryRouteType}
                         </SelectValue>
@@ -2695,10 +2693,10 @@ export default function LogisticsManagement() {
                       </SelectContent>
                     </Select>
                   </div>
-                  <div className="flex flex-col gap-1">
-                    <Label>口岸</Label>
+                  <div className="flex flex-col gap-0.5" style={{ minWidth: '100px', flex: '0 0 auto' }}>
+                    <Label className="text-sm">口岸</Label>
                     <Select value={orderQueryPort} onValueChange={v => setOrderQueryPort(v)}>
-                      <SelectTrigger>
+                      <SelectTrigger className="h-9">
                         <SelectValue placeholder="全部">
                           {orderQueryPort === '全部' ? '全部' : orderQueryPort}
                         </SelectValue>
@@ -2710,10 +2708,10 @@ export default function LogisticsManagement() {
                       </SelectContent>
                     </Select>
                   </div>
-                  <div className="flex flex-col gap-1">
-                    <Label>货物属性</Label>
+                  <div className="flex flex-col gap-0.5" style={{ minWidth: '100px', flex: '0 0 auto' }}>
+                    <Label className="text-sm">货物属性</Label>
                     <Select value={orderQueryCargoType} onValueChange={v => setOrderQueryCargoType(v)}>
-                      <SelectTrigger>
+                      <SelectTrigger className="h-9">
                         <SelectValue placeholder="全部">
                           {orderQueryCargoType === '全部' ? '全部' : orderQueryCargoType}
                         </SelectValue>
@@ -2725,9 +2723,10 @@ export default function LogisticsManagement() {
                       </SelectContent>
                     </Select>
                   </div>
-                  <div className="flex flex-col gap-1">
-                    <Label>主单号</Label>
+                  <div className="flex flex-col gap-0.5" style={{ minWidth: '150px', flex: '0 0 auto' }}>
+                    <Label className="text-sm">主单号</Label>
                     <Input
+                      className="h-9"
                       placeholder="搜索"
                       value={orderQueryMainOrderNo}
                       onChange={(e) => setOrderQueryMainOrderNo(e.target.value)}
