@@ -245,7 +245,13 @@ export const mainOrderApi = {
       query = query.eq('cargo_type', params.cargoType);
     }
     if (params.issueCard) {
-      query = query.eq('issue_card', params.issueCard);
+      // 如果选择"否"，则匹配 issue_card 为"否"或 null 的记录
+      if (params.issueCard === '否') {
+        query = query.or('issue_card.eq.否,issue_card.is.null');
+      } else {
+        // 如果选择"是"，则只匹配 issue_card 为"是"的记录
+        query = query.eq('issue_card', params.issueCard);
+      }
     }
     if (params.origin) {
       query = query.eq('origin', params.origin);
