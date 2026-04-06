@@ -2125,11 +2125,17 @@ export default function LogisticsManagement() {
                     <Select value={volumeForm.warehouse}
                       onValueChange={v => {
                         setVolumeForm(prev => ({ ...prev, warehouse: v }));
-                        // 自动查找并加载对应的记录
-                        loadVolumeEstimateByDateAndWarehouse(volumeForm.collect_date, v);
+                        // 自动查找并加载对应的记录（只有选择具体仓库时才加载）
+                        if (v !== '全部') {
+                          loadVolumeEstimateByDateAndWarehouse(volumeForm.collect_date, v);
+                        } else {
+                          // 选择"全部"时，清空编辑状态，准备汇总计算
+                          setEditingVolume(null);
+                        }
                       }}>
                       <SelectTrigger><SelectValue placeholder="请选择" /></SelectTrigger>
                       <SelectContent>
+                        <SelectItem value="全部">全部</SelectItem>
                         <SelectItem value="东莞">东莞</SelectItem>
                         <SelectItem value="加工区">加工区</SelectItem>
                       </SelectContent>
