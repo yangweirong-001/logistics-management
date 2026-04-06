@@ -675,7 +675,289 @@ export default function LogisticsManagement() {
     loadFlightExceptions();
 
   }, []);
-  
+
+  // Markdown 转 HTML 辅助函数
+  const markdownToHtml = (markdown: string): string => {
+    let html = markdown;
+    
+    // 标题
+    html = html.replace(/^# (.*$)/gim, '<h1>$1</h1>');
+    html = html.replace(/^## (.*$)/gim, '<h2>$1</h2>');
+    html = html.replace(/^### (.*$)/gim, '<h3>$1</h3>');
+    html = html.replace(/^#### (.*$)/gim, '<h4>$1</h4>');
+    
+    // 流程步骤块
+    html = html.replace(/^\【第(.*)步：(.*?)】/gim, '<div class="flow-step"><div class="flow-step-title">第$1步：$2</div>');
+    html = html.replace(/^│$/gim, '</div>');
+    
+    // 粗体
+    html = html.replace(/\*\*(.*?)\*\*/gim, '<strong>$1</strong>');
+    
+    // 代码块
+    html = html.replace(/```(\w*)([\s\S]*?)```/gim, '<pre><code class="language-$1">$2</code></pre>');
+    html = html.replace(/`([^`]+)`/gim, '<code>$1</code>');
+    
+    // 列表
+    html = html.replace(/^├─ (.*)$/gim, '<li>$1</li>');
+    html = html.replace(/^│  ├── (.*)$/gim, '<li style="margin-left: 20px;">$1</li>');
+    html = html.replace(/^│  │  ├── (.*)$/gim, '<li style="margin-left: 40px;">$1</li>');
+    html = html.replace(/^│  └── (.*)$/gim, '<li style="margin-left: 20px;">$1</li>');
+    html = html.replace(/^└── (.*)$/gim, '<li>$1</li>');
+    html = html.replace(/^\d+\. (.*)$/gim, '<li>$1</li>');
+    
+    // 公式
+    html = html.replace(/^([a-zA-Z\u4e00-\u9fa5\s]+)=([\s\S]*?)$/gm, (match, left, right) => {
+      if (left.includes('=') || right.includes('\n')) return match;
+      return `<div class="formula"><strong>${left.trim()}</strong> = ${right.trim()}</div>`;
+    });
+    
+    // 分隔线
+    html = html.replace(/^---$/gim, '<hr>');
+    
+    // 引用
+    html = html.replace(/^> (.*)$/gim, '<blockquote>$1</blockquote>');
+    
+    // 段落
+    html = html.replace(/\n\n/g, '</p><p>');
+    
+    return html;
+  };
+
+  // 渲染逻辑流程文档
+  const renderLogicFlowDoc = () => {
+    return (
+      <div className="logic-flow-doc">
+        <h1>物流管理系统 - 模块逻辑流程文档</h1>
+        <p><strong>版本：</strong>v1.0 | <strong>更新日期：</strong>2026-04-06</p>
+        
+        <h2>文档说明</h2>
+        <p>本文档说明各个模块之间的数据流和计算逻辑，帮助理解系统运作方式。</p>
+        
+        <h2>1. 方数预估模块逻辑</h2>
+        
+        <h3>1.1 输入数据</h3>
+        <pre><code>用户输入：
+├── 揽收日期
+├── 仓库（东莞/加工区/全部）
+├── 揽收大包数
+├── 重量
+└── 货物袋数是否齐全</code></pre>
+        
+        <h3>1.2 计算流程</h3>
+        
+        <div className="flow-step">
+          <div className="flow-step-title">第一步：获取区域参数配置</div>
+          <ul>
+            <li>查询条件：warehouse = 用户选择的仓库</li>
+            <li>如果找不到当天的配置：查找前一天的配置（递归查找）</li>
+            <li>获取：大包预估体积、关东/关西目的港占比、关东/关西普货/特货占比</li>
+          </ul>
+        </div>
+        
+        <div className="flow-step">
+          <div className="flow-step-title">第二步：获取航班配置</div>
+          <ul>
+            <li>查询条件：warehouse + weekday</li>
+            <li>获取：关东/关西普货/特货的路由类型</li>
+          </ul>
+        </div>
+        
+        <div className="flow-step">
+          <div className="flow-step-title">第三步：计算基础信息</div>
+          <div className="formula"><strong>总方数</strong> = 揽收大包数 × 大包预估体积</div>
+          <div className="formula"><strong>关东总方数</strong> = 总方数 × 关东目的港占比 / 100</div>
+          <div className="formula"><strong>关西总方数</strong> = 总方数 × 关西目的港占比 / 100</div>
+        </div>
+        
+        <div className="flow-step">
+          <div className="flow-step-title">第四步：计算货物分类</div>
+          <ul>
+            <li>关东普货 = 关东总方数 × 关东普货占比 / 100</li>
+            <li>关东特货 = 关东总方数 × 关东特货占比 / 100</li>
+            <li>关西普货 = 关西总方数 × 关西普货占比 / 100</li>
+            <li>关西特货 = 关西总方数 × 关西特货占比 / 100</li>
+          </ul>
+        </div>
+        
+        <div className="flow-step">
+          <div className="flow-step-title">第五步：计算应配置方数</div>
+          <ul>
+            <li>应配置空运方数 = 所有路由类型为"空运"的货物分类之和</li>
+            <li>应配置海空方数 = 所有路由类型为"海空"的货物分类之和</li>
+          </ul>
+        </div>
+        
+        <div className="flow-step">
+          <div className="flow-step-title">第六步：获取已保存的主单数据</div>
+          <ul>
+            <li>查询条件：collect_date + warehouse + route_type</li>
+            <li>对每个主单，确定有效方数（多级回退）：</li>
+            <li>优先级1：actual_volume（实际方数，如果 {'>'} 0）</li>
+            <li>优先级2：max_volume（打货上限，如果 {'>'} 0）</li>
+            <li>优先级3：est_volume（预估方数，如果 {'>'} 0）</li>
+            <li>默认：0</li>
+          </ul>
+        </div>
+        
+        <div className="flow-step">
+          <div className="flow-step-title">第七步：计算实际配置和未配置</div>
+          <div className="formula"><strong>未配置方数</strong> = 总方数 - 实际配置空运方数 - 实际配置海空方数</div>
+        </div>
+        
+        <h3>1.3 仓库为"全部"时的特殊逻辑</h3>
+        <p>当用户选择仓库 = "全部"时，系统会汇总所有仓库的数据。</p>
+        
+        <h2>2. 主单发放模块逻辑</h2>
+        
+        <h3>2.1 自动计算流程</h3>
+        
+        <div className="flow-step">
+          <div className="flow-step-title">第一步：自动计算类别</div>
+          <div className="formula"><strong>类别</strong> = 口岸 + 货物属性</div>
+          <p>例1：关东 + 普货 = "关东普货"</p>
+        </div>
+        
+        <div className="flow-step">
+          <div className="flow-step-title">第二步：自动计算打货上限件数</div>
+          <div className="formula"><strong>打货上限件数</strong> = 打货上限 / 单件体积（向下取整）</div>
+        </div>
+        
+        <div className="flow-step">
+          <div className="flow-step-title">第三步：自动查找预估方数</div>
+          <ul>
+            <li>查找顺序：当天 → 前一天 → 前2天...（最多查找7天）</li>
+            <li>根据类别匹配对应的数值</li>
+          </ul>
+        </div>
+        
+        <div className="flow-step">
+          <div className="flow-step-title">第四步：自动匹配路由配置</div>
+          <ul>
+            <li>触发条件：用户填写了 航班号 + 始发机场 + 目的机场</li>
+            <li>自动填充：起飞时间、到港时间、二程航班、路由类型</li>
+          </ul>
+        </div>
+        
+        <div className="flow-step">
+          <div className="flow-step-title">第五步：自动判断到港日期</div>
+          <ul>
+            <li>根据 is_next_day 字段判断是否隔天</li>
+            <li>如果 is_next_day = "是"：到港日期 = 实际起飞日期 + 1天</li>
+          </ul>
+        </div>
+        
+        <h2>3. 欠方余方查询逻辑</h2>
+        
+        <h3>3.1 计算流程</h3>
+        
+        <div className="flow-step">
+          <div className="flow-step-title">第一步：查找方数预估</div>
+          <ul>
+            <li>查询条件：collect_date + warehouse</li>
+            <li>数据完整性检查：如果 is_complete = "否"，继续查找前一天</li>
+          </ul>
+        </div>
+        
+        <div className="flow-step">
+          <div className="flow-step-title">第二步：汇总打货上限</div>
+          <div className="formula"><strong>打货上限</strong> = Σ 主单.max_volume</div>
+        </div>
+        
+        <div className="flow-step">
+          <div className="flow-step-title">第三步：计算差异</div>
+          <div className="formula"><strong>差异</strong> = 预估方数 - 打货上限</div>
+          <div className="formula"><strong>欠方</strong> = 差异 {'>'} 0 ? 差异 : 0</div>
+          <div className="formula"><strong>余方</strong> = 差异 {'<'} 0 ? Math.abs(差异) : 0</div>
+        </div>
+        
+        <h2>4. 模块间数据流关系</h2>
+        <pre><code>区域参数配置 ──提供──→ 方数预估（大包预估体积、占比）
+航班配置 ──提供──→ 方数预估（路由类型）
+目的港配置 ──提供──→ 主单发放（dest 映射到 port）
+航空路由配置 ──提供──→ 主单发放（航班信息、路由类型）
+
+方数预估 ←读取→ 区域参数配置、航班配置、主单发放
+主单发放 ←读取→ 区域参数配置、目的港配置、航空路由配置、方数预估
+欠方余方查询 ←读取→ 方数预估、主单发放</code></pre>
+        
+        <h2>5. 关键计算公式汇总</h2>
+        
+        <h3>5.1 方数预估</h3>
+        <div className="formula"><strong>总方数</strong> = 揽收大包数 × 大包预估体积</div>
+        <div className="formula"><strong>关东总方数</strong> = 总方数 × 关东目的港占比 / 100</div>
+        <div className="formula"><strong>关西总方数</strong> = 总方数 × 关西目的港占比 / 100</div>
+        <div className="formula"><strong>未配置方数</strong> = 总方数 - 空运主单已配置方数 - 海空主单已配置方数</div>
+        
+        <h3>5.2 主单发放</h3>
+        <div className="formula"><strong>类别</strong> = 口岸 + 货物属性</div>
+        <div className="formula"><strong>打货上限件数</strong> = 打货上限 / 单件体积（向下取整）</div>
+        
+        <h3>5.3 欠方余方查询</h3>
+        <div className="formula"><strong>差异</strong> = 预估方数 - 打货上限</div>
+        <div className="formula"><strong>欠方</strong> = 差异 {'>'} 0 ? 差异 : 0</div>
+        <div className="formula"><strong>余方</strong> = 差异 {'<'} 0 ? Math.abs(差异) : 0</div>
+        
+        <h2>6. 常见场景示例</h2>
+        
+        <h3>6.1 场景一：新的一天开始，如何进行方数预估？</h3>
+        <ol>
+          <li>进入"方数预估"模块</li>
+          <li>输入揽收日期、仓库、揽收大包数、重量、货物袋数是否齐全</li>
+          <li>系统自动计算各方数</li>
+          <li>点击"保存数据"按钮</li>
+        </ol>
+        
+        <h3>6.2 场景二：如何创建一个新主单？</h3>
+        <ol>
+          <li>进入"主单发放"模块</li>
+          <li>填写基础信息（系统自动计算类别和预估方数）</li>
+          <li>填写打货上限（系统自动计算打货上限件数）</li>
+          <li>填写航班信息（系统自动匹配路由配置）</li>
+          <li>填写实际数据</li>
+          <li>点击"保存"按钮</li>
+        </ol>
+        
+        <h3>6.3 场景三：如何查看欠方余方情况？</h3>
+        <ol>
+          <li>进入"欠方余方查询"模块</li>
+          <li>输入揽收日期和筛选条件</li>
+          <li>点击"查询"按钮</li>
+          <li>系统自动计算欠方/余方结果</li>
+        </ol>
+        
+        <h2>7. 数据完整性检查</h2>
+        
+        <h3>7.1 方数预估前检查</h3>
+        <ul>
+          <li>区域参数配置是否完整？</li>
+          <li>航班配置是否完整？</li>
+        </ul>
+        
+        <h3>7.2 主单发放前检查</h3>
+        <ul>
+          <li>方数预估是否已保存？</li>
+          <li>目的港配置是否完整？</li>
+          <li>航空路由配置是否完整？</li>
+        </ul>
+        
+        <hr />
+        <p className="text-center text-gray-500"><strong>文档结束</strong></p>
+      </div>
+    );
+  };
+
+  // 初始加载
+  useEffect(() => {
+    loadAreaConfigs();
+    loadFlightConfigs();
+    loadPortConfigs();
+    loadRouteConfigs();
+    loadVolumeEstimates();
+    loadMainOrders();
+    loadFlightExceptions();
+
+  }, []);
+
   // 监听volumeForm变化，自动计算（延迟执行避免频繁计算）
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -700,7 +982,6 @@ export default function LogisticsManagement() {
           const weekday = getWeekday(volumeForm.collect_date);
 
           warehouses.forEach(wh => {
-            const areaConfig = areaConfigs.find(a => a.warehouse === wh);
             if (areaConfig) {
               try {
                 const packageVolume = parseFloat(areaConfig.package_volume) || 0;
@@ -3387,56 +3668,117 @@ export default function LogisticsManagement() {
         {activeTab === 'config-docs' && (
           <Card>
             <CardHeader className="flex flex-row items-center justify-between">
-              <CardTitle>📄 配置逻辑文档</CardTitle>
-              <Button onClick={async () => {
-                try {
-                  const response = await fetch('/配置逻辑文档.md');
-                  const content = await response.text();
-                  const blob = new Blob([content], { type: 'text/markdown;charset=utf-8' });
-                  const url = URL.createObjectURL(blob);
-                  const link = document.createElement('a');
-                  link.href = url;
-                  link.download = '配置逻辑文档.md';
-                  document.body.appendChild(link);
-                  link.click();
-                  document.body.removeChild(link);
-                  URL.revokeObjectURL(url);
-                } catch (error) {
-                  alert('下载失败: ' + (error instanceof Error ? error.message : '网络错误'));
-                }
-              }}>
-                📥 下载完整文档
-              </Button>
+              <div>
+                <CardTitle>📄 模块逻辑流程文档</CardTitle>
+                <p className="text-sm text-gray-500 mt-1">查看各模块之间的数据流和计算逻辑</p>
+              </div>
+              <div className="flex gap-2">
+                <Button variant="outline" onClick={async () => {
+                  try {
+                    const response = await fetch('/api/logic-flow-docs');
+                    const data = await response.json();
+                    if (!data.success) throw new Error('获取文档失败');
+                    
+                    // 下载 Markdown
+                    const blob = new Blob([data.content], { type: 'text/markdown;charset=utf-8' });
+                    const url = URL.createObjectURL(blob);
+                    const link = document.createElement('a');
+                    link.href = url;
+                    link.download = '模块逻辑流程文档.md';
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                    URL.revokeObjectURL(url);
+                  } catch (error) {
+                    alert('下载失败: ' + (error instanceof Error ? error.message : '网络错误'));
+                  }
+                }}>
+                  📄 下载 Markdown
+                </Button>
+                <Button onClick={async () => {
+                  try {
+                    const response = await fetch('/api/logic-flow-docs');
+                    const data = await response.json();
+                    if (!data.success) throw new Error('获取文档失败');
+                    
+                    // 将 Markdown 转换为 HTML 用于 Word
+                    const htmlContent = `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>模块逻辑流程文档</title>
+  <style>
+    body { font-family: "Microsoft YaHei", sans-serif; line-height: 1.6; padding: 40px; }
+    h1 { color: #1e3a8a; border-bottom: 3px solid #1e3a8a; padding-bottom: 10px; }
+    h2 { color: #1e40af; border-bottom: 2px solid #93c5fd; padding-bottom: 8px; margin-top: 30px; }
+    h3 { color: #3b82f6; margin-top: 25px; }
+    h4 { color: #2563eb; margin-top: 20px; }
+    pre { background: #f3f4f6; padding: 15px; border-radius: 8px; overflow-x: auto; font-size: 13px; }
+    code { background: #fef3c7; padding: 2px 6px; border-radius: 4px; font-size: 13px; }
+    pre code { background: none; padding: 0; }
+    ul, ol { padding-left: 20px; }
+    li { margin: 5px 0; }
+    strong { color: #1e40af; }
+    hr { border: none; border-top: 2px dashed #d1d5db; margin: 30px 0; }
+    blockquote { border-left: 4px solid #3b82f6; padding-left: 15px; color: #4b5563; background: #f9fafb; padding: 10px 15px; }
+  </style>
+</head>
+<body>
+${markdownToHtml(data.content)}
+</body>
+</html>`;
+
+                    const blob = new Blob([htmlContent], { type: 'application/msword;charset=utf-8' });
+                    const url = URL.createObjectURL(blob);
+                    const link = document.createElement('a');
+                    link.href = url;
+                    link.download = '模块逻辑流程文档.doc';
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                    URL.revokeObjectURL(url);
+                  } catch (error) {
+                    alert('下载失败: ' + (error instanceof Error ? error.message : '网络错误'));
+                  }
+                }}>
+                  📥 下载 Word
+                </Button>
+              </div>
             </CardHeader>
             <CardContent>
-              <div className="text-center py-12">
-                <div className="text-6xl mb-4">📋</div>
-                <h2 className="text-2xl font-bold mb-4">配置逻辑文档</h2>
-                <p className="text-gray-600 mb-6 max-w-lg mx-auto">
-                  本文档包含物流管理系统的所有配置逻辑说明，包括区域参数配置、航班配置、目的港配置、航空路由配置、方数预估、主单发放、主单查询、欠方余方查询等模块的详细说明。
-                </p>
-                <div className="space-y-3 max-w-2xl mx-auto text-left bg-gray-50 p-6 rounded-lg">
-                  <h3 className="font-semibold mb-3">文档目录：</h3>
-                  <ul className="space-y-2 text-sm text-gray-700">
-                    <li>1. 区域参数配置</li>
-                    <li>2. 航班配置</li>
-                    <li>3. 目的港配置</li>
-                    <li>4. 航空路由配置</li>
-                    <li>5. 方数预估</li>
-                    <li>6. 主单发放</li>
-                    <li>7. 主单查询</li>
-                    <li>8. 欠方余方查询</li>
-                  </ul>
+              <div className="overflow-auto" style={{ maxHeight: 'calc(100vh - 280px)' }}>
+                <div className="prose prose-slate max-w-none bg-white rounded-lg border p-8" style={{ minWidth: '1200px' }}>
+                  {renderLogicFlowDoc()}
                 </div>
-                <p className="text-gray-500 mt-6 text-sm">
-                  点击右上角的"下载完整文档"按钮，可以下载 Markdown 格式的完整文档文件。
-                </p>
               </div>
             </CardContent>
           </Card>
         )}
       </main>
-      
+
+      {/* Markdown 转 HTML 辅助函数 */}
+      <style dangerouslySetInnerHTML={{
+        __html: `
+          .prose h1 { font-size: 2.25em; font-weight: 700; margin-bottom: 1em; color: #1e3a8a; border-bottom: 3px solid #1e3a8a; padding-bottom: 0.5em; }
+          .prose h2 { font-size: 1.875em; font-weight: 600; margin-top: 2em; margin-bottom: 1em; color: #1e40af; border-bottom: 2px solid #93c5fd; padding-bottom: 0.5em; }
+          .prose h3 { font-size: 1.5em; font-weight: 600; margin-top: 1.5em; margin-bottom: 0.75em; color: #3b82f6; }
+          .prose h4 { font-size: 1.25em; font-weight: 600; margin-top: 1.25em; margin-bottom: 0.5em; color: #2563eb; }
+          .prose p { margin-bottom: 1em; line-height: 1.8; color: #374151; }
+          .prose ul, .prose ol { margin-bottom: 1em; padding-left: 2em; }
+          .prose li { margin-bottom: 0.5em; line-height: 1.7; }
+          .prose pre { background: #f3f4f6; padding: 1.5em; border-radius: 0.5em; overflow-x: auto; margin: 1em 0; font-size: 0.875em; line-height: 1.6; }
+          .prose code { background: #fef3c7; padding: 0.125em 0.375em; border-radius: 0.25em; font-size: 0.875em; color: #92400e; }
+          .prose pre code { background: none; padding: 0; color: inherit; }
+          .prose strong { color: #1e40af; font-weight: 700; }
+          .prose hr { border: none; border-top: 2px dashed #d1d5db; margin: 2em 0; }
+          .prose blockquote { border-left: 4px solid #3b82f6; padding-left: 1em; margin: 1em 0; color: #4b5563; background: #f9fafb; padding: 1em; border-radius: 0 0.5em 0.5em 0; }
+          .flow-step { background: #eff6ff; border-left: 4px solid #3b82f6; padding: 1em 1.5em; margin: 1em 0; border-radius: 0.5em; }
+          .flow-step-title { font-weight: 700; color: #1e40af; margin-bottom: 0.5em; font-size: 1.1em; }
+          .formula { background: #fef3c7; border: 1px solid #fbbf24; padding: 1em; border-radius: 0.5em; margin: 1em 0; font-family: monospace; }
+        `
+      }} />
+
       {/* 区域参数模态框 */}
       <Dialog open={areaModalOpen} onOpenChange={setAreaModalOpen}>
         <DialogContent>
