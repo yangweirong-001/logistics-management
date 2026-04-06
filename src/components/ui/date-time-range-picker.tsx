@@ -243,8 +243,8 @@ export default function DateTimeRangePicker({ value, onChange, placeholder = '�
       {/* 遮罩层 */}
       {isOpen && (
         <div
-          className="fixed inset-0 bg-black bg-opacity-30"
-          style={{ zIndex: 60 }}
+          className="fixed inset-0 bg-black bg-opacity-50"
+          style={{ zIndex: 999 }}
           onClick={handleClose}
         />
       )}
