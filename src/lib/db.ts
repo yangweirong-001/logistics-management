@@ -219,7 +219,18 @@ export const mainOrderApi = {
     if (error) throw new Error(`删除失败: ${error.message}`);
   },
 
-  async query(params: { collectDate?: string; warehouse?: string; port?: string; cargoType?: string }) {
+  async query(params: {
+    collectDate?: string;
+    warehouse?: string;
+    port?: string;
+    cargoType?: string;
+    issueCard?: string;
+    origin?: string;
+    routeType?: string;
+    mainOrderNo?: string;
+    departStartDate?: string;
+    departEndDate?: string;
+  }) {
     let query = client.from('main_orders').select('*');
     if (params.collectDate) {
       query = query.eq('collect_date', params.collectDate);
@@ -232,6 +243,21 @@ export const mainOrderApi = {
     }
     if (params.cargoType) {
       query = query.eq('cargo_type', params.cargoType);
+    }
+    if (params.issueCard) {
+      query = query.eq('issue_card', params.issueCard);
+    }
+    if (params.origin) {
+      query = query.eq('origin', params.origin);
+    }
+    if (params.routeType) {
+      query = query.eq('route_type', params.routeType);
+    }
+    if (params.mainOrderNo) {
+      query = query.ilike('main_no', `%${params.mainOrderNo}%`);
+    }
+    if (params.departStartDate && params.departEndDate) {
+      query = query.gte('actual_flight_date', params.departStartDate).lte('actual_flight_date', params.departEndDate);
     }
     const { data, error } = await query.order('collect_date', { ascending: false });
     if (error) throw new Error(`查询失败: ${error.message}`);

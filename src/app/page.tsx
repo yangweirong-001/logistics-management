@@ -107,6 +107,7 @@ interface MainOrder {
   actual_volume: string | null;
   actual_bills: number | null;
   remark: string | null;
+  issue_card: string | null;
 }
 
 interface FlightException {
@@ -401,6 +402,7 @@ export default function LogisticsManagement() {
     actual_volume: '',
     actual_bills: '',
     remark: '',
+    issue_card: '否',
   });
   
   // 欠方余方查询
@@ -481,6 +483,7 @@ export default function LogisticsManagement() {
   const [orderQueryCargoType, setOrderQueryCargoType] = useState('全部');
   const [orderQueryOrigin, setOrderQueryOrigin] = useState('全部');
   const [orderQueryRouteType, setOrderQueryRouteType] = useState('全部');
+  const [orderQueryIssueCard, setOrderQueryIssueCard] = useState('全部');
   const [orderQueryMainOrderNo, setOrderQueryMainOrderNo] = useState('');
   const [uniqueOrigins, setUniqueOrigins] = useState<string[]>([]);
 
@@ -590,6 +593,48 @@ export default function LogisticsManagement() {
       params.append('collectDate', formatDate(orderQueryStartDate));
     }
 
+    // 预计起飞日期范围筛选
+    if (orderQueryDepartStartDate && orderQueryDepartEndDate) {
+      const formatDateTime = (date: Date) => {
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+      };
+      params.append('departStartDate', formatDateTime(orderQueryDepartStartDate));
+      params.append('departEndDate', formatDateTime(orderQueryDepartEndDate));
+    }
+
+    // 仓库筛选
+    if (orderQueryWarehouse && orderQueryWarehouse !== '全部') {
+      params.append('warehouse', orderQueryWarehouse);
+    }
+
+    // 始发筛选
+    if (orderQueryOrigin && orderQueryOrigin !== '全部') {
+      params.append('origin', orderQueryOrigin);
+    }
+
+    // 路由类型筛选
+    if (orderQueryRouteType && orderQueryRouteType !== '全部') {
+      params.append('routeType', orderQueryRouteType);
+    }
+
+    // 货物属性筛选
+    if (orderQueryCargoType && orderQueryCargoType !== '全部') {
+      params.append('cargoType', orderQueryCargoType);
+    }
+
+    // 是否开具售卡筛选
+    if (orderQueryIssueCard && orderQueryIssueCard !== '全部') {
+      params.append('issueCard', orderQueryIssueCard);
+    }
+
+    // 主单号筛选
+    if (orderQueryMainOrderNo) {
+      params.append('mainOrderNo', orderQueryMainOrderNo);
+    }
+
     if (params.toString()) {
       url += `?${params.toString()}`;
     }
@@ -598,55 +643,7 @@ export default function LogisticsManagement() {
     const data = await res.json();
 
     if (data.success) {
-      let results = data.data;
-
-      // 前端过滤预计起飞日期范围
-      if (orderQueryDepartStartDate && orderQueryDepartEndDate) {
-        results = results.filter((o: MainOrder) => {
-          if (!o.actual_flight_date) return false;
-
-          // 提取日期部分进行比较（忽略时间）
-          const actualFlightDateStr = o.actual_flight_date.split(' ')[0];
-          const startDateStr = orderQueryDepartStartDate.toISOString().split('T')[0];
-          const endDateStr = orderQueryDepartEndDate.toISOString().split('T')[0];
-
-          return actualFlightDateStr >= startDateStr && actualFlightDateStr <= endDateStr;
-        });
-      } else if (orderQueryDepartStartDate) {
-        // 只选择了开始日期，筛选该日期的所有数据
-        const startDateStr = orderQueryDepartStartDate.toISOString().split('T')[0];
-        results = results.filter((o: MainOrder) => {
-          if (!o.actual_flight_date) return false;
-          return o.actual_flight_date === startDateStr;
-        });
-      }
-
-      // 前端过滤仓库
-      if (orderQueryWarehouse && orderQueryWarehouse !== '全部') {
-        results = results.filter((o: MainOrder) => o.warehouse === orderQueryWarehouse);
-      }
-
-      // 前端过滤始发
-      if (orderQueryOrigin && orderQueryOrigin !== '全部') {
-        results = results.filter((o: MainOrder) => o.origin === orderQueryOrigin);
-      }
-
-      // 前端过滤路由类型
-      if (orderQueryRouteType && orderQueryRouteType !== '全部') {
-        results = results.filter((o: MainOrder) => o.route_type === orderQueryRouteType);
-      }
-
-      // 前端过滤货物属性
-      if (orderQueryCargoType && orderQueryCargoType !== '全部') {
-        results = results.filter((o: MainOrder) => o.cargo_type === orderQueryCargoType);
-      }
-
-      // 前端过滤主单号
-      if (orderQueryMainOrderNo) {
-        results = results.filter((o: MainOrder) => (o.main_no || '').includes(orderQueryMainOrderNo));
-      }
-
-      setMainOrders(results);
+      setMainOrders(data.data);
     }
   };
   
@@ -2617,6 +2614,17 @@ export default function LogisticsManagement() {
                     <Input placeholder="请输入备注信息" value={orderForm.remark || ''}
                       onChange={e => setOrderForm(prev => ({ ...prev, remark: e.target.value }))} />
                   </div>
+                  <div>
+                    <Label className="text-sm text-gray-600 mb-1 block">是否开具售卡</Label>
+                    <select
+                      value={orderForm.issue_card || '否'}
+                      onChange={e => setOrderForm(prev => ({ ...prev, issue_card: e.target.value }))}
+                      className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                    >
+                      <option value="否">否</option>
+                      <option value="是">是</option>
+                    </select>
+                  </div>
                 </div>
                 
                 {/* 按钮区域 */}
@@ -2632,7 +2640,7 @@ export default function LogisticsManagement() {
                       collect_date: '', depart_date: '', warehouse: '', cargo_type: '', port: '',
                       status: '', pack_req: '', max_volume: '', route_type: '', actual_flight_date: '', main_no: '',
                       flight_no: '', origin: '', transfer: '', dest: '', second_flight: '', depart_time: '', arrive_time: '',
-                      actual_pieces: '', actual_weight: '', actual_volume: '', actual_bills: '', remark: '',
+                      actual_pieces: '', actual_weight: '', actual_volume: '', actual_bills: '', remark: '', issue_card: '否',
                     });
                     setEditingOrder(null);
                   }}>清空表单</Button>
@@ -2752,6 +2760,21 @@ export default function LogisticsManagement() {
                       </SelectContent>
                     </Select>
                   </div>
+                  <div className="flex flex-col gap-2" style={{ width: '100px' }}>
+                    <Label>是否开具售卡</Label>
+                    <Select value={orderQueryIssueCard} onValueChange={v => setOrderQueryIssueCard(v)}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="全部">
+                          {orderQueryIssueCard === '全部' ? '全部' : orderQueryIssueCard}
+                        </SelectValue>
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="全部">全部</SelectItem>
+                        <SelectItem value="是">是</SelectItem>
+                        <SelectItem value="否">否</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
                   <div className="flex flex-col gap-2" style={{ width: '150px' }}>
                     <Label>主单号</Label>
                     <Input
@@ -2785,7 +2808,7 @@ export default function LogisticsManagement() {
                 <span className="text-sm text-gray-500">共 {mainOrders.length} 条记录</span>
               </div>
               <div style={{ overflow: 'auto', maxHeight: '800px', position: 'relative' }}>
-                <table style={{ borderCollapse: 'separate', borderSpacing: 0, minWidth: '2305px' }}>
+                <table style={{ borderCollapse: 'separate', borderSpacing: 0, minWidth: '2405px' }}>
                   <thead>
                     <tr>
                       <th style={{ position: 'sticky', left: 0, top: 0, zIndex: 50, backgroundColor: '#fff', minWidth: '125px', borderRight: '3px solid #f97316', borderBottom: '2px solid #e5e7eb', visibility: datePickerOpen ? 'hidden' : 'visible' }} className="text-center px-1 py-2 text-sm">揽收日期</th>
@@ -2804,6 +2827,7 @@ export default function LogisticsManagement() {
                       <th style={{ position: 'sticky', top: 0, zIndex: 40, backgroundColor: '#f3f4f6', minWidth: '90px', borderBottom: '2px solid #e5e7eb' }} className="text-center px-2 py-2">打货上限(件)</th>
                       <th style={{ position: 'sticky', top: 0, zIndex: 40, backgroundColor: '#f3f4f6', minWidth: '90px', borderBottom: '2px solid #e5e7eb' }} className="text-center px-2 py-2">实际件数</th>
                       <th style={{ position: 'sticky', top: 0, zIndex: 40, backgroundColor: '#f3f4f6', minWidth: '90px', borderBottom: '2px solid #e5e7eb' }} className="text-center px-2 py-2">实际方数</th>
+                      <th style={{ position: 'sticky', top: 0, zIndex: 40, backgroundColor: '#f3f4f6', minWidth: '100px', borderBottom: '2px solid #e5e7eb' }} className="text-center px-2 py-2">是否开具售卡</th>
                       <th style={{ position: 'sticky', top: 0, zIndex: 40, backgroundColor: '#f3f4f6', minWidth: '80px', borderBottom: '2px solid #e5e7eb' }} className="text-center px-2 py-2">操作</th>
                     </tr>
                   </thead>
@@ -2836,6 +2860,13 @@ export default function LogisticsManagement() {
                         <td style={{ minWidth: '90px', backgroundColor: '#fff' }} className="text-center px-2 py-2">{order.max_pieces || '-'}</td>
                         <td style={{ minWidth: '90px', backgroundColor: '#fff' }} className="text-center px-2 py-2">{order.actual_pieces || '-'}</td>
                         <td style={{ minWidth: '90px', backgroundColor: '#fff' }} className="text-center px-2 py-2">{order.actual_volume || '-'}</td>
+                        <td style={{ minWidth: '100px', backgroundColor: '#fff' }} className="text-center px-2 py-2">
+                          {order.issue_card ? (
+                            <Badge variant={order.issue_card === '是' ? 'default' : 'secondary'}>
+                              {order.issue_card}
+                            </Badge>
+                          ) : '-'}
+                        </td>
                         <td style={{ minWidth: '80px', backgroundColor: '#fff' }} className="text-center px-2 py-2">
                           <Button size="sm" variant="outline" className="mr-2"
                             onClick={() => {
@@ -2864,6 +2895,7 @@ export default function LogisticsManagement() {
                                 actual_volume: order.actual_volume || '',
                                 actual_bills: order.actual_bills?.toString() || '',
                                 remark: order.remark || '',
+                                issue_card: order.issue_card || '否',
                               });
                               setActiveTab('main-order');
                             }}>
@@ -3515,6 +3547,7 @@ export default function LogisticsManagement() {
                   <TableHead className="bg-gray-50 text-center px-1 py-1" style={{ width: '90px' }}>实际体积</TableHead>
                   <TableHead className="bg-gray-50 text-center px-1 py-1" style={{ width: '90px' }}>实际票数</TableHead>
                   <TableHead className="bg-gray-50 text-center px-1 py-1" style={{ width: '100px' }}>备注</TableHead>
+                  <TableHead className="bg-gray-50 text-center px-1 py-1" style={{ width: '100px' }}>是否开具售卡</TableHead>
                   <TableHead className="bg-gray-50 text-center px-1 py-1 sticky right-0" style={{ width: '120px' }}>操作</TableHead>
                 </TableRow>
               </TableHeader>
@@ -3548,6 +3581,13 @@ export default function LogisticsManagement() {
                     <TableCell className="text-center px-1 py-2">{order.actual_volume || '-'}</TableCell>
                     <TableCell className="text-center px-1 py-2">{order.actual_bills || '-'}</TableCell>
                     <TableCell className="text-center px-1 py-2 truncate max-w-[100px]" title={order.remark || ''}>{order.remark || '-'}</TableCell>
+                    <TableCell className="text-center px-1 py-2">
+                      {order.issue_card ? (
+                        <Badge variant={order.issue_card === '是' ? 'default' : 'secondary'}>
+                          {order.issue_card}
+                        </Badge>
+                      ) : '-'}
+                    </TableCell>
                     <TableCell className="text-center px-1 py-2 sticky right-0 bg-white">
                       <Button size="sm" className="bg-blue-600 hover:bg-blue-700 text-white mr-1"
                         onClick={() => {
@@ -3576,6 +3616,7 @@ export default function LogisticsManagement() {
                             actual_volume: order.actual_volume || '',
                             actual_bills: order.actual_bills?.toString() || '',
                             remark: order.remark || '',
+                            issue_card: order.issue_card || '否',
                           });
                           setOrderListOpen(false);
                           setActiveTab('main-order');

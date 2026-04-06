@@ -142,6 +142,7 @@ export const mainOrders = pgTable("main_orders", {
 	actualVolume: numeric("actual_volume", { precision: 15, scale: 3 }),
 	actualBills: integer("actual_bills"),
 	remark: varchar({ length: 500 }),
+	issueCard: varchar("issue_card", { length: 10 }),
 	createdAt: timestamp("created_at", { withTimezone: true, mode: 'string' }).defaultNow().notNull(),
 	updatedAt: timestamp("updated_at", { withTimezone: true, mode: 'string' }).defaultNow(),
 }, (table) => [

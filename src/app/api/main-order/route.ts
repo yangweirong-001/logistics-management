@@ -23,6 +23,12 @@ export async function GET(request: NextRequest) {
     const warehouse = searchParams.get('warehouse');
     const port = searchParams.get('port');
     const cargoType = searchParams.get('cargoType');
+    const issueCard = searchParams.get('issueCard');
+    const origin = searchParams.get('origin');
+    const routeType = searchParams.get('routeType');
+    const mainOrderNo = searchParams.get('mainOrderNo');
+    const departStartDate = searchParams.get('departStartDate');
+    const departEndDate = searchParams.get('departEndDate');
 
     // 支持日期范围查询
     if (startDate && endDate) {
@@ -31,12 +37,18 @@ export async function GET(request: NextRequest) {
     }
 
     // 支持单条件或多条件查询
-    if (collectDate || warehouse || port || cargoType) {
+    if (collectDate || warehouse || port || cargoType || issueCard || origin || routeType || mainOrderNo || departStartDate || departEndDate) {
       const data = await mainOrderApi.query({
         collectDate: collectDate || undefined,
         warehouse: warehouse || undefined,
         port: port || undefined,
         cargoType: cargoType || undefined,
+        issueCard: issueCard || undefined,
+        origin: origin || undefined,
+        routeType: routeType || undefined,
+        mainOrderNo: mainOrderNo || undefined,
+        departStartDate: departStartDate || undefined,
+        departEndDate: departEndDate || undefined,
       });
       return NextResponse.json({ success: true, data });
     }
