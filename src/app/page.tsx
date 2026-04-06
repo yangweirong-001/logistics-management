@@ -439,6 +439,9 @@ export default function LogisticsManagement() {
   const [orderQueryMainOrderNo, setOrderQueryMainOrderNo] = useState('');
   const [uniqueOrigins, setUniqueOrigins] = useState<string[]>([]);
 
+  // 日期选择器打开状态（用于控制固定表头显示）
+  const [datePickerOpen, setDatePickerOpen] = useState(false);
+
   // 方数预估筛选条件
   const [volumeFilterStartDate, setVolumeFilterStartDate] = useState('');
   const [volumeFilterEndDate, setVolumeFilterEndDate] = useState('');
@@ -2628,6 +2631,7 @@ export default function LogisticsManagement() {
                       }}
                       placeholder="选择日期"
                       showTime={false}
+                      onOpenChange={setDatePickerOpen}
                     />
                   </div>
                   <div className="flex flex-col gap-2 flex-[1]">
@@ -2640,6 +2644,7 @@ export default function LogisticsManagement() {
                       }}
                       placeholder="选择日期时间"
                       showTime={true}
+                      onOpenChange={setDatePickerOpen}
                     />
                   </div>
                 </div>
@@ -2744,11 +2749,11 @@ export default function LogisticsManagement() {
                 <table style={{ borderCollapse: 'separate', borderSpacing: 0, minWidth: '2305px' }}>
                   <thead>
                     <tr>
-                      <th style={{ position: 'sticky', left: 0, top: 0, zIndex: 50, backgroundColor: '#fff', minWidth: '125px', borderRight: '3px solid #f97316', borderBottom: '2px solid #e5e7eb' }} className="text-center px-1 py-2 text-sm">揽收日期</th>
-                      <th style={{ position: 'sticky', left: '125px', top: 0, zIndex: 50, backgroundColor: '#fff', minWidth: '80px', borderRight: '3px solid #f97316', borderBottom: '2px solid #e5e7eb' }} className="text-center px-1 py-2 text-sm">仓库</th>
-                      <th style={{ position: 'sticky', left: '205px', top: 0, zIndex: 50, backgroundColor: '#fff', minWidth: '80px', borderRight: '3px solid #f97316', borderBottom: '2px solid #e5e7eb' }} className="text-center px-1 py-2 text-sm">口岸</th>
-                      <th style={{ position: 'sticky', left: '285px', top: 0, zIndex: 50, backgroundColor: '#fff', minWidth: '80px', borderRight: '3px solid #f97316', borderBottom: '2px solid #e5e7eb' }} className="text-center px-1 py-2 text-sm">货物属性</th>
-                      <th style={{ position: 'sticky', left: '365px', top: 0, zIndex: 50, backgroundColor: '#fff', minWidth: '90px', borderRight: '3px solid #f97316', borderBottom: '2px solid #e5e7eb' }} className="text-center px-1 py-2 text-sm">路由类型</th>
+                      <th style={{ position: 'sticky', left: 0, top: 0, zIndex: 50, backgroundColor: '#fff', minWidth: '125px', borderRight: '3px solid #f97316', borderBottom: '2px solid #e5e7eb', visibility: datePickerOpen ? 'hidden' : 'visible' }} className="text-center px-1 py-2 text-sm">揽收日期</th>
+                      <th style={{ position: 'sticky', left: '125px', top: 0, zIndex: 50, backgroundColor: '#fff', minWidth: '80px', borderRight: '3px solid #f97316', borderBottom: '2px solid #e5e7eb', visibility: datePickerOpen ? 'hidden' : 'visible' }} className="text-center px-1 py-2 text-sm">仓库</th>
+                      <th style={{ position: 'sticky', left: '205px', top: 0, zIndex: 50, backgroundColor: '#fff', minWidth: '80px', borderRight: '3px solid #f97316', borderBottom: '2px solid #e5e7eb', visibility: datePickerOpen ? 'hidden' : 'visible' }} className="text-center px-1 py-2 text-sm">口岸</th>
+                      <th style={{ position: 'sticky', left: '285px', top: 0, zIndex: 50, backgroundColor: '#fff', minWidth: '80px', borderRight: '3px solid #f97316', borderBottom: '2px solid #e5e7eb', visibility: datePickerOpen ? 'hidden' : 'visible' }} className="text-center px-1 py-2 text-sm">货物属性</th>
+                      <th style={{ position: 'sticky', left: '365px', top: 0, zIndex: 50, backgroundColor: '#fff', minWidth: '90px', borderRight: '3px solid #f97316', borderBottom: '2px solid #e5e7eb', visibility: datePickerOpen ? 'hidden' : 'visible' }} className="text-center px-1 py-2 text-sm">路由类型</th>
                       <th style={{ position: 'sticky', top: 0, zIndex: 40, backgroundColor: '#f3f4f6', minWidth: '120px', borderBottom: '2px solid #e5e7eb' }} className="text-center px-2 py-2">主单号</th>
                       <th style={{ position: 'sticky', top: 0, zIndex: 40, backgroundColor: '#f3f4f6', minWidth: '90px', borderBottom: '2px solid #e5e7eb' }} className="text-center px-2 py-2">航班号</th>
                       <th style={{ position: 'sticky', top: 0, zIndex: 40, backgroundColor: '#f3f4f6', minWidth: '60px', borderBottom: '2px solid #e5e7eb' }} className="text-center px-2 py-2">始发</th>
@@ -2766,11 +2771,11 @@ export default function LogisticsManagement() {
                   <tbody>
                     {mainOrders.slice(0, 50).map(order => (
                       <tr key={order.id} style={{ borderBottom: '1px solid #e5e7eb' }}>
-                        <td style={{ position: 'sticky', left: 0, zIndex: 15, backgroundColor: '#fff', minWidth: '125px', borderRight: '3px solid #f97316' }} className="text-center px-1 py-2 text-sm">{order.collect_date}</td>
-                        <td style={{ position: 'sticky', left: '125px', zIndex: 15, backgroundColor: '#fff', minWidth: '80px', borderRight: '3px solid #f97316' }} className="text-center px-1 py-2 text-sm">{order.warehouse}</td>
-                        <td style={{ position: 'sticky', left: '205px', zIndex: 15, backgroundColor: '#fff', minWidth: '80px', borderRight: '3px solid #f97316' }} className="text-center px-1 py-2 text-sm">{order.port}</td>
-                        <td style={{ position: 'sticky', left: '285px', zIndex: 15, backgroundColor: '#fff', minWidth: '80px', borderRight: '3px solid #f97316' }} className="text-center px-1 py-2 text-sm">{order.cargo_type}</td>
-                        <td style={{ position: 'sticky', left: '365px', zIndex: 15, backgroundColor: '#fff', minWidth: '90px', borderRight: '3px solid #f97316' }} className="text-center px-1 py-2 text-sm">
+                        <td style={{ position: 'sticky', left: 0, zIndex: 15, backgroundColor: '#fff', minWidth: '125px', borderRight: '3px solid #f97316', visibility: datePickerOpen ? 'hidden' : 'visible' }} className="text-center px-1 py-2 text-sm">{order.collect_date}</td>
+                        <td style={{ position: 'sticky', left: '125px', zIndex: 15, backgroundColor: '#fff', minWidth: '80px', borderRight: '3px solid #f97316', visibility: datePickerOpen ? 'hidden' : 'visible' }} className="text-center px-1 py-2 text-sm">{order.warehouse}</td>
+                        <td style={{ position: 'sticky', left: '205px', zIndex: 15, backgroundColor: '#fff', minWidth: '80px', borderRight: '3px solid #f97316', visibility: datePickerOpen ? 'hidden' : 'visible' }} className="text-center px-1 py-2 text-sm">{order.port}</td>
+                        <td style={{ position: 'sticky', left: '285px', zIndex: 15, backgroundColor: '#fff', minWidth: '80px', borderRight: '3px solid #f97316', visibility: datePickerOpen ? 'hidden' : 'visible' }} className="text-center px-1 py-2 text-sm">{order.cargo_type}</td>
+                        <td style={{ position: 'sticky', left: '365px', zIndex: 15, backgroundColor: '#fff', minWidth: '90px', borderRight: '3px solid #f97316', visibility: datePickerOpen ? 'hidden' : 'visible' }} className="text-center px-1 py-2 text-sm">
                           {order.route_type ? (
                             <Badge variant={order.route_type === '空运' ? 'default' : 'secondary'}>
                               {order.route_type}
