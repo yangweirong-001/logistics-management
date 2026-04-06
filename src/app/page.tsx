@@ -3485,6 +3485,15 @@ export default function LogisticsManagement() {
               loadMainOrdersWithFilter(orderListFilterDate, orderListFilterWarehouse, orderListFilterPort, orderListFilterCargoType);
             }}>查询</Button>
           </div>
+          <div className="mb-4">
+            <Button variant="outline" onClick={() => {
+              setOrderListFilterDate('');
+              setOrderListFilterWarehouse('全部');
+              setOrderListFilterPort('全部');
+              setOrderListFilterCargoType('全部');
+              loadMainOrdersWithFilter();
+            }}>重置筛选</Button>
+          </div>
           <div className="flex-1 overflow-auto border rounded-lg" style={{ maxHeight: 'calc(90vh - 200px)' }}>
             <Table style={{ tableLayout: 'fixed', minWidth: '1800px' }} className="w-full text-base">
               <TableHeader className="sticky top-0 bg-white z-50">
