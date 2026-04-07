@@ -325,6 +325,10 @@ export default function LogisticsManagement() {
   const [volumeEstimates, setVolumeEstimates] = useState<VolumeEstimate[]>([]);
   const [mainOrders, setMainOrders] = useState<MainOrder[]>([]);
   const [flightExceptions, setFlightExceptions] = useState<FlightException[]>([]);
+
+  // 航班异常编辑状态
+  const [editingFlightException, setEditingFlightException] = useState<FlightException | null>(null);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   
   // 方数预估计算结果
   const [volumeResult, setVolumeResult] = useState<{
@@ -592,6 +596,81 @@ export default function LogisticsManagement() {
     const res = await fetch('/api/flight-exception');
     const data = await res.json();
     if (data.success) setFlightExceptions(data.data);
+  };
+
+  // 导出航班异常记录为Excel
+  const exportFlightExceptions = () => {
+    if (flightExceptions.length === 0) {
+      alert('没有数据可导出');
+      return;
+    }
+
+    // 创建CSV内容
+    const headers = ['发车日期', '航班日期', '航班号', '主单号', '票数', '始发港', '中转站', '目的港', '异常原因', '备注', '创建时间'];
+    const rows = flightExceptions.map(item => [
+      item.depart_date,
+      item.flight_date,
+      item.flight_no,
+      item.main_no,
+      item.bills,
+      item.origin,
+      item.transfer || '-',
+      item.dest,
+      item.exception_reason,
+      item.remark || '-',
+      new Date(item.created_at).toLocaleString('zh-CN'),
+    ]);
+
+    const csvContent = [
+      headers.join(','),
+      ...rows.map(row => row.map(cell => `"${cell}"`).join(',')),
+    ].join('\n');
+
+    // 添加BOM以支持中文
+    const BOM = '\uFEFF';
+    const blob = new Blob([BOM + csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `航班异常记录_${new Date().toISOString().slice(0, 10)}.csv`;
+    link.click();
+    URL.revokeObjectURL(url);
+  };
+
+  // 打开编辑弹窗
+  const openEditFlightException = (item: FlightException) => {
+    setEditingFlightException(item);
+    setIsEditDialogOpen(true);
+  };
+
+  // 保存编辑的航班异常记录
+  const saveFlightExceptionEdit = async () => {
+    if (!editingFlightException) return;
+
+    try {
+      const response = await fetch('/api/flight-exception', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          id: editingFlightException.id,
+          exceptionReason: editingFlightException.exception_reason,
+          remark: editingFlightException.remark,
+        }),
+      });
+
+      const result = await response.json();
+      if (!result.success) {
+        alert('更新失败: ' + (result.error || '未知错误'));
+        return;
+      }
+
+      alert('更新成功');
+      setIsEditDialogOpen(false);
+      setEditingFlightException(null);
+      loadFlightExceptions();
+    } catch (error) {
+      alert('更新失败: ' + (error instanceof Error ? error.message : '网络错误'));
+    }
   };
   
   // 主单查询
@@ -3819,6 +3898,9 @@ export default function LogisticsManagement() {
           <Card>
             <CardHeader className="flex flex-row items-center justify-between">
               <CardTitle>航班异常情况记录</CardTitle>
+              <Button onClick={exportFlightExceptions} variant="outline" size="sm">
+                导出 Excel
+              </Button>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-5 gap-4 mb-4">
@@ -3948,11 +4030,19 @@ export default function LogisticsManagement() {
                           <td className="px-2 py-1 text-sm border-b border-r border-gray-200">{item.exception_reason}</td>
                           <td className="px-2 py-1 text-sm border-b border-r border-gray-200">{item.remark || '-'}</td>
                           <td className="px-2 py-1 text-sm border-b border-gray-200">
-                            <Button
-                              variant="destructive"
-                              size="sm"
-                              onClick={async () => {
-                                if (!confirm('确定要删除这条记录吗？')) return;
+                            <div className="flex gap-1">
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => openEditFlightException(item)}
+                              >
+                                编辑
+                              </Button>
+                              <Button
+                                variant="destructive"
+                                size="sm"
+                                onClick={async () => {
+                                  if (!confirm('确定要删除这条记录吗？')) return;
                                 try {
                                   const response = await fetch(`/api/flight-exception?id=${item.id}`, {
                                     method: 'DELETE',
@@ -3970,6 +4060,7 @@ export default function LogisticsManagement() {
                             >
                               删除
                             </Button>
+                            </div>
                           </td>
                         </tr>
                       ))
@@ -3977,6 +4068,59 @@ export default function LogisticsManagement() {
                   </tbody>
                 </table>
               </div>
+
+              {/* 编辑弹窗 */}
+              {isEditDialogOpen && editingFlightException && (
+                <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+                  <DialogContent className="sm:max-w-[500px]">
+                    <DialogHeader>
+                      <DialogTitle>编辑航班异常记录</DialogTitle>
+                    </DialogHeader>
+                    <div className="grid gap-4 py-4">
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <Label>主单号</Label>
+                          <Input value={editingFlightException.main_no} disabled className="bg-gray-50" />
+                        </div>
+                        <div>
+                          <Label>航班号</Label>
+                          <Input value={editingFlightException.flight_no} disabled className="bg-gray-50" />
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <Label>发车日期</Label>
+                          <Input value={editingFlightException.depart_date} disabled className="bg-gray-50" />
+                        </div>
+                        <div>
+                          <Label>航班日期</Label>
+                          <Input value={editingFlightException.flight_date} disabled className="bg-gray-50" />
+                        </div>
+                      </div>
+                      <div>
+                        <Label>异常原因 <span className="text-red-500">*</span></Label>
+                        <Input
+                          value={editingFlightException.exception_reason}
+                          onChange={e => setEditingFlightException(prev => prev ? { ...prev, exception_reason: e.target.value } : null)}
+                          placeholder="请输入异常原因"
+                        />
+                      </div>
+                      <div>
+                        <Label>备注</Label>
+                        <Input
+                          value={editingFlightException.remark || ''}
+                          onChange={e => setEditingFlightException(prev => prev ? { ...prev, remark: e.target.value } : null)}
+                          placeholder="请输入备注"
+                        />
+                      </div>
+                    </div>
+                    <DialogFooter>
+                      <Button variant="outline" onClick={() => setIsEditDialogOpen(false)}>取消</Button>
+                      <Button onClick={saveFlightExceptionEdit}>保存</Button>
+                    </DialogFooter>
+                  </DialogContent>
+                </Dialog>
+              )}
             </CardContent>
           </Card>
         )}
