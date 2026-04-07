@@ -1965,7 +1965,52 @@ export default function LogisticsManagement() {
       }
     }
   };
-  
+
+  // 根据揽收日期和仓库自动加载实际配置明细的揽收大包数和重量
+  const loadConfigDetailByDateAndWarehouse = (collectDate: string, warehouse: string) => {
+    if (!collectDate || !warehouse) return;
+
+    console.log('加载实际配置明细数据:', { collectDate, warehouse });
+
+    if (warehouse === '全部') {
+      // 汇总所有仓库的数据
+      const records = volumeEstimates.filter(e => e.collect_date === collectDate);
+      if (records.length > 0) {
+        const summarizedPackageCount = records.reduce((sum, r) => sum + (r.package_count || 0), 0);
+        const summarizedWeight = records.reduce((sum, r) => sum + (r.weight || 0), 0);
+
+        // 填充表单
+        setConfigDetailForm(prev => ({
+          ...prev,
+          package_count: summarizedPackageCount,
+          weight: summarizedWeight,
+        }));
+
+        console.log('实际配置明细加载成功(全部):', { package_count: summarizedPackageCount, weight: summarizedWeight });
+      }
+    } else {
+      // 加载单个仓库的记录
+      const record = volumeEstimates.find(
+        e => e.collect_date === collectDate && e.warehouse === warehouse
+      );
+
+      if (record) {
+        // 填充表单
+        setConfigDetailForm(prev => ({
+          ...prev,
+          package_count: record.package_count || 0,
+          weight: record.weight || 0,
+        }));
+
+        console.log('实际配置明细加载成功(单个仓库):', {
+          warehouse,
+          package_count: record.package_count,
+          weight: record.weight
+        });
+      }
+    }
+  };
+
   // 删除方数预估记录
   const deleteVolumeEstimate = async (id: number) => {
     if (confirm('确定删除此记录？')) {
@@ -3950,6 +3995,8 @@ export default function LogisticsManagement() {
                     onChange={e => {
                       const newDate = e.target.value;
                       setConfigDetailForm(prev => ({ ...prev, collect_date: newDate }));
+                      // 自动加载揽收大包数和重量
+                      loadConfigDetailByDateAndWarehouse(newDate, configDetailForm.warehouse);
                     }} />
                 </div>
                 <div>
@@ -3960,7 +4007,11 @@ export default function LogisticsManagement() {
                 <div>
                   <Label>仓库</Label>
                   <Select value={configDetailForm.warehouse}
-                    onValueChange={v => setConfigDetailForm(prev => ({ ...prev, warehouse: v }))}>
+                    onValueChange={v => {
+                      setConfigDetailForm(prev => ({ ...prev, warehouse: v }));
+                      // 自动加载揽收大包数和重量
+                      loadConfigDetailByDateAndWarehouse(configDetailForm.collect_date, v);
+                    }}>
                     <SelectTrigger><SelectValue placeholder="请选择" /></SelectTrigger>
                     <SelectContent>
                       <SelectItem value="全部">全部</SelectItem>
