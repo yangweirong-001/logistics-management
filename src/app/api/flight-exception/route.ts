@@ -60,11 +60,16 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ success: false, error: '主单号和异常原因必填' }, { status: 400 });
     }
 
+    console.log('创建航班异常记录请求:', { mainNo, exceptionReason, remark });
+
     // 根据主单号获取主单信息
     const mainOrder = await getMainOrderByMainNo(mainNo);
     if (!mainOrder) {
-      return NextResponse.json({ success: false, error: '未找到该主单号' }, { status: 404 });
+      console.log('未找到主单号:', mainNo);
+      return NextResponse.json({ success: false, error: `未找到主单号: ${mainNo}，请先创建该主单` }, { status: 404 });
     }
+
+    console.log('找到主单:', mainOrder);
 
     // 创建航班异常记录
     const newRecord = {
@@ -80,13 +85,21 @@ export async function POST(request: NextRequest) {
       remark: remark || '',
     };
 
+    console.log('准备插入的记录:', newRecord);
+
     const { data, error } = await client.from('flight_exceptions').insert(newRecord).select().single();
-    if (error) throw new Error(`创建失败: ${error.message}`);
+
+    if (error) {
+      console.error('插入失败:', error);
+      throw new Error(`创建失败: ${error.message} (Code: ${error.code})`);
+    }
+
+    console.log('插入成功:', data);
 
     return NextResponse.json({ success: true, data });
   } catch (error) {
     console.error('创建航班异常记录失败:', error);
-    return NextResponse.json({ success: false, error: '创建航班异常记录失败' }, { status: 500 });
+    return NextResponse.json({ success: false, error: error instanceof Error ? error.message : '创建航班异常记录失败' }, { status: 500 });
   }
 }
 
