@@ -1170,6 +1170,7 @@ export default function LogisticsManagement() {
   // 计算实际配置明细
   useEffect(() => {
     const timer = setTimeout(() => {
+      // 只需要选择日期，如果没有选择仓库，默认使用"全部"
       if (configDetailForm.collect_date && mainOrders.length > 0) {
 
         let airConfig = {
@@ -1186,8 +1187,11 @@ export default function LogisticsManagement() {
           kansaiSpecial: 0,
         };
 
+        // 如果没有选择仓库，默认使用"全部"
+        const warehouse = configDetailForm.warehouse || '全部';
+
         // 判断是否为"全部"仓库
-        if (configDetailForm.warehouse === '全部') {
+        if (warehouse === '全部') {
           // 汇总所有仓库的数据
           const warehouses = ['东莞', '加工区'];
 
@@ -1267,13 +1271,13 @@ export default function LogisticsManagement() {
               .reduce((sum, o) => sum + getConfigDetailVolume(o), 0);
           });
 
-        } else if (configDetailForm.warehouse) {
+        } else {
           // 单个仓库的计算逻辑
           // 空运配置明细
           airConfig.kantoNormal = mainOrders
             .filter(o =>
               o.collect_date === configDetailForm.collect_date &&
-              o.warehouse === configDetailForm.warehouse &&
+              o.warehouse === warehouse &&
               o.category === '关东普货' &&
               o.route_type === '空运'
             )
@@ -1282,7 +1286,7 @@ export default function LogisticsManagement() {
           airConfig.kantoSpecial = mainOrders
             .filter(o =>
               o.collect_date === configDetailForm.collect_date &&
-              o.warehouse === configDetailForm.warehouse &&
+              o.warehouse === warehouse &&
               o.category === '关东特货' &&
               o.route_type === '空运'
             )
@@ -1291,7 +1295,7 @@ export default function LogisticsManagement() {
           airConfig.kansaiNormal = mainOrders
             .filter(o =>
               o.collect_date === configDetailForm.collect_date &&
-              o.warehouse === configDetailForm.warehouse &&
+              o.warehouse === warehouse &&
               o.category === '关西普货' &&
               o.route_type === '空运'
             )
@@ -1300,7 +1304,7 @@ export default function LogisticsManagement() {
           airConfig.kansaiSpecial = mainOrders
             .filter(o =>
               o.collect_date === configDetailForm.collect_date &&
-              o.warehouse === configDetailForm.warehouse &&
+              o.warehouse === warehouse &&
               o.category === '关西特货' &&
               o.route_type === '空运'
             )
@@ -1310,7 +1314,7 @@ export default function LogisticsManagement() {
           seaAirConfig.kantoNormal = mainOrders
             .filter(o =>
               o.collect_date === configDetailForm.collect_date &&
-              o.warehouse === configDetailForm.warehouse &&
+              o.warehouse === warehouse &&
               o.category === '关东普货' &&
               o.route_type === '海空'
             )
@@ -1319,7 +1323,7 @@ export default function LogisticsManagement() {
           seaAirConfig.kantoSpecial = mainOrders
             .filter(o =>
               o.collect_date === configDetailForm.collect_date &&
-              o.warehouse === configDetailForm.warehouse &&
+              o.warehouse === warehouse &&
               o.category === '关东特货' &&
               o.route_type === '海空'
             )
@@ -1328,7 +1332,7 @@ export default function LogisticsManagement() {
           seaAirConfig.kansaiNormal = mainOrders
             .filter(o =>
               o.collect_date === configDetailForm.collect_date &&
-              o.warehouse === configDetailForm.warehouse &&
+              o.warehouse === warehouse &&
               o.category === '关西普货' &&
               o.route_type === '海空'
             )
@@ -1337,7 +1341,7 @@ export default function LogisticsManagement() {
           seaAirConfig.kansaiSpecial = mainOrders
             .filter(o =>
               o.collect_date === configDetailForm.collect_date &&
-              o.warehouse === configDetailForm.warehouse &&
+              o.warehouse === warehouse &&
               o.category === '关西特货' &&
               o.route_type === '海空'
             )
@@ -3969,7 +3973,7 @@ export default function LogisticsManagement() {
               </div>
 
               {/* 配置明细展示 */}
-              {configDetailResult && (
+              {configDetailResult ? (
                 <div>
                   {/* 空运配置明细 */}
                   <div className="mb-4">
@@ -4017,7 +4021,11 @@ export default function LogisticsManagement() {
                     </div>
                   </div>
                 </div>
-              )}
+              ) : configDetailForm.collect_date ? (
+                <div className="text-center py-8 text-gray-500">
+                  该日期下没有配置明细数据，请先在主单发放模块创建主单
+                </div>
+              ) : null}
 
               {/* 操作区 */}
               <div className="flex items-center gap-4 mt-5">
