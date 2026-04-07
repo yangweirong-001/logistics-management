@@ -1196,10 +1196,10 @@ export default function LogisticsManagement() {
         // 如果没有选择仓库，默认使用"全部"
         const warehouse = configDetailForm.warehouse || '全部';
 
-        // 只有在有主单数据时才进行计算
-        if (mainOrders.length > 0) {
-          console.log('开始计算配置明细，仓库:', warehouse);
+        // 根据选择的仓库类型进行计算
+        if (warehouse === '全部') {
           // 汇总所有仓库的数据
+          console.log('计算模式：全部仓库');
           const warehouses = ['东莞', '加工区'];
 
           warehouses.forEach(wh => {
@@ -1280,6 +1280,7 @@ export default function LogisticsManagement() {
 
         } else {
           // 单个仓库的计算逻辑
+          console.log('计算模式：单个仓库 -', warehouse);
           // 空运配置明细
           airConfig.kantoNormal = mainOrders
             .filter(o =>
@@ -4037,46 +4038,46 @@ export default function LogisticsManagement() {
                 <div>
                   {/* 空运配置明细 */}
                   <div className="mb-4">
-                    <div className="text-base font-bold text-gray-700 mb-2 pl-2 border-l-4 border-sky-500">空运配置明细</div>
+                    <div className="text-base font-bold text-gray-700 mb-2 pl-2 border-l-4 border-blue-600">空运配置明细</div>
                     <div className="grid grid-cols-4 gap-4">
-                      <div className="bg-sky-50 rounded-lg p-3 text-center border border-sky-200 shadow-sm">
-                        <div className="text-xl font-bold text-black">{configDetailResult.airConfig.kantoNormal.toFixed(3)}</div>
-                        <div className="text-sm font-bold text-sky-700 mt-1">关东普货</div>
+                      <div className="bg-blue-100 rounded-lg p-3 text-center border-2 border-blue-300 shadow-md hover:shadow-lg transition-shadow">
+                        <div className="text-2xl font-bold text-gray-900">{configDetailResult.airConfig.kantoNormal.toFixed(3)}</div>
+                        <div className="text-sm font-bold text-blue-700 mt-1">关东普货</div>
                       </div>
-                      <div className="bg-sky-50 rounded-lg p-3 text-center border border-sky-200 shadow-sm">
-                        <div className="text-xl font-bold text-black">{configDetailResult.airConfig.kantoSpecial.toFixed(3)}</div>
-                        <div className="text-sm font-bold text-sky-700 mt-1">关东特货</div>
+                      <div className="bg-blue-100 rounded-lg p-3 text-center border-2 border-blue-300 shadow-md hover:shadow-lg transition-shadow">
+                        <div className="text-2xl font-bold text-gray-900">{configDetailResult.airConfig.kantoSpecial.toFixed(3)}</div>
+                        <div className="text-sm font-bold text-blue-700 mt-1">关东特货</div>
                       </div>
-                      <div className="bg-sky-50 rounded-lg p-3 text-center border border-sky-200 shadow-sm">
-                        <div className="text-xl font-bold text-black">{configDetailResult.airConfig.kansaiNormal.toFixed(3)}</div>
-                        <div className="text-sm font-bold text-sky-700 mt-1">关西普货</div>
+                      <div className="bg-blue-100 rounded-lg p-3 text-center border-2 border-blue-300 shadow-md hover:shadow-lg transition-shadow">
+                        <div className="text-2xl font-bold text-gray-900">{configDetailResult.airConfig.kansaiNormal.toFixed(3)}</div>
+                        <div className="text-sm font-bold text-blue-700 mt-1">关西普货</div>
                       </div>
-                      <div className="bg-sky-50 rounded-lg p-3 text-center border border-sky-200 shadow-sm">
-                        <div className="text-xl font-bold text-black">{configDetailResult.airConfig.kansaiSpecial.toFixed(3)}</div>
-                        <div className="text-sm font-bold text-sky-700 mt-1">关西特货</div>
+                      <div className="bg-blue-100 rounded-lg p-3 text-center border-2 border-blue-300 shadow-md hover:shadow-lg transition-shadow">
+                        <div className="text-2xl font-bold text-gray-900">{configDetailResult.airConfig.kansaiSpecial.toFixed(3)}</div>
+                        <div className="text-sm font-bold text-blue-700 mt-1">关西特货</div>
                       </div>
                     </div>
                   </div>
 
                   {/* 海空配置明细 */}
                   <div>
-                    <div className="text-base font-bold text-gray-700 mb-2 pl-2 border-l-4 border-cyan-500">海空配置明细</div>
+                    <div className="text-base font-bold text-gray-700 mb-2 pl-2 border-l-4 border-teal-600">海空配置明细</div>
                     <div className="grid grid-cols-4 gap-4">
-                      <div className="bg-cyan-50 rounded-lg p-3 text-center border border-cyan-200 shadow-sm">
-                        <div className="text-xl font-bold text-black">{configDetailResult.seaAirConfig.kantoNormal.toFixed(3)}</div>
-                        <div className="text-sm font-bold text-cyan-700 mt-1">关东普货</div>
+                      <div className="bg-teal-50 rounded-lg p-3 text-center border-2 border-teal-300 shadow-md hover:shadow-lg transition-shadow">
+                        <div className="text-2xl font-bold text-gray-900">{configDetailResult.seaAirConfig.kantoNormal.toFixed(3)}</div>
+                        <div className="text-sm font-bold text-teal-700 mt-1">关东普货</div>
                       </div>
-                      <div className="bg-cyan-50 rounded-lg p-3 text-center border border-cyan-200 shadow-sm">
-                        <div className="text-xl font-bold text-black">{configDetailResult.seaAirConfig.kantoSpecial.toFixed(3)}</div>
-                        <div className="text-sm font-bold text-cyan-700 mt-1">关东特货</div>
+                      <div className="bg-teal-50 rounded-lg p-3 text-center border-2 border-teal-300 shadow-md hover:shadow-lg transition-shadow">
+                        <div className="text-2xl font-bold text-gray-900">{configDetailResult.seaAirConfig.kantoSpecial.toFixed(3)}</div>
+                        <div className="text-sm font-bold text-teal-700 mt-1">关东特货</div>
                       </div>
-                      <div className="bg-cyan-50 rounded-lg p-3 text-center border border-cyan-200 shadow-sm">
-                        <div className="text-xl font-bold text-black">{configDetailResult.seaAirConfig.kansaiNormal.toFixed(3)}</div>
-                        <div className="text-sm font-bold text-cyan-700 mt-1">关西普货</div>
+                      <div className="bg-teal-50 rounded-lg p-3 text-center border-2 border-teal-300 shadow-md hover:shadow-lg transition-shadow">
+                        <div className="text-2xl font-bold text-gray-900">{configDetailResult.seaAirConfig.kansaiNormal.toFixed(3)}</div>
+                        <div className="text-sm font-bold text-teal-700 mt-1">关西普货</div>
                       </div>
-                      <div className="bg-cyan-50 rounded-lg p-3 text-center border border-cyan-200 shadow-sm">
-                        <div className="text-xl font-bold text-black">{configDetailResult.seaAirConfig.kansaiSpecial.toFixed(3)}</div>
-                        <div className="text-sm font-bold text-cyan-700 mt-1">关西特货</div>
+                      <div className="bg-teal-50 rounded-lg p-3 text-center border-2 border-teal-300 shadow-md hover:shadow-lg transition-shadow">
+                        <div className="text-2xl font-bold text-gray-900">{configDetailResult.seaAirConfig.kansaiSpecial.toFixed(3)}</div>
+                        <div className="text-sm font-bold text-teal-700 mt-1">关西特货</div>
                       </div>
                     </div>
                   </div>
