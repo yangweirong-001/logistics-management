@@ -1170,8 +1170,14 @@ export default function LogisticsManagement() {
   // 计算实际配置明细
   useEffect(() => {
     const timer = setTimeout(() => {
+      console.log('实际配置明细计算触发:', {
+        collect_date: configDetailForm.collect_date,
+        warehouse: configDetailForm.warehouse,
+        mainOrdersCount: mainOrders.length
+      });
+
       // 只需要选择日期，如果没有选择仓库，默认使用"全部"
-      if (configDetailForm.collect_date && mainOrders.length > 0) {
+      if (configDetailForm.collect_date) {
 
         let airConfig = {
           kantoNormal: 0,
@@ -1190,8 +1196,9 @@ export default function LogisticsManagement() {
         // 如果没有选择仓库，默认使用"全部"
         const warehouse = configDetailForm.warehouse || '全部';
 
-        // 判断是否为"全部"仓库
-        if (warehouse === '全部') {
+        // 只有在有主单数据时才进行计算
+        if (mainOrders.length > 0) {
+          console.log('开始计算配置明细，仓库:', warehouse);
           // 汇总所有仓库的数据
           const warehouses = ['东莞', '加工区'];
 
@@ -1348,12 +1355,14 @@ export default function LogisticsManagement() {
             .reduce((sum, o) => sum + getConfigDetailVolume(o), 0);
         }
 
+        console.log('设置配置明细结果:', { airConfig, seaAirConfig });
         setConfigDetailResult({
           airConfig,
           seaAirConfig,
         });
 
       } else {
+        console.log('清空配置明细结果');
         setConfigDetailResult(null);
       }
     }, 100);
