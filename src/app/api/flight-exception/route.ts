@@ -1,10 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSupabaseClient } from '@/storage/database/supabase-client';
 
-const client = getSupabaseClient();
-
 // 获取所有航班异常记录
 export async function GET(request: NextRequest) {
+  const client = getSupabaseClient();
   try {
     const { searchParams } = new URL(request.url);
     const mainNo = searchParams.get('main_no');
@@ -35,6 +34,7 @@ export async function GET(request: NextRequest) {
 
 // 根据主单号获取主单信息
 async function getMainOrderByMainNo(mainNo: string) {
+  const client = getSupabaseClient();
   const { data, error } = await client
     .from('main_orders')
     .select('*')
@@ -51,6 +51,7 @@ async function getMainOrderByMainNo(mainNo: string) {
 
 // 创建航班异常记录
 export async function POST(request: NextRequest) {
+  const client = getSupabaseClient();
   try {
     const body = await request.json();
     const { mainNo, exceptionReason, remark } = body;
@@ -91,6 +92,7 @@ export async function POST(request: NextRequest) {
 
 // 更新航班异常记录
 export async function PUT(request: NextRequest) {
+  const client = getSupabaseClient();
   try {
     const body = await request.json();
     const { id, exceptionReason, remark } = body;
@@ -117,6 +119,7 @@ export async function PUT(request: NextRequest) {
 
 // 删除航班异常记录
 export async function DELETE(request: NextRequest) {
+  const client = getSupabaseClient();
   try {
     const { searchParams } = new URL(request.url);
     const id = searchParams.get('id');

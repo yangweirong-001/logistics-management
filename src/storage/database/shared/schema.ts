@@ -177,8 +177,8 @@ export const flightExceptions = pgTable("flight_exceptions", {
 	index("flight_exceptions_flight_date_idx").using("btree", table.flightDate.asc().nullsLast().op("text_ops")),
 	index("flight_exceptions_main_no_idx").using("btree", table.mainNo.asc().nullsLast().op("text_ops")),
 	pgPolicy("flight_exceptions_允许公开删除", { as: "permissive", for: "delete", to: ["public"], using: sql`true` }),
-	pgPolicy("flight_exceptions_允许公开更新", { as: "permissive", for: "update", to: ["public"] }),
-	pgPolicy("flight_exceptions_允许公开写入", { as: "permissive", for: "insert", to: ["public"] }),
+	pgPolicy("flight_exceptions_允许公开更新", { as: "permissive", for: "update", to: ["public"], using: sql`true`, withCheck: sql`true` }),
+	pgPolicy("flight_exceptions_允许公开写入", { as: "permissive", for: "insert", to: ["public"], withCheck: sql`true` }),
 	pgPolicy("flight_exceptions_允许公开读取", { as: "permissive", for: "select", to: ["public"] }),
 ]);
 
