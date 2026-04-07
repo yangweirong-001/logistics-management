@@ -2435,6 +2435,12 @@ export default function LogisticsManagement() {
           >
             航班异常情况记录
           </button>
+          <button
+            onClick={() => setActiveTab('config-detail')}
+            className={`w-full px-5 py-3 text-left hover:bg-white/10 ${activeTab === 'config-detail' ? 'bg-blue-500' : ''}`}
+          >
+            实际配置明细
+          </button>
 
           <div className="px-4 py-2 text-xs text-white/50 uppercase mt-4">系统文档</div>
           <button
@@ -3040,113 +3046,6 @@ export default function LogisticsManagement() {
               </CardContent>
             </Card>
           </div>
-        )}
-
-        {/* 实际配置明细 */}
-        {activeTab === 'volume-estimate' && (
-          <Card className="mt-5">
-            <CardHeader>
-              <CardTitle>实际配置明细</CardTitle>
-            </CardHeader>
-            <CardContent>
-              {/* 顶部筛选 */}
-              <div className="grid grid-cols-5 gap-4 mb-5">
-                <div>
-                  <Label>揽收日期</Label>
-                  <Input type="date" value={configDetailForm.collect_date}
-                    onChange={e => {
-                      const newDate = e.target.value;
-                      setConfigDetailForm(prev => ({ ...prev, collect_date: newDate }));
-                    }} />
-                </div>
-                <div>
-                  <Label>星期</Label>
-                  <Input value={configDetailForm.collect_date ? getWeekday(configDetailForm.collect_date) : ''} readOnly
-                    className="bg-gray-50" />
-                </div>
-                <div>
-                  <Label>仓库</Label>
-                  <Select value={configDetailForm.warehouse}
-                    onValueChange={v => setConfigDetailForm(prev => ({ ...prev, warehouse: v }))}>
-                    <SelectTrigger><SelectValue placeholder="请选择" /></SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="全部">全部</SelectItem>
-                      <SelectItem value="东莞">东莞</SelectItem>
-                      <SelectItem value="加工区">加工区</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div>
-                  <Label>揽收大包数</Label>
-                  <Input type="number" placeholder="请输入" value={configDetailForm.package_count || ''}
-                    onChange={e => setConfigDetailForm(prev => ({ ...prev, package_count: parseInt(e.target.value) || 0 }))} />
-                </div>
-                <div>
-                  <Label>重量 (kg)</Label>
-                  <Input type="number" step="0.01" placeholder="请输入" value={configDetailForm.weight || ''}
-                    onChange={e => setConfigDetailForm(prev => ({ ...prev, weight: parseFloat(e.target.value) || 0 }))} />
-                </div>
-              </div>
-
-              {/* 配置明细展示 */}
-              {configDetailResult && (
-                <div>
-                  {/* 空运配置明细 */}
-                  <div className="mb-4">
-                    <div className="text-base font-bold text-gray-700 mb-2 pl-2 border-l-4 border-sky-500">空运配置明细</div>
-                    <div className="grid grid-cols-4 gap-4">
-                      <div className="bg-sky-50 rounded-lg p-3 text-center border border-sky-200 shadow-sm">
-                        <div className="text-xl font-bold text-black">{configDetailResult.airConfig.kantoNormal.toFixed(3)}</div>
-                        <div className="text-sm font-bold text-sky-700 mt-1">关东普货</div>
-                      </div>
-                      <div className="bg-sky-50 rounded-lg p-3 text-center border border-sky-200 shadow-sm">
-                        <div className="text-xl font-bold text-black">{configDetailResult.airConfig.kantoSpecial.toFixed(3)}</div>
-                        <div className="text-sm font-bold text-sky-700 mt-1">关东特货</div>
-                      </div>
-                      <div className="bg-sky-50 rounded-lg p-3 text-center border border-sky-200 shadow-sm">
-                        <div className="text-xl font-bold text-black">{configDetailResult.airConfig.kansaiNormal.toFixed(3)}</div>
-                        <div className="text-sm font-bold text-sky-700 mt-1">关西普货</div>
-                      </div>
-                      <div className="bg-sky-50 rounded-lg p-3 text-center border border-sky-200 shadow-sm">
-                        <div className="text-xl font-bold text-black">{configDetailResult.airConfig.kansaiSpecial.toFixed(3)}</div>
-                        <div className="text-sm font-bold text-sky-700 mt-1">关西特货</div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* 海空配置明细 */}
-                  <div>
-                    <div className="text-base font-bold text-gray-700 mb-2 pl-2 border-l-4 border-cyan-500">海空配置明细</div>
-                    <div className="grid grid-cols-4 gap-4">
-                      <div className="bg-cyan-50 rounded-lg p-3 text-center border border-cyan-200 shadow-sm">
-                        <div className="text-xl font-bold text-black">{configDetailResult.seaAirConfig.kantoNormal.toFixed(3)}</div>
-                        <div className="text-sm font-bold text-cyan-700 mt-1">关东普货</div>
-                      </div>
-                      <div className="bg-cyan-50 rounded-lg p-3 text-center border border-cyan-200 shadow-sm">
-                        <div className="text-xl font-bold text-black">{configDetailResult.seaAirConfig.kantoSpecial.toFixed(3)}</div>
-                        <div className="text-sm font-bold text-cyan-700 mt-1">关东特货</div>
-                      </div>
-                      <div className="bg-cyan-50 rounded-lg p-3 text-center border border-cyan-200 shadow-sm">
-                        <div className="text-xl font-bold text-black">{configDetailResult.seaAirConfig.kansaiNormal.toFixed(3)}</div>
-                        <div className="text-sm font-bold text-cyan-700 mt-1">关西普货</div>
-                      </div>
-                      <div className="bg-cyan-50 rounded-lg p-3 text-center border border-cyan-200 shadow-sm">
-                        <div className="text-xl font-bold text-black">{configDetailResult.seaAirConfig.kansaiSpecial.toFixed(3)}</div>
-                        <div className="text-sm font-bold text-cyan-700 mt-1">关西特货</div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {/* 操作区 */}
-              <div className="flex items-center gap-4 mt-5">
-                <Button variant="outline" onClick={() => { setConfigDetailForm({ collect_date: '', warehouse: '', package_count: 0, weight: 0 }); setConfigDetailResult(null); }}>
-                  清空
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
         )}
 
         {/* 主单发放 */}
@@ -4018,6 +3917,113 @@ export default function LogisticsManagement() {
                     )}
                   </tbody>
                 </table>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* 实际配置明细 */}
+        {activeTab === 'config-detail' && (
+          <Card>
+            <CardHeader>
+              <CardTitle>实际配置明细</CardTitle>
+            </CardHeader>
+            <CardContent>
+              {/* 顶部筛选 */}
+              <div className="grid grid-cols-5 gap-4 mb-5">
+                <div>
+                  <Label>揽收日期</Label>
+                  <Input type="date" value={configDetailForm.collect_date}
+                    onChange={e => {
+                      const newDate = e.target.value;
+                      setConfigDetailForm(prev => ({ ...prev, collect_date: newDate }));
+                    }} />
+                </div>
+                <div>
+                  <Label>星期</Label>
+                  <Input value={configDetailForm.collect_date ? getWeekday(configDetailForm.collect_date) : ''} readOnly
+                    className="bg-gray-50" />
+                </div>
+                <div>
+                  <Label>仓库</Label>
+                  <Select value={configDetailForm.warehouse}
+                    onValueChange={v => setConfigDetailForm(prev => ({ ...prev, warehouse: v }))}>
+                    <SelectTrigger><SelectValue placeholder="请选择" /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="全部">全部</SelectItem>
+                      <SelectItem value="东莞">东莞</SelectItem>
+                      <SelectItem value="加工区">加工区</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <Label>揽收大包数</Label>
+                  <Input type="number" placeholder="请输入" value={configDetailForm.package_count || ''}
+                    onChange={e => setConfigDetailForm(prev => ({ ...prev, package_count: parseInt(e.target.value) || 0 }))} />
+                </div>
+                <div>
+                  <Label>重量 (kg)</Label>
+                  <Input type="number" step="0.01" placeholder="请输入" value={configDetailForm.weight || ''}
+                    onChange={e => setConfigDetailForm(prev => ({ ...prev, weight: parseFloat(e.target.value) || 0 }))} />
+                </div>
+              </div>
+
+              {/* 配置明细展示 */}
+              {configDetailResult && (
+                <div>
+                  {/* 空运配置明细 */}
+                  <div className="mb-4">
+                    <div className="text-base font-bold text-gray-700 mb-2 pl-2 border-l-4 border-sky-500">空运配置明细</div>
+                    <div className="grid grid-cols-4 gap-4">
+                      <div className="bg-sky-50 rounded-lg p-3 text-center border border-sky-200 shadow-sm">
+                        <div className="text-xl font-bold text-black">{configDetailResult.airConfig.kantoNormal.toFixed(3)}</div>
+                        <div className="text-sm font-bold text-sky-700 mt-1">关东普货</div>
+                      </div>
+                      <div className="bg-sky-50 rounded-lg p-3 text-center border border-sky-200 shadow-sm">
+                        <div className="text-xl font-bold text-black">{configDetailResult.airConfig.kantoSpecial.toFixed(3)}</div>
+                        <div className="text-sm font-bold text-sky-700 mt-1">关东特货</div>
+                      </div>
+                      <div className="bg-sky-50 rounded-lg p-3 text-center border border-sky-200 shadow-sm">
+                        <div className="text-xl font-bold text-black">{configDetailResult.airConfig.kansaiNormal.toFixed(3)}</div>
+                        <div className="text-sm font-bold text-sky-700 mt-1">关西普货</div>
+                      </div>
+                      <div className="bg-sky-50 rounded-lg p-3 text-center border border-sky-200 shadow-sm">
+                        <div className="text-xl font-bold text-black">{configDetailResult.airConfig.kansaiSpecial.toFixed(3)}</div>
+                        <div className="text-sm font-bold text-sky-700 mt-1">关西特货</div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* 海空配置明细 */}
+                  <div>
+                    <div className="text-base font-bold text-gray-700 mb-2 pl-2 border-l-4 border-cyan-500">海空配置明细</div>
+                    <div className="grid grid-cols-4 gap-4">
+                      <div className="bg-cyan-50 rounded-lg p-3 text-center border border-cyan-200 shadow-sm">
+                        <div className="text-xl font-bold text-black">{configDetailResult.seaAirConfig.kantoNormal.toFixed(3)}</div>
+                        <div className="text-sm font-bold text-cyan-700 mt-1">关东普货</div>
+                      </div>
+                      <div className="bg-cyan-50 rounded-lg p-3 text-center border border-cyan-200 shadow-sm">
+                        <div className="text-xl font-bold text-black">{configDetailResult.seaAirConfig.kantoSpecial.toFixed(3)}</div>
+                        <div className="text-sm font-bold text-cyan-700 mt-1">关东特货</div>
+                      </div>
+                      <div className="bg-cyan-50 rounded-lg p-3 text-center border border-cyan-200 shadow-sm">
+                        <div className="text-xl font-bold text-black">{configDetailResult.seaAirConfig.kansaiNormal.toFixed(3)}</div>
+                        <div className="text-sm font-bold text-cyan-700 mt-1">关西普货</div>
+                      </div>
+                      <div className="bg-cyan-50 rounded-lg p-3 text-center border border-cyan-200 shadow-sm">
+                        <div className="text-xl font-bold text-black">{configDetailResult.seaAirConfig.kansaiSpecial.toFixed(3)}</div>
+                        <div className="text-sm font-bold text-cyan-700 mt-1">关西特货</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* 操作区 */}
+              <div className="flex items-center gap-4 mt-5">
+                <Button variant="outline" onClick={() => { setConfigDetailForm({ collect_date: '', warehouse: '', package_count: 0, weight: 0 }); setConfigDetailResult(null); }}>
+                  清空
+                </Button>
               </div>
             </CardContent>
           </Card>
