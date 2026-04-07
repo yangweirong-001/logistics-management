@@ -341,6 +341,22 @@ export default function LogisticsManagement() {
     configuredSeaAirVolume: number;
     unconfiguredVolume: number;
   } | null>(null);
+
+  // 实际配置明细
+  const [configDetailResult, setConfigDetailResult] = useState<{
+    airConfig: {
+      kantoNormal: number;
+      kantoSpecial: number;
+      kansaiNormal: number;
+      kansaiSpecial: number;
+    };
+    seaAirConfig: {
+      kantoNormal: number;
+      kantoSpecial: number;
+      kansaiNormal: number;
+      kansaiSpecial: number;
+    };
+  } | null>(null);
   
   // 模态框状态
   const [areaModalOpen, setAreaModalOpen] = useState(false);
@@ -1142,6 +1158,198 @@ export default function LogisticsManagement() {
     return () => clearTimeout(timer);
 
   }, [volumeForm.collect_date, volumeForm.warehouse, volumeForm.package_count, areaConfigs, flightConfigs, mainOrders, volumeEstimates]);
+
+  // 计算实际配置明细
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (volumeForm.collect_date && mainOrders.length > 0) {
+
+        let airConfig = {
+          kantoNormal: 0,
+          kantoSpecial: 0,
+          kansaiNormal: 0,
+          kansaiSpecial: 0,
+        };
+
+        let seaAirConfig = {
+          kantoNormal: 0,
+          kantoSpecial: 0,
+          kansaiNormal: 0,
+          kansaiSpecial: 0,
+        };
+
+        // 判断是否为"全部"仓库
+        if (volumeForm.warehouse === '全部') {
+          // 汇总所有仓库的数据
+          const warehouses = ['东莞', '加工区'];
+
+          warehouses.forEach(wh => {
+            // 空运配置明细
+            airConfig.kantoNormal += mainOrders
+              .filter(o =>
+                o.collect_date === volumeForm.collect_date &&
+                o.warehouse === wh &&
+                o.category === '关东普货' &&
+                o.route_type === '空运'
+              )
+              .reduce((sum, o) => sum + getConfigDetailVolume(o), 0);
+
+            airConfig.kantoSpecial += mainOrders
+              .filter(o =>
+                o.collect_date === volumeForm.collect_date &&
+                o.warehouse === wh &&
+                o.category === '关东特货' &&
+                o.route_type === '空运'
+              )
+              .reduce((sum, o) => sum + getConfigDetailVolume(o), 0);
+
+            airConfig.kansaiNormal += mainOrders
+              .filter(o =>
+                o.collect_date === volumeForm.collect_date &&
+                o.warehouse === wh &&
+                o.category === '关西普货' &&
+                o.route_type === '空运'
+              )
+              .reduce((sum, o) => sum + getConfigDetailVolume(o), 0);
+
+            airConfig.kansaiSpecial += mainOrders
+              .filter(o =>
+                o.collect_date === volumeForm.collect_date &&
+                o.warehouse === wh &&
+                o.category === '关西特货' &&
+                o.route_type === '空运'
+              )
+              .reduce((sum, o) => sum + getConfigDetailVolume(o), 0);
+
+            // 海空配置明细
+            seaAirConfig.kantoNormal += mainOrders
+              .filter(o =>
+                o.collect_date === volumeForm.collect_date &&
+                o.warehouse === wh &&
+                o.category === '关东普货' &&
+                o.route_type === '海空'
+              )
+              .reduce((sum, o) => sum + getConfigDetailVolume(o), 0);
+
+            seaAirConfig.kantoSpecial += mainOrders
+              .filter(o =>
+                o.collect_date === volumeForm.collect_date &&
+                o.warehouse === wh &&
+                o.category === '关东特货' &&
+                o.route_type === '海空'
+              )
+              .reduce((sum, o) => sum + getConfigDetailVolume(o), 0);
+
+            seaAirConfig.kansaiNormal += mainOrders
+              .filter(o =>
+                o.collect_date === volumeForm.collect_date &&
+                o.warehouse === wh &&
+                o.category === '关西普货' &&
+                o.route_type === '海空'
+              )
+              .reduce((sum, o) => sum + getConfigDetailVolume(o), 0);
+
+            seaAirConfig.kansaiSpecial += mainOrders
+              .filter(o =>
+                o.collect_date === volumeForm.collect_date &&
+                o.warehouse === wh &&
+                o.category === '关西特货' &&
+                o.route_type === '海空'
+              )
+              .reduce((sum, o) => sum + getConfigDetailVolume(o), 0);
+          });
+
+        } else if (volumeForm.warehouse) {
+          // 单个仓库的计算逻辑
+          // 空运配置明细
+          airConfig.kantoNormal = mainOrders
+            .filter(o =>
+              o.collect_date === volumeForm.collect_date &&
+              o.warehouse === volumeForm.warehouse &&
+              o.category === '关东普货' &&
+              o.route_type === '空运'
+            )
+            .reduce((sum, o) => sum + getConfigDetailVolume(o), 0);
+
+          airConfig.kantoSpecial = mainOrders
+            .filter(o =>
+              o.collect_date === volumeForm.collect_date &&
+              o.warehouse === volumeForm.warehouse &&
+              o.category === '关东特货' &&
+              o.route_type === '空运'
+            )
+            .reduce((sum, o) => sum + getConfigDetailVolume(o), 0);
+
+          airConfig.kansaiNormal = mainOrders
+            .filter(o =>
+              o.collect_date === volumeForm.collect_date &&
+              o.warehouse === volumeForm.warehouse &&
+              o.category === '关西普货' &&
+              o.route_type === '空运'
+            )
+            .reduce((sum, o) => sum + getConfigDetailVolume(o), 0);
+
+          airConfig.kansaiSpecial = mainOrders
+            .filter(o =>
+              o.collect_date === volumeForm.collect_date &&
+              o.warehouse === volumeForm.warehouse &&
+              o.category === '关西特货' &&
+              o.route_type === '空运'
+            )
+            .reduce((sum, o) => sum + getConfigDetailVolume(o), 0);
+
+          // 海空配置明细
+          seaAirConfig.kantoNormal = mainOrders
+            .filter(o =>
+              o.collect_date === volumeForm.collect_date &&
+              o.warehouse === volumeForm.warehouse &&
+              o.category === '关东普货' &&
+              o.route_type === '海空'
+            )
+            .reduce((sum, o) => sum + getConfigDetailVolume(o), 0);
+
+          seaAirConfig.kantoSpecial = mainOrders
+            .filter(o =>
+              o.collect_date === volumeForm.collect_date &&
+              o.warehouse === volumeForm.warehouse &&
+              o.category === '关东特货' &&
+              o.route_type === '海空'
+            )
+            .reduce((sum, o) => sum + getConfigDetailVolume(o), 0);
+
+          seaAirConfig.kansaiNormal = mainOrders
+            .filter(o =>
+              o.collect_date === volumeForm.collect_date &&
+              o.warehouse === volumeForm.warehouse &&
+              o.category === '关西普货' &&
+              o.route_type === '海空'
+            )
+            .reduce((sum, o) => sum + getConfigDetailVolume(o), 0);
+
+          seaAirConfig.kansaiSpecial = mainOrders
+            .filter(o =>
+              o.collect_date === volumeForm.collect_date &&
+              o.warehouse === volumeForm.warehouse &&
+              o.category === '关西特货' &&
+              o.route_type === '海空'
+            )
+            .reduce((sum, o) => sum + getConfigDetailVolume(o), 0);
+        }
+
+        setConfigDetailResult({
+          airConfig,
+          seaAirConfig,
+        });
+
+      } else {
+        setConfigDetailResult(null);
+      }
+    }, 100);
+
+    return () => clearTimeout(timer);
+
+  }, [volumeForm.collect_date, volumeForm.warehouse, mainOrders]);
+
   // 监听主单表单航班信息变化，自动匹配路由填充时间
   useEffect(() => {
     const { flight_no, origin, dest } = orderForm;
@@ -1765,6 +1973,21 @@ export default function LogisticsManagement() {
     // 3. 最后使用预估方数
     if (order.est_volume && parseFloat(order.est_volume) > 0) {
       return parseFloat(order.est_volume);
+    }
+
+    return 0;
+  };
+
+  // 获取主单的配置明细方数（用于实际配置明细展示：优先打货上限，其次实际方数）
+  const getConfigDetailVolume = (order: MainOrder): number => {
+    // 1. 优先使用打货上限
+    if (order.max_volume && parseFloat(order.max_volume) > 0) {
+      return parseFloat(order.max_volume);
+    }
+
+    // 2. 其次使用实际方数
+    if (order.actual_volume && parseFloat(order.actual_volume) > 0) {
+      return parseFloat(order.actual_volume);
     }
 
     return 0;
@@ -2676,7 +2899,60 @@ export default function LogisticsManagement() {
                     </div>
                   </div>
                 </div>
-                
+
+                {/* 实际配置明细 */}
+                {configDetailResult && (
+                  <div className="mt-6">
+                    <h3 className="font-semibold text-lg mb-3">实际配置明细</h3>
+
+                    {/* 空运配置明细 */}
+                    <div className="mb-4">
+                      <div className="text-base font-bold text-gray-700 mb-2 pl-2 border-l-4 border-sky-500">空运配置明细</div>
+                      <div className="grid grid-cols-4 gap-4">
+                        <div className="bg-sky-50 rounded-lg p-3 text-center border border-sky-200 shadow-sm">
+                          <div className="text-xl font-bold text-black">{configDetailResult.airConfig.kantoNormal.toFixed(3)}</div>
+                          <div className="text-sm font-bold text-sky-700 mt-1">关东普货</div>
+                        </div>
+                        <div className="bg-sky-50 rounded-lg p-3 text-center border border-sky-200 shadow-sm">
+                          <div className="text-xl font-bold text-black">{configDetailResult.airConfig.kantoSpecial.toFixed(3)}</div>
+                          <div className="text-sm font-bold text-sky-700 mt-1">关东特货</div>
+                        </div>
+                        <div className="bg-sky-50 rounded-lg p-3 text-center border border-sky-200 shadow-sm">
+                          <div className="text-xl font-bold text-black">{configDetailResult.airConfig.kansaiNormal.toFixed(3)}</div>
+                          <div className="text-sm font-bold text-sky-700 mt-1">关西普货</div>
+                        </div>
+                        <div className="bg-sky-50 rounded-lg p-3 text-center border border-sky-200 shadow-sm">
+                          <div className="text-xl font-bold text-black">{configDetailResult.airConfig.kansaiSpecial.toFixed(3)}</div>
+                          <div className="text-sm font-bold text-sky-700 mt-1">关西特货</div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* 海空配置明细 */}
+                    <div>
+                      <div className="text-base font-bold text-gray-700 mb-2 pl-2 border-l-4 border-cyan-500">海空配置明细</div>
+                      <div className="grid grid-cols-4 gap-4">
+                        <div className="bg-cyan-50 rounded-lg p-3 text-center border border-cyan-200 shadow-sm">
+                          <div className="text-xl font-bold text-black">{configDetailResult.seaAirConfig.kantoNormal.toFixed(3)}</div>
+                          <div className="text-sm font-bold text-cyan-700 mt-1">关东普货</div>
+                        </div>
+                        <div className="bg-cyan-50 rounded-lg p-3 text-center border border-cyan-200 shadow-sm">
+                          <div className="text-xl font-bold text-black">{configDetailResult.seaAirConfig.kantoSpecial.toFixed(3)}</div>
+                          <div className="text-sm font-bold text-cyan-700 mt-1">关东特货</div>
+                        </div>
+                        <div className="bg-cyan-50 rounded-lg p-3 text-center border border-cyan-200 shadow-sm">
+                          <div className="text-xl font-bold text-black">{configDetailResult.seaAirConfig.kansaiNormal.toFixed(3)}</div>
+                          <div className="text-sm font-bold text-cyan-700 mt-1">关西普货</div>
+                        </div>
+                        <div className="bg-cyan-50 rounded-lg p-3 text-center border border-cyan-200 shadow-sm">
+                          <div className="text-xl font-bold text-black">{configDetailResult.seaAirConfig.kansaiSpecial.toFixed(3)}</div>
+                          <div className="text-sm font-bold text-cyan-700 mt-1">关西特货</div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
                 {/* 操作区 */}
                 <div className="flex items-center gap-4 mb-5">
                   <div className="w-48">
@@ -2694,7 +2970,7 @@ export default function LogisticsManagement() {
                     <Button onClick={saveVolumeEstimate} className="bg-green-600 hover:bg-green-700">
                       保存数据
                     </Button>
-                    <Button variant="outline" onClick={() => { setEditingVolume(null); setVolumeForm({ collect_date: '', warehouse: '', package_count: 0, weight: 0, is_complete: '是' }); setVolumeResult(null); }}>
+                    <Button variant="outline" onClick={() => { setEditingVolume(null); setVolumeForm({ collect_date: '', warehouse: '', package_count: 0, weight: 0, is_complete: '是' }); setVolumeResult(null); setConfigDetailResult(null); }}>
                       清空
                     </Button>
                   </div>
