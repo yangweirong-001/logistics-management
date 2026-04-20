@@ -62,6 +62,8 @@ interface VolumeEstimate {
   weekday: string | null;
   warehouse: string;
   package_count: number;
+  weight: number | null;
+  actual_total_volume: number | null;
   total_volume: number | null;
   kanto_total: number | null;
   kansai_total: number | null;
@@ -71,7 +73,6 @@ interface VolumeEstimate {
   kansai_special: number | null;
   air_volume: number | null;
   sea_air_volume: number | null;
-  weight: number | null;
   is_complete: string | null;
 }
 
@@ -396,6 +397,7 @@ export default function LogisticsManagement() {
     warehouse: '',
     package_count: 0,
     weight: 0,
+    actual_total_volume: 0,
     is_complete: '是',
   });
 
@@ -1927,6 +1929,7 @@ export default function LogisticsManagement() {
             air_volume: airVolume.toFixed(3),
             sea_air_volume: seaAirVolume.toFixed(3),
             weight: volumeForm.weight ? truncateToDecimals(volumeForm.weight, 2) : null,
+            actual_total_volume: volumeForm.actual_total_volume || null,
             is_complete: volumeForm.is_complete,
           }),
         });
@@ -1954,6 +1957,7 @@ export default function LogisticsManagement() {
             air_volume: airVolume.toFixed(3),
             sea_air_volume: seaAirVolume.toFixed(3),
             weight: volumeForm.weight ? truncateToDecimals(volumeForm.weight, 2) : null,
+            actual_total_volume: volumeForm.actual_total_volume || null,
             is_complete: volumeForm.is_complete,
           }),
         });
@@ -1966,7 +1970,7 @@ export default function LogisticsManagement() {
       
       loadVolumeEstimates();
       setEditingVolume(null);
-      setVolumeForm({ collect_date: '', warehouse: '', package_count: 0, weight: 0, is_complete: '是' });
+      setVolumeForm({ collect_date: '', warehouse: '', package_count: 0, weight: 0, actual_total_volume: 0, is_complete: '是' });
       setVolumeResult(null);
       alert('保存成功！');
     } catch (err) {
@@ -1984,6 +1988,7 @@ export default function LogisticsManagement() {
       warehouse: record.warehouse,
       package_count: record.package_count,
       weight: record.weight || 0,
+      actual_total_volume: record.actual_total_volume || 0,
       is_complete: record.is_complete || '是',
     });
   };
@@ -2004,6 +2009,7 @@ export default function LogisticsManagement() {
           weekday: records[0].weekday || null,
           package_count: records.reduce((sum, r) => sum + (r.package_count || 0), 0),
           weight: records.reduce((sum, r) => sum + (r.weight || 0), 0),
+          actual_total_volume: records.reduce((sum, r) => sum + (r.actual_total_volume || 0), 0),
           total_volume: records.reduce((sum, r) => sum + (r.total_volume || 0), 0),
           kanto_total: records.reduce((sum, r) => sum + (r.kanto_total || 0), 0),
           kansai_total: records.reduce((sum, r) => sum + (r.kansai_total || 0), 0),
@@ -2023,6 +2029,7 @@ export default function LogisticsManagement() {
           warehouse: '全部',
           package_count: summarizedRecord.package_count,
           weight: summarizedRecord.weight || 0,
+          actual_total_volume: summarizedRecord.actual_total_volume || 0,
           is_complete: summarizedRecord.is_complete || '是',
         });
       }
@@ -2040,6 +2047,7 @@ export default function LogisticsManagement() {
           warehouse: record.warehouse,
           package_count: record.package_count,
           weight: record.weight || 0,
+          actual_total_volume: record.actual_total_volume || 0,
           is_complete: record.is_complete || '是',
         });
       }
@@ -2927,7 +2935,7 @@ export default function LogisticsManagement() {
               </CardHeader>
               <CardContent>
                 {/* 顶部筛选 */}
-                <div className="grid grid-cols-5 gap-4 mb-5">
+                <div className="grid grid-cols-6 gap-4 mb-5">
                   <div>
                     <Label>揽收日期</Label>
                     <Input type="date" value={volumeForm.collect_date}
@@ -2968,6 +2976,23 @@ export default function LogisticsManagement() {
                     <Label>重量 (kg)</Label>
                     <Input type="number" step="0.01" placeholder="请输入" value={volumeForm.weight || ''}
                       onChange={e => setVolumeForm(prev => ({ ...prev, weight: parseFloat(e.target.value) || 0 }))} />
+                  </div>
+                  <div>
+                    <Label>实际出货总方数</Label>
+                    <Input type="number" step="0.0001" placeholder="请输入" value={volumeForm.actual_total_volume || ''}
+                      onChange={e => {
+                        const value = e.target.value;
+                        // 保留4位小数，不四舍五入
+                        if (value) {
+                          const num = parseFloat(value);
+                          if (!isNaN(num)) {
+                            const truncated = Math.floor(num * 10000) / 10000;
+                            setVolumeForm(prev => ({ ...prev, actual_total_volume: truncated }));
+                            return;
+                          }
+                        }
+                        setVolumeForm(prev => ({ ...prev, actual_total_volume: parseFloat(value) || 0 }));
+                      }} />
                   </div>
                 </div>
                 
@@ -3069,7 +3094,7 @@ export default function LogisticsManagement() {
                     <Button onClick={saveVolumeEstimate} className="bg-green-600 hover:bg-green-700">
                       保存数据
                     </Button>
-                    <Button variant="outline" onClick={() => { setEditingVolume(null); setVolumeForm({ collect_date: '', warehouse: '', package_count: 0, weight: 0, is_complete: '是' }); setVolumeResult(null); }}>
+                    <Button variant="outline" onClick={() => { setEditingVolume(null); setVolumeForm({ collect_date: '', warehouse: '', package_count: 0, weight: 0, actual_total_volume: 0, is_complete: '是' }); setVolumeResult(null); }}>
                       清空
                     </Button>
                   </div>
