@@ -315,6 +315,44 @@ const exportToExcel = (data: MainOrder[], filename: string, routeConfigs: RouteC
   URL.revokeObjectURL(url);
 };
 
+// 导出航空路由配置到Excel
+const exportRouteConfigs = (data: RouteConfig[], filename: string) => {
+  // 定义列标题和对应的字段
+  const headers = [
+    '航班号', '始发站', '中转站', '目的站', '路由类型', '二程航班', '起飞时间', '落地时间', '是否隔天'
+  ];
+
+  // 转换数据
+  const rows = data.map(route => [
+    route.flight_no || '',
+    route.origin || '',
+    route.transfer || '',
+    route.dest || '',
+    route.route_type || '',
+    route.second_flight || '',
+    route.depart_time || '',
+    route.arrive_time || '',
+    route.is_next_day || ''
+  ]);
+  
+  // 创建CSV内容（Excel兼容）
+  const BOM = '\uFEFF'; // UTF-8 BOM，确保Excel正确识别中文
+  const csvContent = BOM + [headers, ...rows]
+    .map(row => row.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(','))
+    .join('\n');
+  
+  // 创建Blob并下载
+  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = `${filename}.csv`;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+};
+
 export default function LogisticsManagement() {
   const [activeTab, setActiveTab] = useState('config-area');
   
@@ -2805,6 +2843,9 @@ export default function LogisticsManagement() {
                   />
                   <Button variant="outline" onClick={() => routeImportRef.current?.click()}>
                     Excel导入
+                  </Button>
+                  <Button variant="outline" onClick={() => exportRouteConfigs(routeConfigs, `航空路由配置_${new Date().toISOString().split('T')[0]}`)}>
+                    导出Excel
                   </Button>
                   {selectedRouteIds.size > 0 && (
                     <Button variant="destructive" onClick={deleteSelectedRoutes}>
