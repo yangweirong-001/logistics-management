@@ -144,9 +144,20 @@ export const volumeEstimateApi = {
       },
       body: JSON.stringify(estimate)
     });
-    const data = await response.json();
-    if (!response.ok) throw new Error(`创建失败: ${data.message || response.statusText}`);
-    return data;
+    const text = await response.text();
+    if (!response.ok) {
+      let errorMsg = response.statusText;
+      try {
+        const data = JSON.parse(text);
+        errorMsg = data.message || data.error?.message || errorMsg;
+      } catch {}
+      throw new Error(`创建失败: ${errorMsg}`);
+    }
+    try {
+      return JSON.parse(text);
+    } catch {
+      return text;
+    }
   },
 
   async update(id: number, estimate: Record<string, unknown>) {
@@ -161,9 +172,20 @@ export const volumeEstimateApi = {
       },
       body: JSON.stringify(estimate)
     });
-    const data = await response.json();
-    if (!response.ok) throw new Error(`更新失败: ${data.message || response.statusText}`);
-    return data;
+    const text = await response.text();
+    if (!response.ok) {
+      let errorMsg = response.statusText;
+      try {
+        const data = JSON.parse(text);
+        errorMsg = data.message || data.error?.message || errorMsg;
+      } catch {}
+      throw new Error(`更新失败: ${errorMsg}`);
+    }
+    try {
+      return JSON.parse(text);
+    } catch {
+      return text;
+    }
   },
 
   async delete(id: number) {
