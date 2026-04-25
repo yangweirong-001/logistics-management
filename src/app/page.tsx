@@ -2481,6 +2481,7 @@ export default function LogisticsManagement() {
       '仓库': record.warehouse,
       '大包数': record.package_count,
       '重量': record.weight ? truncateToDecimals(record.weight, 2) : '0.00',
+      '实际出货总方数': record.actual_total_volume ? truncateToDecimals(record.actual_total_volume, 4) : '-',
       '总方数': (record.total_volume || 0).toFixed(3),
       '关东总方数': (record.kanto_total || 0).toFixed(3),
       '关西总方数': (record.kansai_total || 0).toFixed(3),
