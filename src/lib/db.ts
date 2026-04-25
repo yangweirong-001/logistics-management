@@ -1,6 +1,9 @@
-import { getSupabaseClient } from '@/storage/database/supabase-client';
+import { getSupabaseClient, getSupabaseAdminClient } from '@/storage/database/supabase-client';
 
 const client = getSupabaseClient();
+
+// volumeEstimateApi 使用 admin 客户端绕过 schema cache
+const volumeEstimateAdmin = getSupabaseAdminClient();
 
 // 区域参数配置
 export const areaConfigApi = {
@@ -124,7 +127,7 @@ export const routeConfigApi = {
   },
 };
 
-// 方数预估
+// 方数预估 - 使用 admin 客户端绕过 schema cache
 export const volumeEstimateApi = {
   async getAll() {
     const { data, error } = await client.from('volume_estimates').select('*').order('collect_date', { ascending: false });
@@ -133,19 +136,19 @@ export const volumeEstimateApi = {
   },
 
   async create(estimate: Record<string, unknown>) {
-    const { data, error } = await client.from('volume_estimates').insert(estimate).select();
+    const { data, error } = await volumeEstimateAdmin.from('volume_estimates').insert(estimate).select();
     if (error) throw new Error(`创建失败: ${error.message}`);
     return data[0];
   },
 
   async update(id: number, estimate: Record<string, unknown>) {
-    const { data, error } = await client.from('volume_estimates').update(estimate).eq('id', id).select();
+    const { data, error } = await volumeEstimateAdmin.from('volume_estimates').update(estimate).eq('id', id).select();
     if (error) throw new Error(`更新失败: ${error.message}`);
     return data[0];
   },
 
   async delete(id: number) {
-    const { error } = await client.from('volume_estimates').delete().eq('id', id);
+    const { error } = await volumeEstimateAdmin.from('volume_estimates').delete().eq('id', id);
     if (error) throw new Error(`删除失败: ${error.message}`);
   },
 
