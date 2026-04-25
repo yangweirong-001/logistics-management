@@ -1,9 +1,6 @@
-import { getSupabaseClient, getSupabaseAdminClient } from '@/storage/database/supabase-client';
+import { getSupabaseClient } from '@/storage/database/supabase-client';
 
 const client = getSupabaseClient();
-
-// volumeEstimateApi 使用 admin 客户端绕过 schema cache
-const volumeEstimateAdmin = getSupabaseAdminClient();
 
 // 区域参数配置
 export const areaConfigApi = {
@@ -127,7 +124,7 @@ export const routeConfigApi = {
   },
 };
 
-// 方数预估 - 使用 admin 客户端绕过 schema cache
+// 方数预估 - 使用 fetch 直接调用 Supabase REST API 绕过 schema cache
 export const volumeEstimateApi = {
   async getAll() {
     const { data, error } = await client.from('volume_estimates').select('*').order('collect_date', { ascending: false });
@@ -136,20 +133,53 @@ export const volumeEstimateApi = {
   },
 
   async create(estimate: Record<string, unknown>) {
-    const { data, error } = await volumeEstimateAdmin.from('volume_estimates').insert(estimate).select();
-    if (error) throw new Error(`创建失败: ${error.message}`);
-    return data[0];
+    // 使用 fetch 直接调用 Supabase REST API
+    const url = `${process.env.COZE_SUPABASE_URL}/rest/v1/volume_estimates`;
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'apikey': process.env.COZE_SUPABASE_ANON_KEY || '',
+        'Authorization': `Bearer ${process.env.COZE_SUPABASE_SERVICE_ROLE_KEY || ''}`
+      },
+      body: JSON.stringify(estimate)
+    });
+    const data = await response.json();
+    if (!response.ok) throw new Error(`创建失败: ${data.message || response.statusText}`);
+    return data;
   },
 
   async update(id: number, estimate: Record<string, unknown>) {
-    const { data, error } = await volumeEstimateAdmin.from('volume_estimates').update(estimate).eq('id', id).select();
-    if (error) throw new Error(`更新失败: ${error.message}`);
-    return data[0];
+    // 使用 fetch 直接调用 Supabase REST API
+    const url = `${process.env.COZE_SUPABASE_URL}/rest/v1/volume_estimates?id=eq.${id}`;
+    const response = await fetch(url, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        'apikey': process.env.COZE_SUPABASE_ANON_KEY || '',
+        'Authorization': `Bearer ${process.env.COZE_SUPABASE_SERVICE_ROLE_KEY || ''}`
+      },
+      body: JSON.stringify(estimate)
+    });
+    const data = await response.json();
+    if (!response.ok) throw new Error(`更新失败: ${data.message || response.statusText}`);
+    return data;
   },
 
   async delete(id: number) {
-    const { error } = await volumeEstimateAdmin.from('volume_estimates').delete().eq('id', id);
-    if (error) throw new Error(`删除失败: ${error.message}`);
+    // 使用 fetch 直接调用 Supabase REST API
+    const url = `${process.env.COZE_SUPABASE_URL}/rest/v1/volume_estimates?id=eq.${id}`;
+    const response = await fetch(url, {
+      method: 'DELETE',
+      headers: {
+        'apikey': process.env.COZE_SUPABASE_ANON_KEY || '',
+        'Authorization': `Bearer ${process.env.COZE_SUPABASE_SERVICE_ROLE_KEY || ''}`
+      }
+    });
+    if (!response.ok) {
+      const data = await response.json();
+      throw new Error(`删除失败: ${data.message || response.statusText}`);
+    }
   },
 
   async getByDateAndWarehouse(collectDate: string, warehouse: string) {

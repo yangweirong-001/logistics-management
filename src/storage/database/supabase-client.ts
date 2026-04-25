@@ -100,19 +100,6 @@ function getSupabaseCredentials(): SupabaseCredentials {
   return { url, anonKey };
 }
 
-// 获取 Service Role Key
-function getServiceRoleKey(): string {
-  loadEnv();
-
-  const serviceRoleKey = process.env.COZE_SUPABASE_SERVICE_ROLE_KEY;
-
-  if (!serviceRoleKey) {
-    throw new Error('COZE_SUPABASE_SERVICE_ROLE_KEY is not set');
-  }
-
-  return serviceRoleKey;
-}
-
 function getSupabaseClient(token?: string): SupabaseClient {
   const { url, anonKey } = getSupabaseCredentials();
 
@@ -143,17 +130,4 @@ function getSupabaseClient(token?: string): SupabaseClient {
   });
 }
 
-export { loadEnv, getSupabaseCredentials, getServiceRoleKey, getSupabaseClient };
-
-// 获取使用 Service Role Key 的 Admin 客户端（绕过 RLS 和 Schema Cache）
-export function getSupabaseAdminClient(): SupabaseClient {
-  const { url } = getSupabaseCredentials();
-  const serviceRoleKey = getServiceRoleKey();
-
-  return createClient(url, serviceRoleKey, {
-    auth: {
-      autoRefreshToken: false,
-      persistSession: false,
-    },
-  });
-}
+export { loadEnv, getSupabaseCredentials, getSupabaseClient };
