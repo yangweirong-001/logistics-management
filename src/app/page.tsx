@@ -3197,6 +3197,7 @@ export default function LogisticsManagement() {
                         <TableHead className="bg-white text-center px-1 py-1" style={{ backgroundColor: '#ffffff', zIndex: 10, width: '60px' }}>仓库</TableHead>
                         <TableHead className="bg-white text-center px-1 py-1" style={{ backgroundColor: '#ffffff', zIndex: 10, width: '70px' }}>大包数</TableHead>
                         <TableHead className="bg-white text-center px-1 py-1" style={{ backgroundColor: '#ffffff', zIndex: 10, width: '70px' }}>重量</TableHead>
+                        <TableHead className="bg-white text-center px-1 py-1" style={{ backgroundColor: '#ffffff', zIndex: 10, width: '80px' }}>实际出货</TableHead>
                         <TableHead className="bg-white text-center px-1 py-1" style={{ backgroundColor: '#ffffff', zIndex: 10, width: '80px' }}>总方数</TableHead>
                         <TableHead className="bg-white text-center px-1 py-1" style={{ backgroundColor: '#ffffff', zIndex: 10, width: '80px' }}>关东总</TableHead>
                         <TableHead className="bg-white text-center px-1 py-1" style={{ backgroundColor: '#ffffff', zIndex: 10, width: '80px' }}>关西总</TableHead>
@@ -3217,6 +3218,7 @@ export default function LogisticsManagement() {
                           <TableCell className="text-center px-1 py-1">{record.warehouse}</TableCell>
                           <TableCell className="text-center px-1 py-1">{record.package_count}</TableCell>
                           <TableCell className="text-center px-1 py-1">{record.weight ? truncateToDecimals(record.weight, 2) : '0.00'}</TableCell>
+                          <TableCell className="text-center px-1 py-1">{record.actual_total_volume ? truncateToDecimals(record.actual_total_volume, 4) : '-'}</TableCell>
                           <TableCell className="text-center px-1 py-1">{(record.total_volume || 0).toFixed(3)}</TableCell>
                           <TableCell className="text-center px-1 py-1">{(record.kanto_total || 0).toFixed(3)}</TableCell>
                           <TableCell className="text-center px-1 py-1">{(record.kansai_total || 0).toFixed(3)}</TableCell>
