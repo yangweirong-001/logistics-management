@@ -1936,12 +1936,58 @@ export default function LogisticsManagement() {
         return;
       }
 
-      // 转换数据格式
+      // 转换数据格式并计算
       const estimates = jsonData.map((row) => {
         const collectDate = parseExcelDate(row['揽收日期'] || row['collect_date'] || '');
         const warehouse = String(row['仓库'] || row['warehouse'] || '').trim();
         const packageCount = parseInt(String(row['揽收大包数'] || row['package_count'] || '0')) || 0;
         const weight = parseFloat(String(row['重量'] || row['weight'] || '0')) || 0;
+
+        // 根据区域配置计算方数
+        const areaConfig = areaConfigs.find(a => a.warehouse === warehouse);
+        let totalVolume = 0;
+        let kantoTotal = 0;
+        let kansaiTotal = 0;
+        let kantoNormal = 0;
+        let kantoSpecial = 0;
+        let kansaiNormal = 0;
+        let kansaiSpecial = 0;
+        let airVolume = 0;
+        let seaAirVolume = 0;
+
+        if (areaConfig && packageCount > 0) {
+          const packageVolume = parseFloat(areaConfig.package_volume);
+          totalVolume = packageVolume * packageCount;
+
+          const kantoRatio = parseFloat(areaConfig.kanto_ratio) / 100;
+          const kansaiRatio = parseFloat(areaConfig.kansai_ratio) / 100;
+          const kantoNormalRatio = parseFloat(areaConfig.kanto_normal_ratio) / 100;
+          const kantoSpecialRatio = parseFloat(areaConfig.kanto_special_ratio) / 100;
+          const kansaiNormalRatio = parseFloat(areaConfig.kansai_normal_ratio) / 100;
+          const kansaiSpecialRatio = parseFloat(areaConfig.kansai_special_ratio) / 100;
+
+          kantoTotal = totalVolume * kantoRatio;
+          kansaiTotal = totalVolume * kansaiRatio;
+          kantoNormal = kantoTotal * kantoNormalRatio;
+          kantoSpecial = kantoTotal * kantoSpecialRatio;
+          kansaiNormal = kansaiTotal * kansaiNormalRatio;
+          kansaiSpecial = kansaiTotal * kansaiSpecialRatio;
+
+          // 根据航班配置区分空运/海空
+          const weekday = collectDate ? getWeekday(collectDate) : '';
+          const flightConfig = flightConfigs.find(f => f.warehouse === warehouse && f.weekday === weekday);
+
+          if (flightConfig) {
+            if (flightConfig.kanto_normal === '空运') airVolume += kantoNormal;
+            else if (flightConfig.kanto_normal === '海空') seaAirVolume += kantoNormal;
+            if (flightConfig.kanto_special === '空运') airVolume += kantoSpecial;
+            else if (flightConfig.kanto_special === '海空') seaAirVolume += kantoSpecial;
+            if (flightConfig.kansai_normal === '空运') airVolume += kansaiNormal;
+            else if (flightConfig.kansai_normal === '海空') seaAirVolume += kansaiNormal;
+            if (flightConfig.kansai_special === '空运') airVolume += kansaiSpecial;
+            else if (flightConfig.kansai_special === '海空') seaAirVolume += kansaiSpecial;
+          }
+        }
 
         return {
           collect_date: collectDate,
@@ -1949,6 +1995,15 @@ export default function LogisticsManagement() {
           warehouse,
           package_count: packageCount,
           weight: weight || null,
+          total_volume: totalVolume > 0 ? totalVolume.toFixed(3) : null,
+          kanto_total: kantoTotal > 0 ? kantoTotal.toFixed(3) : null,
+          kansai_total: kansaiTotal > 0 ? kansaiTotal.toFixed(3) : null,
+          kanto_normal: kantoNormal > 0 ? kantoNormal.toFixed(3) : null,
+          kanto_special: kantoSpecial > 0 ? kantoSpecial.toFixed(3) : null,
+          kansai_normal: kansaiNormal > 0 ? kansaiNormal.toFixed(3) : null,
+          kansai_special: kansaiSpecial > 0 ? kansaiSpecial.toFixed(3) : null,
+          air_volume: airVolume > 0 ? airVolume.toFixed(3) : null,
+          sea_air_volume: seaAirVolume > 0 ? seaAirVolume.toFixed(3) : null,
         };
       }).filter(r => r.collect_date && r.warehouse && r.package_count > 0);
 
