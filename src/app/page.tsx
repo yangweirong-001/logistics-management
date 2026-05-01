@@ -2073,8 +2073,17 @@ export default function LogisticsManagement() {
           ? isCompleteRaw.trim() === '是' ? '是' : '否'
           : '否';
 
-        // 根据区域配置计算方数
-        const areaConfig = areaConfigs.find(a => a.warehouse === warehouse);
+        // 根据区域配置计算方数（支持模糊匹配）
+        let matchedWarehouse = warehouse;
+        let areaConfig = areaConfigs.find(a => a.warehouse === warehouse);
+        if (!areaConfig) {
+          // 尝试模糊匹配（去掉"仓"字）
+          const normalizedWarehouse = warehouse.replace(/仓$/, '');
+          areaConfig = areaConfigs.find(a => a.warehouse === normalizedWarehouse);
+          if (areaConfig) {
+            matchedWarehouse = areaConfig.warehouse;
+          }
+        }
         let totalVolume = 0;
         let kantoTotal = 0;
         let kansaiTotal = 0;
@@ -2105,7 +2114,7 @@ export default function LogisticsManagement() {
 
           // 根据航班配置区分空运/海空
           const weekday = collectDate ? getWeekday(collectDate) : '';
-          const flightConfig = flightConfigs.find(f => f.warehouse === warehouse && f.weekday === weekday);
+          const flightConfig = flightConfigs.find(f => f.warehouse === matchedWarehouse && f.weekday === weekday);
 
           if (flightConfig) {
             if (flightConfig.kanto_normal === '空运') airVolume += kantoNormal;
