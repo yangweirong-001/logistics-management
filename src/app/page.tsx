@@ -876,22 +876,67 @@ export default function LogisticsManagement() {
     return (
       <div className="logic-flow-doc">
         <h1>物流管理系统 - 模块逻辑流程文档</h1>
-        <p><strong>版本：</strong>v1.0 | <strong>更新日期：</strong>2026-04-06</p>
+        <p><strong>版本：</strong>v2.0 | <strong>更新日期：</strong>2026-05-01</p>
         
         <h2>文档说明</h2>
         <p>本文档说明各个模块之间的数据流和计算逻辑，帮助理解系统运作方式。</p>
         
-        <h2>1. 方数预估模块逻辑</h2>
+        <h2>1. 字段规范说明</h2>
         
-        <h3>1.1 输入数据</h3>
+        <h3>1.1 小数位数规范</h3>
+        <table style={{ width: '100%', borderCollapse: 'collapse', marginBottom: '20px' }}>
+          <thead>
+            <tr style={{ background: '#e5e7eb' }}>
+              <th style={{ padding: '8px', border: '1px solid #d1d5db' }}>模块/字段</th>
+              <th style={{ padding: '8px', border: '1px solid #d1d5db' }}>字段名</th>
+              <th style={{ padding: '8px', border: '1px solid #d1d5db' }}>小数位数</th>
+              <th style={{ padding: '8px', border: '1px solid #d1d5db' }}>说明</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td style={{ padding: '8px', border: '1px solid #d1d5db' }}>区域参数配置</td>
+              <td style={{ padding: '8px', border: '1px solid #d1d5db' }}>大包预估体积</td>
+              <td style={{ padding: '8px', border: '1px solid #d1d5db' }}>12位</td>
+              <td style={{ padding: '8px', border: '1px solid #d1d5db' }}>不四舍五入</td>
+            </tr>
+            <tr>
+              <td style={{ padding: '8px', border: '1px solid #d1d5db' }} rowSpan={3}>方数预估</td>
+              <td style={{ padding: '8px', border: '1px solid #d1d5db' }}>计算结果</td>
+              <td style={{ padding: '8px', border: '1px solid #d1d5db' }}>3位</td>
+              <td style={{ padding: '8px', border: '1px solid #d1d5db' }}>不四舍五入</td>
+            </tr>
+            <tr>
+              <td style={{ padding: '8px', border: '1px solid #d1d5db' }}>重量(kg)</td>
+              <td style={{ padding: '8px', border: '1px solid #d1d5db' }}>2位</td>
+              <td style={{ padding: '8px', border: '1px solid #d1d5db' }}>截断保留</td>
+            </tr>
+            <tr>
+              <td style={{ padding: '8px', border: '1px solid #d1d5db' }}>实际出货总方数</td>
+              <td style={{ padding: '8px', border: '1px solid #d1d5db' }}>4位</td>
+              <td style={{ padding: '8px', border: '1px solid #d1d5db' }}>不四舍五入</td>
+            </tr>
+            <tr>
+              <td style={{ padding: '8px', border: '1px solid #d1d5db' }}>欠方余方查询</td>
+              <td style={{ padding: '8px', border: '1px solid #d1d5db' }}>差异</td>
+              <td style={{ padding: '8px', border: '1px solid #d1d5db' }}>3位</td>
+              <td style={{ padding: '8px', border: '1px solid #d1d5db' }}>不四舍五入</td>
+            </tr>
+          </tbody>
+        </table>
+        
+        <h2>2. 方数预估模块逻辑</h2>
+        
+        <h3>2.1 输入数据</h3>
         <pre><code>用户输入：
 ├── 揽收日期
 ├── 仓库（东莞/加工区/全部）
 ├── 揽收大包数
-├── 重量
+├── 重量(kg)
+├── 实际出货总方数（可选）
 └── 货物袋数是否齐全</code></pre>
         
-        <h3>1.2 计算流程</h3>
+        <h3>2.2 计算流程</h3>
         
         <div className="flow-step">
           <div className="flow-step-title">第一步：获取区域参数配置</div>
@@ -952,12 +997,88 @@ export default function LogisticsManagement() {
           <div className="formula"><strong>未配置方数</strong> = 总方数 - 实际配置空运方数 - 实际配置海空方数</div>
         </div>
         
-        <h3>1.3 仓库为"全部"时的特殊逻辑</h3>
+        <h3>2.4 Excel导入功能</h3>
+        <p>方数预估支持通过Excel批量导入数据，导入后自动计算各方数。</p>
+        <pre><code>Excel表头格式：
+├── 揽收日期（必填，格式：YYYY-MM-DD）
+├── 仓库（必填，如：东莞、加工区）
+├── 揽收大包数（必填）
+└── 重量（可选）</code></pre>
+        <p><strong>说明：</strong></p>
+        <ul>
+          <li>系统自动根据揽收日期计算星期</li>
+          <li>支持 .xlsx、.xls、.csv 格式</li>
+          <li>自动判断是新增还是更新记录（根据揽收日期+仓库）</li>
+          <li>导入后自动计算所有方数</li>
+        </ul>
+        
+        <h3>2.5 批量删除功能</h3>
+        <p>最近保存的记录支持批量删除：</p>
+        <ol>
+          <li>勾选要删除的记录（可全选）</li>
+          <li>点击"批量删除"按钮</li>
+          <li>确认删除操作</li>
+        </ol>
+        
+        <h3>2.6 自动加载功能</h3>
+        <p>根据揽收日期和仓库自动加载已保存的记录：</p>
+        <ul>
+          <li>切换日期或仓库时，自动清空表单数据</li>
+          <li>如有已保存记录，自动填充表单</li>
+        </ul>
+        
+        <h3>2.7 仓库为"全部"时的特殊逻辑</h3>
         <p>当用户选择仓库 = "全部"时，系统会汇总所有仓库的数据。</p>
         
-        <h2>2. 主单发放模块逻辑</h2>
+        <h2>3. 实际配置明细模块</h2>
+        <p>展示各仓库的实际配置情况，帮助了解打货进度。</p>
         
-        <h3>2.1 自动计算流程</h3>
+        <h3>3.1 筛选条件</h3>
+        <pre><code>├── 揽收日期
+├── 星期（自动从揽收日期计算）
+├── 仓库（东莞/加工区/全部）
+├── 揽收大包数
+└── 重量</code></pre>
+        
+        <h3>3.2 配置明细展示</h3>
+        <p>分为空运配置明细和海空配置明细两部分：</p>
+        <ul>
+          <li>空运配置：靛蓝色系背景（indigo-50）</li>
+          <li>海空配置：翠绿色系背景（emerald-50）</li>
+        </ul>
+        
+        <h3>3.3 计算逻辑</h3>
+        <div className="flow-step">
+          <div className="flow-step-title">汇总打货上限</div>
+          <ul>
+            <li>优先级1：如果主单有打货上限（max_volume），汇总打货上限</li>
+            <li>优先级2：如果打货上限为空，汇总实际方数（actual_volume）</li>
+          </ul>
+        </div>
+        
+        <h2>4. 航班异常情况记录模块</h2>
+        <p>记录航班异常信息，支持编辑和导出功能。</p>
+        
+        <h3>4.1 主要功能</h3>
+        <ul>
+          <li>查看所有航班异常记录</li>
+          <li>新增异常记录</li>
+          <li>编辑异常记录（异常原因、备注）</li>
+          <li>导出Excel（CSV格式）</li>
+        </ul>
+        
+        <h3>4.2 导出字段</h3>
+        <pre><code>导出内容包括：
+├── 航班号
+├── 航线（始发-中转-目的）
+├── 异常类型
+├── 异常日期
+├── 异常原因
+└── 备注</code></pre>
+        
+        <h2>5. 主单发放模块逻辑</h2>
+        
+        <h3>5.1 自动计算流程</h3>
         
         <div className="flow-step">
           <div className="flow-step-title">第一步：自动计算类别</div>
@@ -994,9 +1115,9 @@ export default function LogisticsManagement() {
           </ul>
         </div>
         
-        <h2>3. 欠方余方查询逻辑</h2>
+        <h2>6. 欠方余方查询逻辑</h2>
         
-        <h3>3.1 计算流程</h3>
+        <h3>6.1 计算流程</h3>
         
         <div className="flow-step">
           <div className="flow-step-title">第一步：查找方数预估</div>
@@ -1018,7 +1139,7 @@ export default function LogisticsManagement() {
           <div className="formula"><strong>余方</strong> = 差异 {'<'} 0 ? Math.abs(差异) : 0</div>
         </div>
         
-        <h2>4. 模块间数据流关系</h2>
+        <h2>7. 模块间数据流关系</h2>
         <pre><code>区域参数配置 ──提供──→ 方数预估（大包预估体积、占比）
 航班配置 ──提供──→ 方数预估（路由类型）
 目的港配置 ──提供──→ 主单发放（dest 映射到 port）
@@ -1028,26 +1149,26 @@ export default function LogisticsManagement() {
 主单发放 ←读取→ 区域参数配置、目的港配置、航空路由配置、方数预估
 欠方余方查询 ←读取→ 方数预估、主单发放</code></pre>
         
-        <h2>5. 关键计算公式汇总</h2>
+        <h2>8. 关键计算公式汇总</h2>
         
-        <h3>5.1 方数预估</h3>
+        <h3>8.1 方数预估</h3>
         <div className="formula"><strong>总方数</strong> = 揽收大包数 × 大包预估体积</div>
         <div className="formula"><strong>关东总方数</strong> = 总方数 × 关东目的港占比 / 100</div>
         <div className="formula"><strong>关西总方数</strong> = 总方数 × 关西目的港占比 / 100</div>
         <div className="formula"><strong>未配置方数</strong> = 总方数 - 空运主单已配置方数 - 海空主单已配置方数</div>
         
-        <h3>5.2 主单发放</h3>
+        <h3>8.2 主单发放</h3>
         <div className="formula"><strong>类别</strong> = 口岸 + 货物属性</div>
         <div className="formula"><strong>打货上限件数</strong> = 打货上限 / 单件体积（向下取整）</div>
         
-        <h3>5.3 欠方余方查询</h3>
+        <h3>8.3 欠方余方查询</h3>
         <div className="formula"><strong>差异</strong> = 预估方数 - 打货上限</div>
         <div className="formula"><strong>欠方</strong> = 差异 {'>'} 0 ? 差异 : 0</div>
         <div className="formula"><strong>余方</strong> = 差异 {'<'} 0 ? Math.abs(差异) : 0</div>
         
-        <h2>6. 常见场景示例</h2>
+        <h2>9. 常见场景示例</h2>
         
-        <h3>6.1 场景一：新的一天开始，如何进行方数预估？</h3>
+        <h3>9.1 场景一：新的一天开始，如何进行方数预估？</h3>
         <ol>
           <li>进入"方数预估"模块</li>
           <li>输入揽收日期、仓库、揽收大包数、重量、货物袋数是否齐全</li>
@@ -1055,7 +1176,7 @@ export default function LogisticsManagement() {
           <li>点击"保存数据"按钮</li>
         </ol>
         
-        <h3>6.2 场景二：如何创建一个新主单？</h3>
+        <h3>9.2 场景二：如何创建一个新主单？</h3>
         <ol>
           <li>进入"主单发放"模块</li>
           <li>填写基础信息（系统自动计算类别和预估方数）</li>
@@ -1065,7 +1186,7 @@ export default function LogisticsManagement() {
           <li>点击"保存"按钮</li>
         </ol>
         
-        <h3>6.3 场景三：如何查看欠方余方情况？</h3>
+        <h3>9.3 场景三：如何查看欠方余方情况？</h3>
         <ol>
           <li>进入"欠方余方查询"模块</li>
           <li>输入揽收日期和筛选条件</li>
@@ -1073,15 +1194,15 @@ export default function LogisticsManagement() {
           <li>系统自动计算欠方/余方结果</li>
         </ol>
         
-        <h2>7. 数据完整性检查</h2>
+        <h2>10. 数据完整性检查</h2>
         
-        <h3>7.1 方数预估前检查</h3>
+        <h3>10.1 方数预估前检查</h3>
         <ul>
           <li>区域参数配置是否完整？</li>
           <li>航班配置是否完整？</li>
         </ul>
         
-        <h3>7.2 主单发放前检查</h3>
+        <h3>10.2 主单发放前检查</h3>
         <ul>
           <li>方数预估是否已保存？</li>
           <li>目的港配置是否完整？</li>
