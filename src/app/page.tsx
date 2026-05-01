@@ -2067,11 +2067,25 @@ export default function LogisticsManagement() {
         const warehouse = String(row['仓库'] || row['warehouse'] || '').trim();
         const packageCount = parseInt(String(row['揽收大包数'] || row['package_count'] || '0')) || 0;
         const weight = parseFloat(String(row['重量'] || row['weight'] || '0')) || 0;
-        // 解析袋数是否齐全字段
-        const isCompleteRaw = row['袋数是否齐全'] || row['is_complete'] || '';
-        const isComplete = typeof isCompleteRaw === 'string' 
-          ? isCompleteRaw.trim() === '是' ? '是' : '否'
-          : '否';
+        // 解析袋数是否齐全字段（处理列名可能存在的空格）
+        const findColumn = (row: Record<string, unknown>, ...keys: string[]): string => {
+          for (const key of keys) {
+            const value = row[key];
+            if (value !== undefined && value !== null && String(value).trim() !== '') {
+              return String(value).trim();
+            }
+            // 也检查带空格变体的列名
+            for (const rowKey of Object.keys(row)) {
+              if (rowKey.trim() === key.trim()) {
+                const v = String(row[rowKey]).trim();
+                if (v !== '') return v;
+              }
+            }
+          }
+          return '';
+        };
+        const isCompleteRaw = findColumn(row, '袋数是否齐全', 'is_complete', '货物袋数是否齐全');
+        const isComplete = isCompleteRaw === '是' ? '是' : '否';
 
         // 根据区域配置计算方数（支持模糊匹配）
         let matchedWarehouse = warehouse;
