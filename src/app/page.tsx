@@ -2033,7 +2033,18 @@ export default function LogisticsManagement() {
 
   // 根据揽收日期和仓库自动加载记录
   const loadVolumeEstimateByDateAndWarehouse = (collectDate: string, warehouse: string) => {
-    if (!collectDate || !warehouse) return;
+    // 如果日期或仓库为空，清空表单
+    if (!collectDate || !warehouse) {
+      setEditingVolume(null);
+      setVolumeForm(prev => ({
+        ...prev,
+        package_count: 0,
+        weight: 0,
+        actual_total_volume: 0,
+      }));
+      setVolumeResult(null);
+      return;
+    }
 
     if (warehouse === '全部') {
       // 汇总所有仓库的数据
@@ -2088,6 +2099,17 @@ export default function LogisticsManagement() {
           actual_total_volume: record.actual_total_volume || 0,
           is_complete: record.is_complete || '是',
         });
+      } else {
+        // 没找到记录，清空表单
+        setEditingVolume(null);
+        setVolumeForm(prev => ({
+          ...prev,
+          package_count: 0,
+          weight: 0,
+          actual_total_volume: 0,
+          is_complete: '是',
+        }));
+        setVolumeResult(null);
       }
     }
   };
