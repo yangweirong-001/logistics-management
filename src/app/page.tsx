@@ -1004,7 +1004,7 @@ export default function LogisticsManagement() {
 ├── 仓库（必填，如：东莞、加工区）
 ├── 揽收大包数（必填）
 ├── 重量（可选）
-└── 方数是否齐全（可选，填：是 或 否）</code></pre>
+└── 袋数是否齐全（可选，填：是 或 否）</code></pre>
         <p><strong>说明：</strong></p>
         <ul>
           <li>系统自动根据揽收日期计算星期</li>
@@ -2067,8 +2067,8 @@ export default function LogisticsManagement() {
         const warehouse = String(row['仓库'] || row['warehouse'] || '').trim();
         const packageCount = parseInt(String(row['揽收大包数'] || row['package_count'] || '0')) || 0;
         const weight = parseFloat(String(row['重量'] || row['weight'] || '0')) || 0;
-        // 解析方数是否齐全字段
-        const isCompleteRaw = row['方数是否齐全'] || row['is_complete'] || '';
+        // 解析袋数是否齐全字段
+        const isCompleteRaw = row['袋数是否齐全'] || row['is_complete'] || '';
         const isComplete = typeof isCompleteRaw === 'string' 
           ? isCompleteRaw.trim() === '是' ? '是' : '否'
           : '否';
