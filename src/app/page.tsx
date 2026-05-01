@@ -2850,8 +2850,12 @@ export default function LogisticsManagement() {
       if (volumeFilterStartDate && record.collect_date < volumeFilterStartDate) return false;
       if (volumeFilterEndDate && record.collect_date > volumeFilterEndDate) return false;
 
-      // 仓库筛选
-      if (volumeFilterWarehouse !== '全部' && record.warehouse !== volumeFilterWarehouse) return false;
+      // 仓库筛选（支持"东莞仓"匹配"东莞"）
+      if (volumeFilterWarehouse !== '全部') {
+        const normalizedRecord = record.warehouse.replace(/仓$/, '');
+        const normalizedFilter = volumeFilterWarehouse.replace(/仓$/, '');
+        if (normalizedRecord !== normalizedFilter) return false;
+      }
 
       return true;
     });
