@@ -1003,7 +1003,8 @@ export default function LogisticsManagement() {
 ├── 揽收日期（必填，格式：YYYY-MM-DD）
 ├── 仓库（必填，如：东莞、加工区）
 ├── 揽收大包数（必填）
-└── 重量（可选）</code></pre>
+├── 重量（可选）
+└── 方数是否齐全（可选，填：是 或 否）</code></pre>
         <p><strong>说明：</strong></p>
         <ul>
           <li>系统自动根据揽收日期计算星期</li>
@@ -2066,6 +2067,11 @@ export default function LogisticsManagement() {
         const warehouse = String(row['仓库'] || row['warehouse'] || '').trim();
         const packageCount = parseInt(String(row['揽收大包数'] || row['package_count'] || '0')) || 0;
         const weight = parseFloat(String(row['重量'] || row['weight'] || '0')) || 0;
+        // 解析方数是否齐全字段
+        const isCompleteRaw = row['方数是否齐全'] || row['is_complete'] || '';
+        const isComplete = typeof isCompleteRaw === 'string' 
+          ? isCompleteRaw.trim() === '是' ? '是' : '否'
+          : '否';
 
         // 根据区域配置计算方数
         const areaConfig = areaConfigs.find(a => a.warehouse === warehouse);
@@ -2119,6 +2125,7 @@ export default function LogisticsManagement() {
           warehouse,
           package_count: packageCount,
           weight: weight || null,
+          is_complete: isComplete,
           total_volume: totalVolume > 0 ? totalVolume.toFixed(3) : null,
           kanto_total: kantoTotal > 0 ? kantoTotal.toFixed(3) : null,
           kansai_total: kansaiTotal > 0 ? kansaiTotal.toFixed(3) : null,
