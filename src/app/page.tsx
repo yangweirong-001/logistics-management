@@ -4000,13 +4000,13 @@ export default function LogisticsManagement() {
               </CardContent>
             </Card>
 
-            {/* 查询结果区域 - 固定在筛选器下方 */}
-            <div style={{ position: 'sticky', top: saving ? '290px' : '250px', zIndex: 40, backgroundColor: 'white' }}>
-              <div className="flex flex-row items-center justify-between px-6 py-4 border-b bg-white rounded-t-lg">
+            {/* 查询结果区域 - 使用固定高度容器 */}
+            <div className="mt-4">
+              <div className="flex flex-row items-center justify-between px-6 py-4 border bg-white rounded-t-lg">
                 <span className="font-semibold">查询结果</span>
                 <span className="text-sm text-gray-500">共 {mainOrders.length} 条记录</span>
               </div>
-              <div style={{ overflow: 'auto', maxHeight: 'calc(100vh - 500px)', position: 'relative' }}>
+              <div style={{ overflow: 'auto', maxHeight: 'calc(100vh - 480px)' }}>
                 <table style={{ borderCollapse: 'separate', borderSpacing: 0, minWidth: '2505px' }}>
                   <thead>
                     <tr>
