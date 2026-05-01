@@ -439,6 +439,9 @@ export default function LogisticsManagement() {
     is_complete: '是',
   });
 
+  // 方数预估选中记录状态
+  const [selectedVolumeIds, setSelectedVolumeIds] = useState<Set<number>>(new Set());
+
   // 实际配置明细表单
   const [configDetailForm, setConfigDetailForm] = useState({
     collect_date: '',
@@ -2340,6 +2343,53 @@ export default function LogisticsManagement() {
     }
   };
 
+  // 批量删除方数预估记录
+  const batchDeleteVolumeEstimates = async () => {
+    if (selectedVolumeIds.size === 0) {
+      alert('请先选择要删除的记录');
+      return;
+    }
+    if (confirm(`确定删除选中的 ${selectedVolumeIds.size} 条记录？`)) {
+      const ids = Array.from(selectedVolumeIds);
+      let deletedCount = 0;
+      let failedCount = 0;
+      
+      for (const id of ids) {
+        const response = await fetch(`/api/volume-estimate/${id}`, { method: 'DELETE' });
+        const result = await response.json();
+        if (result.success) {
+          deletedCount++;
+        } else {
+          failedCount++;
+        }
+      }
+      
+      setSelectedVolumeIds(new Set());
+      loadVolumeEstimates();
+      alert(`删除完成：成功 ${deletedCount} 条，失败 ${failedCount} 条`);
+    }
+  };
+
+  // 全选/取消全选
+  const toggleSelectAllVolume = (estimates: VolumeEstimate[]) => {
+    if (selectedVolumeIds.size === estimates.length) {
+      setSelectedVolumeIds(new Set());
+    } else {
+      setSelectedVolumeIds(new Set(estimates.map(e => e.id)));
+    }
+  };
+
+  // 选择/取消选择单条
+  const toggleSelectVolume = (id: number) => {
+    const newSet = new Set(selectedVolumeIds);
+    if (newSet.has(id)) {
+      newSet.delete(id);
+    } else {
+      newSet.add(id);
+    }
+    setSelectedVolumeIds(newSet);
+  };
+
   // 获取主单的有效方数（优先级：实际方数 > 打货上限 > 预估方数）
   const getEffectiveVolume = (order: MainOrder): number => {
     // 1. 优先使用实际方数
@@ -3393,9 +3443,23 @@ export default function LogisticsManagement() {
                 </div>
 
                 <div className="max-h-[300px] overflow-y-auto relative">
+                  {selectedVolumeIds.size > 0 && (
+                    <div className="mb-3">
+                      <Button onClick={batchDeleteVolumeEstimates} variant="destructive" size="sm">
+                        批量删除 ({selectedVolumeIds.size})
+                      </Button>
+                    </div>
+                  )}
                   <Table style={{ tableLayout: 'fixed', minWidth: '1400px' }}>
                     <TableHeader className="sticky top-0 bg-white z-50" style={{ position: 'sticky', top: 0, zIndex: 50, backgroundColor: 'white' }}>
                       <TableRow>
+                        <TableHead className="bg-white text-center px-1 py-1" style={{ backgroundColor: '#ffffff', zIndex: 10, width: '40px' }}>
+                          <input
+                            type="checkbox"
+                            checked={getFilteredVolumeEstimates().length > 0 && selectedVolumeIds.size === getFilteredVolumeEstimates().slice(0, 10).length}
+                            onChange={() => toggleSelectAllVolume(getFilteredVolumeEstimates().slice(0, 10))}
+                          />
+                        </TableHead>
                         <TableHead className="bg-white text-center px-1 py-1" style={{ backgroundColor: '#ffffff', zIndex: 10, width: '90px' }}>揽收日期</TableHead>
                         <TableHead className="bg-white text-center px-1 py-1" style={{ backgroundColor: '#ffffff', zIndex: 10, width: '60px' }}>仓库</TableHead>
                         <TableHead className="bg-white text-center px-1 py-1" style={{ backgroundColor: '#ffffff', zIndex: 10, width: '70px' }}>大包数</TableHead>
@@ -3411,12 +3475,19 @@ export default function LogisticsManagement() {
                         <TableHead className="bg-white text-center px-1 py-1" style={{ backgroundColor: '#ffffff', zIndex: 10, width: '70px' }}>空运</TableHead>
                         <TableHead className="bg-white text-center px-1 py-1" style={{ backgroundColor: '#ffffff', zIndex: 10, width: '70px' }}>海空</TableHead>
                         <TableHead className="bg-white text-center px-1 py-1" style={{ backgroundColor: '#ffffff', zIndex: 10, width: '110px' }}>货物袋数齐全</TableHead>
-                        <TableHead className="bg-white text-center px-1 py-1" style={{ backgroundColor: '#ffffff', zIndex: 10, width: '120px' }}>操作</TableHead>
+                        <TableHead className="bg-white text-center px-1 py-1" style={{ backgroundColor: '#ffffff', zIndex: 10, width: '80px' }}>操作</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
                       {getFilteredVolumeEstimates().slice(0, 10).map(record => (
                         <TableRow key={record.id}>
+                          <TableCell className="text-center px-1 py-1">
+                            <input
+                              type="checkbox"
+                              checked={selectedVolumeIds.has(record.id)}
+                              onChange={() => toggleSelectVolume(record.id)}
+                            />
+                          </TableCell>
                           <TableCell className="text-center px-1 py-1">{record.collect_date}</TableCell>
                           <TableCell className="text-center px-1 py-1">{record.warehouse}</TableCell>
                           <TableCell className="text-center px-1 py-1">{record.package_count}</TableCell>
@@ -3433,7 +3504,7 @@ export default function LogisticsManagement() {
                           <TableCell className="text-center px-1 py-1">{(record.sea_air_volume || 0).toFixed(3)}</TableCell>
                           <TableCell className="text-center px-1 py-1">{record.is_complete || '-'}</TableCell>
                           <TableCell className="text-center px-1 py-1">
-                            <Button size="sm" variant="outline" className="mr-2"
+                            <Button size="sm" variant="outline" className="mr-1"
                               onClick={() => editVolumeEstimate(record)}>
                               编辑
                             </Button>
@@ -3446,7 +3517,7 @@ export default function LogisticsManagement() {
                       ))}
                       {getFilteredVolumeEstimates().length === 0 && (
                         <TableRow>
-                          <TableCell colSpan={15} className="text-center text-gray-500">暂无记录</TableCell>
+                          <TableCell colSpan={17} className="text-center text-gray-500">暂无记录</TableCell>
                         </TableRow>
                       )}
                     </TableBody>
