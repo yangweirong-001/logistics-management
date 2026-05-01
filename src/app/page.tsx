@@ -1891,6 +1891,119 @@ export default function LogisticsManagement() {
       }
     }
   };
+
+  // 处理方数预估 Excel 导入
+  const handleVolumeEstimateImport = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // 解析 Excel 日期格式
+    const parseExcelDate = (value: unknown): string => {
+      if (value === null || value === undefined || value === '') return '';
+      
+      // 如果已经是字符串（YYYY-MM-DD 格式），直接返回
+      if (typeof value === 'string') {
+        const trimmed = value.trim();
+        // 尝试解析 YYYY/MM/DD 或 YYYY-MM-DD 格式
+        if (trimmed.match(/^\d{4}[-/]\d{1,2}[-/]\d{1,2}/)) {
+          return trimmed.replace(/\//g, '-');
+        }
+        return trimmed;
+      }
+      
+      // 如果是数字（Excel 日期序列号），转换为日期字符串
+      if (typeof value === 'number') {
+        const date = new Date(Math.round((value - 25569) * 86400 * 1000));
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+      }
+      
+      return String(value);
+    };
+
+    try {
+      setSaving(true);
+      const data = await file.arrayBuffer();
+      const workbook = XLSX.read(data);
+      const sheetName = workbook.SheetNames[0];
+      const worksheet = workbook.Sheets[sheetName];
+      const jsonData = XLSX.utils.sheet_to_json(worksheet, { raw: false }) as Record<string, unknown>[];
+
+      if (jsonData.length === 0) {
+        alert('Excel 文件为空或格式不正确');
+        return;
+      }
+
+      // 转换数据格式
+      const estimates = jsonData.map((row) => {
+        const collectDate = parseExcelDate(row['揽收日期'] || row['collect_date'] || '');
+        const warehouse = String(row['仓库'] || row['warehouse'] || '').trim();
+        const packageCount = parseInt(String(row['揽收大包数'] || row['package_count'] || '0')) || 0;
+        const weight = parseFloat(String(row['重量'] || row['weight'] || '0')) || 0;
+
+        return {
+          collect_date: collectDate,
+          weekday: collectDate ? getWeekday(collectDate) : '',
+          warehouse,
+          package_count: packageCount,
+          weight: weight || null,
+        };
+      }).filter(r => r.collect_date && r.warehouse && r.package_count > 0);
+
+      if (estimates.length === 0) {
+        alert('未找到有效数据，请检查 Excel 格式（需包含：揽收日期、仓库、揽收大包数）');
+        return;
+      }
+
+      // 批量保存
+      let successCount = 0;
+      let failCount = 0;
+
+      for (const estimate of estimates) {
+        try {
+          // 查找是否已存在记录
+          const existing = volumeEstimates.find(
+            e => e.collect_date === estimate.collect_date && e.warehouse === estimate.warehouse
+          );
+
+          if (existing) {
+            // 更新已有记录
+            const response = await fetch(`/api/volume-estimate/${existing.id}`, {
+              method: 'PUT',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(estimate),
+            });
+            if (response.ok) successCount++;
+            else failCount++;
+          } else {
+            // 创建新记录
+            const response = await fetch('/api/volume-estimate', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(estimate),
+            });
+            if (response.ok) successCount++;
+            else failCount++;
+          }
+        } catch {
+          failCount++;
+        }
+      }
+
+      alert(`导入完成！成功 ${successCount} 条，失败 ${failCount} 条`);
+      if (successCount > 0) {
+        loadVolumeEstimates();
+      }
+    } catch (err) {
+      alert('导入失败: ' + (err instanceof Error ? err.message : '文件解析错误'));
+    } finally {
+      setSaving(false);
+      // 重置文件输入
+      e.target.value = '';
+    }
+  };
   
   // 保存方数预估
   const saveVolumeEstimate = async () => {
@@ -2994,8 +3107,20 @@ export default function LogisticsManagement() {
         {activeTab === 'volume-estimate' && (
           <div>
             <Card className="mb-5">
-              <CardHeader>
+              <CardHeader className="flex flex-row items-center justify-between">
                 <CardTitle>方数预估</CardTitle>
+                <div className="flex gap-2">
+                  <input
+                    type="file"
+                    accept=".xlsx,.xls,.csv"
+                    id="volume-estimate-import"
+                    className="hidden"
+                    onChange={handleVolumeEstimateImport}
+                  />
+                  <Button variant="outline" onClick={() => document.getElementById('volume-estimate-import')?.click()}>
+                    Excel导入
+                  </Button>
+                </div>
               </CardHeader>
               <CardContent>
                 {/* 顶部筛选 */}
