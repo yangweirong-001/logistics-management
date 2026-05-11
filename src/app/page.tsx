@@ -2850,11 +2850,15 @@ export default function LogisticsManagement() {
       if (volumeFilterStartDate && record.collect_date < volumeFilterStartDate) return false;
       if (volumeFilterEndDate && record.collect_date > volumeFilterEndDate) return false;
 
-      // 仓库筛选（支持"东莞仓"匹配"东莞"）
+      // 仓库筛选（支持模糊匹配：东莞匹配东莞/东莞仓，加工区匹配加工区/加工区仓）
       if (volumeFilterWarehouse !== '全部') {
-        const normalizedRecord = record.warehouse.replace(/仓$/, '');
-        const normalizedFilter = volumeFilterWarehouse.replace(/仓$/, '');
-        if (normalizedRecord !== normalizedFilter) return false;
+        const recordWh = record.warehouse || '';
+        const filterWh = volumeFilterWarehouse || '';
+        // 检查记录仓库是否以筛选仓库开头，或者去掉"仓"后匹配
+        const match = recordWh.startsWith(filterWh) || 
+                      recordWh.replace(/仓$/, '') === filterWh ||
+                      filterWh.replace(/仓$/, '') === recordWh;
+        if (!match) return false;
       }
 
       return true;
